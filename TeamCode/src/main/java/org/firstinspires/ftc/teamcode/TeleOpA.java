@@ -11,12 +11,13 @@ public class TeleOpA extends LinearOpMode {
 
     Servo servo;
     double position = servo.getPosition();
+    double servoOpenPosition = 90;
 
     @Override
     public void runOpMode() {
         //turn servo 90
         servo = hardwareMap.get(Servo.class, "servo");
-        servo.setPosition(position);
+        servo.setPosition(servoOpenPosition);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
