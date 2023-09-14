@@ -9,8 +9,15 @@ public class AutoA extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        telemetry.addData("Running", "AutoA");
+        telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            telemetry.addData("Status", "Running");
+            telemetry.update();
+        }
 
     }
 
