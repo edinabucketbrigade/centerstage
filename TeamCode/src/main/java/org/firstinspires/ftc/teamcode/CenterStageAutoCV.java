@@ -10,7 +10,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.jar.Attributes;
 
-@Autonomous (name = "Prop Detector", group = "Auto")
+@Autonomous
 public class CenterStageAutoCV extends LinearOpMode {
     OpenCvWebcam camera;
     @Override
