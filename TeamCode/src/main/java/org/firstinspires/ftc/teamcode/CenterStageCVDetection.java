@@ -79,12 +79,13 @@ public class CenterStageCVDetection extends OpenCvPipeline {
             telemetry.addData("Prop Location:", "Middle");
         }
         if(propLeft){
-            //prop is on right
-            location = Location.Right;
-            telemetry.addData("Prop Location:", "Right");
-        } else {
             //prop is on left
             location = Location.Left;
+            telemetry.addData("Prop Location:", "Right");
+        }
+        if(propRight) {
+            //prop is on right
+            location = Location.Right;
             telemetry.addData("Prop Location:", "Left");
         }
 

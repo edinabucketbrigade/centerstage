@@ -39,7 +39,7 @@ public class CenterStageAutoCV extends LinearOpMode {
             case Right:
                 // ...
                 break;
-            case Not_Found:
+            case Middle:
                 // ...
                 break;
         }
