@@ -17,15 +17,17 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     public enum Location{
         Left,
         Right,
-        Not_Found
+        Middle
     }
     private Location location;
     /*
     *   ROI is an abbreviation of Region of Interest.
     *   This creates a rectangle of areas in the camera where a game element may be placed
     */
-    static final Rect Left_ROI = new Rect(new Point(60,35),new Point(120,75));
-    static final Rect Right_ROI = new Rect(new Point(140,35),new Point(200,75));
+    static final Rect Left_ROI = new Rect(new Point(60,35),new Point(100,75));
+    static final Rect Right_ROI = new Rect(new Point(160,35),new Point(200,75));
+    static final Rect Middle_ROI = new Rect(new Point(110,35),new Point(150,75));
+
     public CenterStageCVDetection(Telemetry t) {
         telemetry = t;
     }
@@ -40,6 +42,8 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         //submat = submatrix - portion of original matrix
         Mat left = mat.submat(Left_ROI);
         Mat right = mat.submat(Right_ROI);
+        Mat middle = mat.submat(Middle_ROI);
+
 
         /*
         *   We can determine the percentage of white in the image by
@@ -52,22 +56,27 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         */
         double leftValue = Core.sumElems(left).val[0] / Left_ROI.area() / 255;
         double rightValue = Core.sumElems(right).val[0] / Right_ROI.area() / 255;
+        double middleValue = Core.sumElems(right).val[0] / Right_ROI.area() / 255;
 
         left.release();
         right.release();
+        middle.release();
 
         telemetry.addData("Left Raw Value:",(int) Core.sumElems(left).val[0]);
         telemetry.addData("Right Raw Value:",(int) Core.sumElems(right).val[0]);
+        telemetry.addData("Middle Raw Value:",(int) Core.sumElems(right).val[0]);
         telemetry.addData("Left Percentage:",Math.round(leftValue * 100)+"%");
         telemetry.addData("Right Percentage:",Math.round(rightValue * 100)+"%");
+        telemetry.addData("Middle Percentage:",Math.round(leftValue * 100)+"%");
 
-        boolean propLeft = leftValue > colorPercentThreshold;
-        boolean propRight = rightValue > colorPercentThreshold;
+        boolean propLeft = leftValue < colorPercentThreshold;
+        boolean propRight = rightValue < colorPercentThreshold;
+        boolean propMiddle = rightValue < colorPercentThreshold;
 
-        if(propLeft && propRight){
-            //not found
-            location = Location.Not_Found;
-            telemetry.addData("Prop Location:", "Not Found");
+        if(propMiddle){
+            //prop is on middle
+            location = Location.Middle;
+            telemetry.addData("Prop Location:", "Middle");
         }
         if(propLeft){
             //prop is on right
@@ -96,6 +105,7 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         *   on the location of the prop.
         */
         Imgproc.rectangle(mat, Left_ROI, location == Location.Left? pixelColor:propColor);
+        Imgproc.rectangle(mat, Middle_ROI, location == Location.Middle? pixelColor:propColor);
         Imgproc.rectangle(mat, Right_ROI, location == Location.Right? pixelColor:propColor);
 
         return mat;
