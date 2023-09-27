@@ -25,7 +25,7 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     *   This creates a rectangle of areas in the camera where a game element may be placed
     */
     static final Rect Left_ROI = new Rect(new Point(10,0),new Point(110,100));
-    static final Rect Right_ROI = new Rect(new Point(230,0),new Point(330,100));
+    static final Rect Right_ROI = new Rect(new Point(230,0),new Point(310,100));
     static final Rect Middle_ROI = new Rect(new Point(120,0),new Point(220,100));
 
     public CenterStageCVDetection(Telemetry t) {
@@ -34,9 +34,14 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     public double colorPercentThreshold = 0.4;
     @Override
     public Mat processFrame(Mat input) {
-        Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV_FULL);
-        Scalar lowHSV = new Scalar(209,98,63);
-        Scalar highHSV = new Scalar(198,98,98);
+        Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
+        //Scalar lowHSV = new Scalar(209,98,63);
+        //Scalar highHSV = new Scalar(198,98,98);
+        /*
+        *   Blue value
+        */
+        Scalar lowHSV = new Scalar(80,0,0);
+        Scalar highHSV = new Scalar(110,255,255);
 
         Core.inRange(mat, lowHSV, highHSV, mat);
         //submat = submatrix - portion of original matrix
