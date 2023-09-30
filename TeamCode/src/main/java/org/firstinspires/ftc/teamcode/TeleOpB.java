@@ -15,7 +15,7 @@ public class TeleOpB extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-    private DcMotor lift = null;
+    //private DcMotor lift = null;
 
     @Override
     public void runOpMode() {
@@ -25,14 +25,14 @@ public class TeleOpB extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        lift = hardwareMap.get(DcMotor.class, "lift");
+        //lift = hardwareMap.get(DcMotor.class, "lift");
 
         // Wheel reversing (test for correct directions)
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        lift.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        //lift.setDirection(DcMotor.Direction.REVERSE);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -47,7 +47,7 @@ public class TeleOpB extends LinearOpMode {
             double lateral =  gamepad1.left_stick_x;
             double yaw     =  gamepad1.right_stick_x;
             double liftPower  = gamepad1.x ? 1.0 : 0.0;
-            int liftPos  = lift.getCurrentPosition();
+            //int liftPos  = lift.getCurrentPosition();
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -61,7 +61,7 @@ public class TeleOpB extends LinearOpMode {
             max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
-            lift.setPower(liftPower);
+            //lift.setPower(liftPower);
 
             if (max > 1.0) {
                 leftFrontPower  /= max;
@@ -81,11 +81,12 @@ public class TeleOpB extends LinearOpMode {
             // Once the correct motors move in the correct direction re-comment this code.
 
             /*
-            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
+            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad reverse
             leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
-            */
+            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad reverse
+            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad reverse
+             */
+
 
 
             // Send calculated power to wheels
