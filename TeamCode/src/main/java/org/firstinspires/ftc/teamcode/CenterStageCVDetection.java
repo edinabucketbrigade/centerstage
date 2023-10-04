@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import org.checkerframework.checker.signedness.qual.Constant;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -12,6 +13,7 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class CenterStageCVDetection extends OpenCvPipeline {
+    public static final boolean DETECT_BLUE = true;
     Telemetry telemetry;
     Mat mat = new Mat();
     public enum Location{
@@ -24,9 +26,9 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     *   ROI is an abbreviation of Region of Interest.
     *   This creates a rectangle of areas in the camera where a game element may be placed
     */
-    static final Rect Left_ROI = new Rect(new Point(10,0),new Point(110,100));
-    static final Rect Right_ROI = new Rect(new Point(230,0),new Point(310,100));
-    static final Rect Middle_ROI = new Rect(new Point(120,0),new Point(220,100));
+    static final Rect Left_ROI = new Rect(new Point(10,0),new Point(105,100));
+    static final Rect Right_ROI = new Rect(new Point(20,0),new Point(310,100));
+    static final Rect Middle_ROI = new Rect(new Point(120,0),new Point(205,100));
 
     public CenterStageCVDetection(Telemetry t) {
         telemetry = t;
@@ -35,15 +37,24 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
-        //Scalar lowHSV = new Scalar(209,98,63);
-        //Scalar highHSV = new Scalar(198,98,98);
-        /*
-        *   Blue value
-        */
-        Scalar lowHSV = new Scalar(80,0,0);
-        Scalar highHSV = new Scalar(110,255,255);
+        Scalar lowHsv;
+        Scalar highHsv;
 
-        Core.inRange(mat, lowHSV, highHSV, mat);
+        if (DETECT_BLUE){
+            //Blue value
+            lowHsv = new Scalar(80,0,0);
+            highHsv = new Scalar(110,255,255);
+        }
+        else {
+            //Red value
+            lowHsv = new Scalar(40,0,0);
+            highHsv = new Scalar(160,255,255);
+        }
+        Core.inRange(mat, lowHsv, highHsv, mat);
+        if (!DETECT_BLUE) {
+            //Red value
+            Core.bitwise_not(mat, mat);
+        }
         //submat = submatrix - portion of original matrix
         Mat left = mat.submat(Left_ROI);
         Mat right = mat.submat(Right_ROI);
