@@ -6,9 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(preselectTeleOp = "TeleOpE")
 public class AutoE extends LinearOpMode {
 
-    Boolean red = null;
-    Boolean left = null;
-    Boolean direct = null;
+    Boolean allianceRed = null;
+    Boolean startLeft = null;
+    Boolean pathDirect = null;
+    Boolean parkingLeft = null;
     boolean initialized = false;
     @Override
     public void runOpMode() {
@@ -21,34 +22,44 @@ public class AutoE extends LinearOpMode {
             boolean currentX = gamepad1.x;
             boolean currentB = gamepad1.b;
 
-            if (red == null) {
-                telemetry.addData("Status", "X = blue, B = red");
+            if (allianceRed == null) {
+                telemetry.addData("Alliance", "X = blue, B = red");
                 telemetry.update();
                 if (currentX && !previousX) {
-                    red = false;
+                    allianceRed = false;
                 }
                 if (currentB && !previousB) {
-                    red = true;
+                    allianceRed = true;
                 }
             }
-            else if (left == null){
-                telemetry.addData("Status", "X = left, B = right");
+            else if (startLeft == null){
+                telemetry.addData("Start", "X = left, B = right");
                 telemetry.update();
                 if (currentX && !previousX) {
-                    left = true;
+                    startLeft = true;
                 }
                 if (currentB && !previousB) {
-                    left = false;
+                    startLeft = false;
                 }
             }
-            else if (direct == null) {
-                telemetry.addData("Status", "X = direct, B = indirect");
+            else if (pathDirect == null) {
+                telemetry.addData("Path", "X = direct, B = indirect");
                 telemetry.update();
                 if (currentX && !previousX) {
-                    direct = true;
+                    pathDirect = true;
                 }
                 if (currentB && !previousB) {
-                    direct = false;
+                    pathDirect = false;
+                }
+            }
+            else if (parkingLeft == null) {
+                telemetry.addData("Parking", "X = left, B = right");
+                telemetry.update();
+                if (currentX && !previousX) {
+                    parkingLeft = true;
+                }
+                if (currentB && !previousB) {
+                    parkingLeft = false;
                 }
             }
             else {
@@ -59,9 +70,10 @@ public class AutoE extends LinearOpMode {
         }
 
         telemetry.addData("Status", "Initialized");
-        telemetry.addData("Red", red);
-        telemetry.addData("Left", left);
-        telemetry.addData("Direct", direct);
+        telemetry.addData("Alliance", allianceRed ? "Red" : "Blue");
+        telemetry.addData("Start", startLeft ? "Left" : "Right");
+        telemetry.addData("Path", pathDirect ? "Direct" : "Indirect");
+        telemetry.addData("Parking", parkingLeft ? "Left" : "Right");
         telemetry.update();
 
         waitForStart();
