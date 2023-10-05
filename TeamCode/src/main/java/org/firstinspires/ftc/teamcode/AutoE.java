@@ -13,38 +13,49 @@ public class AutoE extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        boolean previousX = false;
+        boolean previousB = false;
 
         while (!initialized) {
+
+            boolean currentX = gamepad1.x;
+            boolean currentB = gamepad1.b;
+
             if (red == null) {
                 telemetry.addData("Status", "X = blue, B = red");
                 telemetry.update();
-                if (gamepad1.x) {
+                if (currentX && !previousX) {
                     red = false;
-                } else if (gamepad1.b) {
+                }
+                if (currentB && !previousB) {
                     red = true;
                 }
             }
             else if (left == null){
                 telemetry.addData("Status", "X = left, B = right");
                 telemetry.update();
-                if (gamepad1.x) {
+                if (currentX && !previousX) {
                     left = true;
-                } else if (gamepad1.b) {
+                }
+                if (currentB && !previousB) {
                     left = false;
                 }
             }
             else if (direct == null) {
                 telemetry.addData("Status", "X = direct, B = indirect");
                 telemetry.update();
-                if (gamepad1.x) {
+                if (currentX && !previousX) {
                     direct = true;
-                } else if (gamepad1.b) {
+                }
+                if (currentB && !previousB) {
                     direct = false;
                 }
             }
             else {
                 initialized = true;
             }
+            previousX = currentX;
+            previousB = currentB;
         }
 
         telemetry.addData("Status", "Initialized");
