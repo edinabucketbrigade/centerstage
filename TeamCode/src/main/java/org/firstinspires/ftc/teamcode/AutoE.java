@@ -59,6 +59,9 @@ public class AutoE extends LinearOpMode {
         }
 
         telemetry.addData("Status", "Initialized");
+        telemetry.addData("Red", red);
+        telemetry.addData("Left", left);
+        telemetry.addData("Direct", direct);
         telemetry.update();
 
         waitForStart();
