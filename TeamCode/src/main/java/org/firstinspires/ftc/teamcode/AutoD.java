@@ -70,10 +70,7 @@ public class AutoD extends LinearOpMode {
                 rightFrontDrive.setPower(0);
                 leftBackDrive.setPower(0);
                 rightBackDrive.setPower(0);
-                position += 0.01;
-                if (position >= 1) {
-                    position = 0;
-                }
+                servo.setPosition(0.9);
             }
 
         }
