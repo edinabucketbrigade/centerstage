@@ -16,6 +16,15 @@ import org.openftc.easyopencv.OpenCvPipeline;
 @Config
 public class CenterStageCVDetection extends OpenCvPipeline {
     public static boolean DETECT_RED = true;
+    public static double MINIMUM_BLUE_HUE = 80;
+    public static double MINIMUM_BLUE_VALUES = 50;
+    public static double MAXIMUM_BLUE_HUE = 110;
+    public static double MAXIMUM_BLUE_VALUES = 255;
+    public static double MINIMUM_RED_HUE = 25;
+    public static double MINIMUM_RED_VALUES = 50;
+    public static double MAXIMUM_RED_HUE = 160;
+    public static double MAXIMUM_RED_VALUES = 255;
+
     Telemetry telemetry;
     Mat mat = new Mat();
     public enum Location{
@@ -42,15 +51,20 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         Scalar lowHsv;
         Scalar highHsv;
 
+        Scalar MINIMUM_BLUE = new Scalar(MINIMUM_BLUE_HUE,MINIMUM_BLUE_VALUES,MINIMUM_BLUE_VALUES);
+        Scalar MAXIMUM_BLUE = new Scalar(MAXIMUM_BLUE_HUE,MAXIMUM_BLUE_VALUES,MAXIMUM_BLUE_VALUES);
+        Scalar MINIMUM_RED = new Scalar(MINIMUM_RED_HUE,MINIMUM_RED_VALUES,MINIMUM_RED_VALUES);
+        Scalar MAXIMUM_RED = new Scalar(MAXIMUM_RED_HUE,MAXIMUM_RED_VALUES,MAXIMUM_RED_VALUES);
+
         if (!DETECT_RED){
             //Blue value
-            lowHsv = new Scalar(80,50,50);
-            highHsv = new Scalar(110,255,255);
+            lowHsv = MINIMUM_BLUE;
+            highHsv = MAXIMUM_BLUE;
         }
         else {
             //Red value
-            lowHsv = new Scalar(25,-50,-50);
-            highHsv = new Scalar(160,-255,-255);
+            lowHsv = MINIMUM_RED;
+            highHsv = MAXIMUM_RED;
         }
         Core.inRange(mat, lowHsv, highHsv, mat);
         if (DETECT_RED) {
