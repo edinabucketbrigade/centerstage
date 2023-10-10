@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.checkerframework.checker.signedness.qual.Constant;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
@@ -11,9 +13,9 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
-
+@Config
 public class CenterStageCVDetection extends OpenCvPipeline {
-    public static final boolean DETECT_BLUE = true;
+    public static boolean DETECT_RED = true;
     Telemetry telemetry;
     Mat mat = new Mat();
     public enum Location{
@@ -27,7 +29,7 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     *   This creates a rectangle of areas in the camera where a game element may be placed
     */
     static final Rect Left_ROI = new Rect(new Point(10,0),new Point(105,100));
-    static final Rect Right_ROI = new Rect(new Point(20,0),new Point(310,100));
+    static final Rect Right_ROI = new Rect(new Point(220,0),new Point(310,100));
     static final Rect Middle_ROI = new Rect(new Point(120,0),new Point(205,100));
 
     public CenterStageCVDetection(Telemetry t) {
@@ -40,18 +42,18 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         Scalar lowHsv;
         Scalar highHsv;
 
-        if (DETECT_BLUE){
+        if (!DETECT_RED){
             //Blue value
-            lowHsv = new Scalar(80,0,0);
+            lowHsv = new Scalar(80,50,50);
             highHsv = new Scalar(110,255,255);
         }
         else {
             //Red value
-            lowHsv = new Scalar(40,0,0);
-            highHsv = new Scalar(160,255,255);
+            lowHsv = new Scalar(25,-50,-50);
+            highHsv = new Scalar(160,-255,-255);
         }
         Core.inRange(mat, lowHsv, highHsv, mat);
-        if (!DETECT_BLUE) {
+        if (DETECT_RED) {
             //Red value
             Core.bitwise_not(mat, mat);
         }
