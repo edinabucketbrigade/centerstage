@@ -16,14 +16,15 @@ import org.openftc.easyopencv.OpenCvPipeline;
 @Config
 public class CenterStageCVDetection extends OpenCvPipeline {
     public static boolean DETECT_RED = true;
-    public static double MINIMUM_BLUE_HUE = 80;
-    public static double MINIMUM_BLUE_VALUES = 50;
-    public static double MAXIMUM_BLUE_HUE = 110;
-    public static double MAXIMUM_BLUE_VALUES = 255;
-    public static double MINIMUM_RED_HUE = 25;
-    public static double MINIMUM_RED_VALUES = 50;
-    public static double MAXIMUM_RED_HUE = 160;
-    public static double MAXIMUM_RED_VALUES = 255;
+    public static double BLUE_MINIMUM_VALUES = 50;
+    public static double RED_MINIMUM_VALUES = 100;
+    public static double MAXIMUM_VALUES = 255;
+    public static double MINIMUM_BLUE_HUE = 100;
+    public static double MAXIMUM_BLUE_HUE = 130;
+    public static double MINIMUM_RED_LOW_HUE = 0;
+    public static double MAXIMUM_RED_LOW_HUE = 25;
+    public static double MINIMUM_RED_HIGH_HUE = 160;
+    public static double MAXIMUM_RED_HIGH_HUE = 255;
 
     Telemetry telemetry;
     Mat mat = new Mat();
@@ -48,28 +49,25 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
-        Scalar lowHsv;
-        Scalar highHsv;
 
-        Scalar MINIMUM_BLUE = new Scalar(MINIMUM_BLUE_HUE,MINIMUM_BLUE_VALUES,MINIMUM_BLUE_VALUES);
-        Scalar MAXIMUM_BLUE = new Scalar(MAXIMUM_BLUE_HUE,MAXIMUM_BLUE_VALUES,MAXIMUM_BLUE_VALUES);
-        Scalar MINIMUM_RED = new Scalar(MINIMUM_RED_HUE,MINIMUM_RED_VALUES,MINIMUM_RED_VALUES);
-        Scalar MAXIMUM_RED = new Scalar(MAXIMUM_RED_HUE,MAXIMUM_RED_VALUES,MAXIMUM_RED_VALUES);
+        Scalar MINIMUM_BLUE = new Scalar(MINIMUM_BLUE_HUE,BLUE_MINIMUM_VALUES,BLUE_MINIMUM_VALUES);
+        Scalar MAXIMUM_BLUE = new Scalar(MAXIMUM_BLUE_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
+        Scalar MINIMUM_RED_LOW = new Scalar(MINIMUM_RED_LOW_HUE,RED_MINIMUM_VALUES,RED_MINIMUM_VALUES);
+        Scalar MAXIMUM_RED_LOW = new Scalar(MAXIMUM_RED_LOW_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
+        Scalar MINIMUM_RED_HIGH = new Scalar(MINIMUM_RED_HIGH_HUE,RED_MINIMUM_VALUES,RED_MINIMUM_VALUES);
+        Scalar MAXIMUM_RED_HIGH = new Scalar(MAXIMUM_RED_HIGH_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
 
         if (!DETECT_RED){
             //Blue value
-            lowHsv = MINIMUM_BLUE;
-            highHsv = MAXIMUM_BLUE;
+            Core.inRange(mat, MINIMUM_BLUE, MAXIMUM_BLUE, mat);
         }
         else {
             //Red value
-            lowHsv = MINIMUM_RED;
-            highHsv = MAXIMUM_RED;
-        }
-        Core.inRange(mat, lowHsv, highHsv, mat);
-        if (DETECT_RED) {
-            //Red value
-            Core.bitwise_not(mat, mat);
+            Mat mat1 = mat.clone();
+            Mat mat2 = mat.clone();
+            Core.inRange(mat1, MINIMUM_RED_LOW, MAXIMUM_RED_LOW, mat1);
+            Core.inRange(mat2, MINIMUM_RED_HIGH, MAXIMUM_RED_HIGH, mat2);
+            Core.bitwise_or(mat1, mat2, mat);
         }
         //submat = submatrix - portion of original matrix
         Mat left = mat.submat(Left_ROI);
