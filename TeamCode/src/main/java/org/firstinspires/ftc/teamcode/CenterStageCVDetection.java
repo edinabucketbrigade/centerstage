@@ -38,14 +38,13 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     *   ROI is an abbreviation of Region of Interest.
     *   This creates a rectangle of areas in the camera where a game element may be placed
     */
-    static final Rect Left_ROI = new Rect(new Point(10,0),new Point(105,100));
-    static final Rect Right_ROI = new Rect(new Point(220,0),new Point(310,100));
-    static final Rect Middle_ROI = new Rect(new Point(120,0),new Point(205,100));
+    static final Rect Left_ROI = new Rect(new Point(10,100),new Point(105,200));
+    static final Rect Middle_ROI = new Rect(new Point(120,100),new Point(205,200));
+    static final Rect Right_ROI = new Rect(new Point(220,100),new Point(310,200));
 
     public CenterStageCVDetection(Telemetry t) {
         telemetry = t;
     }
-    public double colorPercentThreshold = 0.4;
     @Override
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
@@ -84,39 +83,27 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         *   Here we only take the first value of the sum result because
         *   there is only one channel in a grayscale image.
         */
-        double leftValue = Core.sumElems(left).val[0] / Left_ROI.area() / 255;
-        double rightValue = Core.sumElems(right).val[0] / Right_ROI.area() / 255;
-        double middleValue = Core.sumElems(right).val[0] / Right_ROI.area() / 255;
+        double leftValue = Core.sumElems(left).val[0];
+        double rightValue = Core.sumElems(right).val[0];
+        double middleValue = Core.sumElems(middle).val[0];
+
+        telemetry.addData("Left Raw Value:",leftValue);
+        telemetry.addData("Right Raw Value:",rightValue);
+        telemetry.addData("Middle Raw Value:",middleValue);
 
         left.release();
         right.release();
         middle.release();
 
-        telemetry.addData("Left Raw Value:",(int) Core.sumElems(left).val[0]);
-        telemetry.addData("Right Raw Value:",(int) Core.sumElems(right).val[0]);
-        telemetry.addData("Middle Raw Value:",(int) Core.sumElems(right).val[0]);
-        telemetry.addData("Left Percentage:",Math.round(leftValue * 100)+"%");
-        telemetry.addData("Right Percentage:",Math.round(rightValue * 100)+"%");
-        telemetry.addData("Middle Percentage:",Math.round(leftValue * 100)+"%");
-
-        boolean propLeft = leftValue < colorPercentThreshold;
-        boolean propRight = rightValue < colorPercentThreshold;
-        boolean propMiddle = rightValue < colorPercentThreshold;
-
-        if(propMiddle){
-            //prop is on middle
-            location = Location.Middle;
-            telemetry.addData("Prop Location:", "Middle");
-        }
-        if(propLeft){
-            //prop is on left
-            location = Location.Left;
+        if(leftValue >= rightValue && leftValue >= middleValue){
+           location = Location.Left;
             telemetry.addData("Prop Location:", "Right");
-        }
-        if(propRight) {
-            //prop is on right
+        } else if (rightValue >= middleValue) {
             location = Location.Right;
             telemetry.addData("Prop Location:", "Left");
+        } else{
+            location = Location.Middle;
+            telemetry.addData("Prop Location:", "Middle");
         }
 
         telemetry.update();
