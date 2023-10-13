@@ -18,7 +18,7 @@ public class TeleOpG extends LinearOpMode {
     public static double WRIST_MINIMUM = 0.3;
     public static double WRIST_MAXIMUM = 0.6;
     public static int ARM_MINIMUM = 0;
-    public static int ARM_MAXIMUM = 1000;
+    public static int ARM_MAXIMUM = 500;
 
     // Declare motors
     private ElapsedTime runtime = new ElapsedTime();
