@@ -16,11 +16,10 @@ import org.openftc.easyopencv.OpenCvPipeline;
 @Config
 public class CenterStageCVDetection extends OpenCvPipeline {
     public static boolean DETECT_RED = true;
-    public static double BLUE_MINIMUM_VALUES = 50;
-    public static double RED_MINIMUM_VALUES = 100;
+    public static double MINIMUM_VALUES = 100;
     public static double MAXIMUM_VALUES = 255;
     public static double MINIMUM_BLUE_HUE = 100;
-    public static double MAXIMUM_BLUE_HUE = 130;
+    public static double MAXIMUM_BLUE_HUE = 115;
     public static double MINIMUM_RED_LOW_HUE = 0;
     public static double MAXIMUM_RED_LOW_HUE = 25;
     public static double MINIMUM_RED_HIGH_HUE = 160;
@@ -49,11 +48,11 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
-        Scalar MINIMUM_BLUE = new Scalar(MINIMUM_BLUE_HUE,BLUE_MINIMUM_VALUES,BLUE_MINIMUM_VALUES);
+        Scalar MINIMUM_BLUE = new Scalar(MINIMUM_BLUE_HUE,MINIMUM_VALUES,MINIMUM_VALUES);
         Scalar MAXIMUM_BLUE = new Scalar(MAXIMUM_BLUE_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
-        Scalar MINIMUM_RED_LOW = new Scalar(MINIMUM_RED_LOW_HUE,RED_MINIMUM_VALUES,RED_MINIMUM_VALUES);
+        Scalar MINIMUM_RED_LOW = new Scalar(MINIMUM_RED_LOW_HUE,MINIMUM_VALUES,MINIMUM_VALUES);
         Scalar MAXIMUM_RED_LOW = new Scalar(MAXIMUM_RED_LOW_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
-        Scalar MINIMUM_RED_HIGH = new Scalar(MINIMUM_RED_HIGH_HUE,RED_MINIMUM_VALUES,RED_MINIMUM_VALUES);
+        Scalar MINIMUM_RED_HIGH = new Scalar(MINIMUM_RED_HIGH_HUE,MINIMUM_VALUES,MINIMUM_VALUES);
         Scalar MAXIMUM_RED_HIGH = new Scalar(MAXIMUM_RED_HIGH_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
 
         if (!DETECT_RED){
