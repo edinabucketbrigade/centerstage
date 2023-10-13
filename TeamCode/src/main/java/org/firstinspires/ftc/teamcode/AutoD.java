@@ -17,8 +17,6 @@ public class AutoD extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DistanceSensor sensorDistance;
     private static final double SPEED = 0.3;
-    static final int CYCLE_MS = 50;
-
     // Define class members
     Servo servo;
     double position = 0; // Start at halfway position
@@ -29,24 +27,26 @@ public class AutoD extends LinearOpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_distance");
-        servo = hardwareMap.get(Servo.class, "left_hand");
 
-        // you can also cast this to a Rev2mDistanceSensor if you want to use added
-        // methods associated with the Rev2mDistanceSensor class.
-        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) sensorDistance;
+        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_distance");
+
+        servo = hardwareMap.get(Servo.class, "left_hand");
 
         telemetry.addData(">>", "Press start to continue");
         telemetry.update();
 
         waitForStart();
+
         while (opModeIsActive()) {
+
             // generic DistanceSensor methods.
             telemetry.addData("deviceName", sensorDistance.getDeviceName());
             telemetry.addData("range", String.format("%.01f mm", sensorDistance.getDistance(DistanceUnit.MM)));
@@ -55,11 +55,8 @@ public class AutoD extends LinearOpMode {
             telemetry.addData("range", String.format("%.01f in", sensorDistance.getDistance(DistanceUnit.INCH)));
             telemetry.addData("Servo Position", "%5.2f", position);
 
-            // Rev2mDistanceSensor specific methods.
-            telemetry.addData("ID", String.format("%x", sensorTimeOfFlight.getModelID()));
-            telemetry.addData("did time out", Boolean.toString(sensorTimeOfFlight.didTimeoutOccur()));
-
             telemetry.update();
+
             if (sensorDistance.getDistance(DistanceUnit.INCH) >= 48) {
                 leftFrontDrive.setPower(-SPEED);
                 rightFrontDrive.setPower(-SPEED);
@@ -70,13 +67,9 @@ public class AutoD extends LinearOpMode {
                 rightFrontDrive.setPower(0);
                 leftBackDrive.setPower(0);
                 rightBackDrive.setPower(0);
-                position += 0.01;
-                if (position >= 1) {
-                    position = 0;
-                }
+                servo.setPosition(0.9);
             }
 
         }
     }
 }
-
