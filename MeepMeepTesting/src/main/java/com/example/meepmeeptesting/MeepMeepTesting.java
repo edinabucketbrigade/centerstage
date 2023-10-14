@@ -22,13 +22,15 @@ enum Route {
     BLUE_RIGHT_DIRECT,
     BLUE_RIGHT_INDIRECT,
     SPEED_TEST,
-    CYCLE_TEST
+    CYCLE_TEST,
+    PARK_LEFT,
+    PARK_RIGHT
 
 }
 
 public class MeepMeepTesting {
 
-    public static final Route ROUTE = Route.RED_RIGHT_DIRECT;
+    public static final Route ROUTE = Route.PARK_LEFT;
     public static final double DELAY = 0.5;
     public static final double MAXVEL = 60;
     public static final double MAXACCEL = 60;
@@ -74,6 +76,12 @@ public class MeepMeepTesting {
             case SPEED_TEST:
                 myBot = speedTest(meepMeep);
                 break;
+            case PARK_LEFT:
+                myBot = parkLeft(meepMeep);
+                break;
+            case PARK_RIGHT:
+                myBot = parkRight(meepMeep);
+                break;
             default:
                 throw new Exception("unrecognized route");
         }
@@ -113,8 +121,6 @@ public class MeepMeepTesting {
                         .lineToLinearHeading(new Pose2d(35, -24, Math.toRadians(90)))
                         .lineToLinearHeading(new Pose2d(35, 50, Math.toRadians(90)))
                         .waitSeconds(DELAY)
-                        .strafeRight(24)
-                        .forward(10)
                         .build()
                 );
         return myBot;
@@ -141,8 +147,6 @@ public class MeepMeepTesting {
                         .forward(74)
                         .strafeRight(29)
                         .waitSeconds(DELAY)
-                        .strafeRight(24)
-                        .forward(10)
                         .build()
                 );
         return myBot;
@@ -170,8 +174,6 @@ public class MeepMeepTesting {
                         .lineToLinearHeading(new Pose2d(35, -24, Math.toRadians(90)))
                         .lineToLinearHeading(new Pose2d(35, 50, Math.toRadians(90)))
                         .waitSeconds(DELAY)
-                        .strafeRight(24)
-                        .forward(10)
                         .build()
                 );
         return myBot;
@@ -199,8 +201,6 @@ public class MeepMeepTesting {
                         .back(70)
                         .lineToLinearHeading(new Pose2d(35, 50, Math.toRadians(90)))
                         .waitSeconds(DELAY)
-                        .strafeRight(24)
-                        .forward(10)
                         .build()
                 );
         return myBot;
@@ -228,8 +228,6 @@ public class MeepMeepTesting {
                         .lineToLinearHeading(new Pose2d(-35, -24, Math.toRadians(90)))
                         .lineToLinearHeading(new Pose2d(-35, 50, Math.toRadians(90)))
                         .waitSeconds(DELAY)
-                        .strafeRight(-24)
-                        .forward(10)
                         .build()
                 );
         return myBot;
@@ -257,8 +255,6 @@ public class MeepMeepTesting {
                         .back(70)
                         .lineToLinearHeading(new Pose2d(-35, 50, Math.toRadians(90)))
                         .waitSeconds(DELAY)
-                        .strafeRight(-24)
-                        .forward(10)
                         .build()
                 );
         return myBot;
@@ -283,8 +279,6 @@ public class MeepMeepTesting {
                         .lineToLinearHeading(new Pose2d(-35, -24, Math.toRadians(90)))
                         .lineToLinearHeading(new Pose2d(-35, 50, Math.toRadians(90)))
                         .waitSeconds(DELAY)
-                        .strafeRight(-24)
-                        .forward(10)
                         .build()
                 );
         return myBot;
@@ -311,8 +305,6 @@ public class MeepMeepTesting {
                         .forward(74)
                         .strafeRight(-29)
                         .waitSeconds(DELAY)
-                        .strafeRight(-24)
-                        .forward(10)
                         .build()
                 );
         return myBot;
@@ -338,6 +330,32 @@ public class MeepMeepTesting {
 
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-61, -36, Math.toRadians(0)))
                         .forward(123)
+                        .build()
+                );
+        return myBot;
+    }
+
+    private static RoadRunnerBotEntity parkLeft(MeepMeep meepMeep) {
+        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+                .setConstraints(MAXVEL, MAXACCEL, MAXANGVEL, MAXANGACCEL, TRACKWIDTH)
+
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(35, 50, Math.toRadians(90)))
+                        .strafeRight(-24)
+                        .forward(10)
+                        .build()
+                );
+        return myBot;
+    }
+
+    private static RoadRunnerBotEntity parkRight(MeepMeep meepMeep) {
+        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+                .setConstraints(MAXVEL, MAXACCEL, MAXANGVEL, MAXANGACCEL, TRACKWIDTH)
+
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-35, 50, Math.toRadians(90)))
+                        .strafeRight(24)
+                        .forward(10)
                         .build()
                 );
         return myBot;
