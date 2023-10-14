@@ -11,12 +11,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp
 public class TeleOpG extends LinearOpMode {
     // Declare servo positions (can be edited in FTC Dashboard)
-    public static double LEFT_CLAW_MINIMUM = 0.5;
+    public static double LEFT_CLAW_MINIMUM = 0.275;
     public static double LEFT_CLAW_MAXIMUM = 0.6;
-    public static double RIGHT_CLAW_MINIMUM = 0.3;
-    public static double RIGHT_CLAW_MAXIMUM = 0.6;
-    public static double WRIST_MINIMUM = 0.3;
-    public static double WRIST_MAXIMUM = 0.6;
+    public static double RIGHT_CLAW_MINIMUM = 0.7;
+    public static double RIGHT_CLAW_MAXIMUM = 1;
+    public static double WRIST_MINIMUM = 0;
+    public static double WRIST_MAXIMUM = 0.8;
     public static int ARM_MINIMUM = 0;
     public static int ARM_MAXIMUM = 500;
 
@@ -79,7 +79,7 @@ public class TeleOpG extends LinearOpMode {
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x;
+            double lateral =  -gamepad1.left_stick_x;
             double yaw     =  gamepad1.right_stick_x;
             //double liftPower  = gamepad1.x ? 1.0 : 0.0;
             //int liftPos  = lift.getCurrentPosition();
@@ -120,6 +120,7 @@ public class TeleOpG extends LinearOpMode {
             leftFrontPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
             rightBackPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             rightFrontPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad*/
+
 
             if (currentX && !previousX) {
                 leftClawPosition = leftClawPosition == LEFT_CLAW_MINIMUM ? LEFT_CLAW_MAXIMUM : LEFT_CLAW_MINIMUM;
