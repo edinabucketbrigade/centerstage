@@ -18,7 +18,7 @@ public class TeleOpG extends LinearOpMode {
     public static double WRIST_MINIMUM = 0;
     public static double WRIST_MAXIMUM = 0.8;
     public static int ARM_MINIMUM = 0;
-    public static int ARM_MAXIMUM = 500;
+    public static int ARM_MAXIMUM = 300;
 
     // Declare motors
     private ElapsedTime runtime = new ElapsedTime();
@@ -147,13 +147,17 @@ public class TeleOpG extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Running");
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+
+            telemetry.addData("Run time", runtime);
+
+            telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
+            telemetry.addData("Back  left/right pwoer", "%4.2f, %4.2f", leftBackPower, rightBackPower);
 
             telemetry.addData("Left claw position", leftClawServo.getPosition());
+            telemetry.addData("Right claw position", rightClawServo.getPosition());
+            telemetry.addData("Wrist target position", wristServo.getPosition());
+
             telemetry.update();
 
             previousB = currentB;
