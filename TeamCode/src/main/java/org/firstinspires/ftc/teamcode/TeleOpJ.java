@@ -17,19 +17,16 @@ public class TeleOpJ extends LinearOpMode {
 
     // goBilda 5202-002-0051
     // https://www.gobilda.com/5202-series-yellow-jacket-planetary-gear-motor-50-9-1-ratio-117-rpm-3-3-5v-encoder/
-    private static final double TICKS_PER_REVOLUTION = 1425.1;
-
-    private static final double DEGREES_PER_REVOLUTION = 360;
-
-    private static final double TICKS_PER_DEGREE = TICKS_PER_REVOLUTION / DEGREES_PER_REVOLUTION;
+    public static double TICKS_PER_DEGREE = 8.5;
+    //Determined experimentally
 
     private static final double INITIAL_DEGREES_BELOW_HORIZONTAL = 11;
 
     PIDController controller;
 
-    public static double p = 0.02, i = 0, d = 0.001;
+    public static double p = 0.008, i = 0, d = 0.0007;
 
-    public static double f = 0.11;
+    public static double f = 0.045;
 
     public static int targetArmPosition = 0;
 
