@@ -15,8 +15,8 @@ public class TeleOpG extends LinearOpMode {
     public static double LEFT_CLAW_MAXIMUM = 0.6;
     public static double RIGHT_CLAW_MINIMUM = 0.7;
     public static double RIGHT_CLAW_MAXIMUM = 1;
-    public static double WRIST_MINIMUM = 0;
-    public static double WRIST_MAXIMUM = 0.8;
+    public static double WRIST_MINIMUM = 0.06;
+    public static double WRIST_MAXIMUM = 0.93;
     public static int ARM_MINIMUM = 0;
     public static int ARM_MAXIMUM = 300;
 
