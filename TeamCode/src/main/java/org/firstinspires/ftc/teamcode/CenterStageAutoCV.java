@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -21,9 +22,9 @@ public class CenterStageAutoCV extends LinearOpMode {
     private DcMotor frontLeftDrive = null;
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive =null;
-    public static int LEFT = 0;
-    public static int RIGHT = 0;
-    public static int MIDDLE = 500;
+    public static int LEFT = 2500;
+    public static int RIGHT = 2500;
+    public static int MIDDLE = 5000;
 
     OpenCvWebcam camera;
     @Override
@@ -32,7 +33,7 @@ public class CenterStageAutoCV extends LinearOpMode {
             frontRightDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
             frontLeftDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
             backRightDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-            backLeftDrive = hardwareMap.get(DcMotor.class, "left_back_ drive");
+            backLeftDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
 
         frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -43,7 +44,11 @@ public class CenterStageAutoCV extends LinearOpMode {
         backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        int position = 0;
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -100,47 +105,52 @@ public class CenterStageAutoCV extends LinearOpMode {
             case Left:
                 frontRightDrive.setTargetPosition(MIDDLE);
                 frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                frontRightDrive.setPower(0.1);
+                frontRightDrive.setPower(0.5);
                 frontLeftDrive.setTargetPosition(LEFT);
                 frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                frontLeftDrive.setPower(0.1);
-                backRightDrive.setTargetPosition(LEFT);
+                frontLeftDrive.setPower(0.5);
+                backRightDrive.setTargetPosition(MIDDLE);
                 backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                backRightDrive.setPower(0.1);
+                backRightDrive.setPower(0.5);
                 backLeftDrive.setTargetPosition(LEFT);
                 backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                backLeftDrive.setPower(0.1);
+                backLeftDrive.setPower(0.5);
                 break;
             case Right:
                 frontRightDrive.setTargetPosition(RIGHT);
                 frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                frontRightDrive.setPower(0.1);
-                frontLeftDrive.setTargetPosition(RIGHT);
+                frontRightDrive.setPower(0.5);
+                frontLeftDrive.setTargetPosition(MIDDLE);
                 frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                frontLeftDrive.setPower(0.1);
+                frontLeftDrive.setPower(0.5);
                 backRightDrive.setTargetPosition(RIGHT);
                 backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                backRightDrive.setPower(0.1);
-                backLeftDrive.setTargetPosition(RIGHT);
+                backRightDrive.setPower(0.5);
+                backLeftDrive.setTargetPosition(MIDDLE);
                 backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                backLeftDrive.setPower(0.1);
+                backLeftDrive.setPower(0.5);
                 break;
             case Middle:
                 frontRightDrive.setTargetPosition(MIDDLE);
                 frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                frontRightDrive.setPower(0.1);
+                frontRightDrive.setPower(0.5);
                 frontLeftDrive.setTargetPosition(MIDDLE);
                 frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                frontLeftDrive.setPower(0.1);
+                frontLeftDrive.setPower(0.5);
                 backRightDrive.setTargetPosition(MIDDLE);
                 backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                backRightDrive.setPower(0.1);
+                backRightDrive.setPower(0.5);
                 backLeftDrive.setTargetPosition(MIDDLE);
                 backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                backLeftDrive.setPower(0.1);
+                backLeftDrive.setPower(0.5);
                 break;
         }
         camera.stopStreaming();
+
+        while(opModeIsActive() && (frontLeftDrive.isBusy() || frontRightDrive.isBusy() || backLeftDrive.isBusy() || backRightDrive.isBusy())){
+
+        }
+
         frontLeftDrive.setPower(0);
         frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRightDrive.setPower(0);
