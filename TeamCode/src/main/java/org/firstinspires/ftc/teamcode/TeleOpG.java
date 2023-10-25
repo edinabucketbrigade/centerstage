@@ -19,8 +19,8 @@ public class TeleOpG extends LinearOpMode {
     public static double LEFT_CLAW_MAXIMUM = 0.6;
     public static double RIGHT_CLAW_MINIMUM = 0.7;
     public static double RIGHT_CLAW_MAXIMUM = 1;
-    public static double WRIST_MINIMUM = 0.06;
-    public static double WRIST_MAXIMUM = 0.93;
+    public static double WRIST_MINIMUM = 0;
+    public static double WRIST_MAXIMUM = 0.72;
     public static int targetArmPosition = 0;
 
     public static double armPower = 0;
@@ -28,7 +28,7 @@ public class TeleOpG extends LinearOpMode {
     private TouchSensor touchSensor;
     private boolean isReady;
     public static int ARM_MINIMUM = 0;
-    public static int ARM_MAXIMUM = 1200;
+    public static int ARM_MAXIMUM = 1300;
     public static double ARM_RAISE_POWER = 0.8;
     public static double ARM_LOWER_POWER = 0.4;
 
@@ -157,6 +157,8 @@ public class TeleOpG extends LinearOpMode {
                     }
                     armMotor.setTargetPosition(armPosition);
                     armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    wristPosition = wristPosition == WRIST_MINIMUM ? WRIST_MAXIMUM : WRIST_MINIMUM;
+                    wristServo.setPosition(wristPosition);
                 }
             }
 
@@ -168,10 +170,6 @@ public class TeleOpG extends LinearOpMode {
             if (currentB && !previousB) {
                 rightClawPosition = rightClawPosition == RIGHT_CLAW_MINIMUM ? RIGHT_CLAW_MAXIMUM : RIGHT_CLAW_MINIMUM;
                 rightClawServo.setPosition(rightClawPosition);
-            }
-            if (currentA && !previousA) {
-                wristPosition = wristPosition == WRIST_MINIMUM ? WRIST_MAXIMUM : WRIST_MINIMUM;
-                wristServo.setPosition(wristPosition);
             }
 
             // Send calculated power to wheels
