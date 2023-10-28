@@ -31,32 +31,7 @@ public class CenterStageAutoCV extends LinearOpMode {
     public static int RIGHT_POSITION = 750;
     public static double WHEEL_POWER = 0.5;
     public static int targetArmPosition = 0;
-    public static double LEFT_CLAW_MINIMUM = 0.275;
-    public static double LEFT_CLAW_MAXIMUM = 0.6;
-    public static double RIGHT_CLAW_MINIMUM = 0.7;
-    public static double RIGHT_CLAW_MAXIMUM = 1;
-    public static double WRIST_MINIMUM = 0;
-    public static double WRIST_MAXIMUM = 0.72;
-    public static double armPower = 0;
     public boolean armIsReady;
-    private TouchSensor touchSensor;
-    public static int ARM_MINIMUM = 0;
-    public static int ARM_MAXIMUM = 1300;
-    public static double ARM_RAISE_POWER = 0.8;
-    public static double ARM_LOWER_POWER = 0.4;
-
-    // Declare motors
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive = null;
-    private Servo wristServo = null;
-    private Servo leftClawServo = null;
-    private Servo rightClawServo = null;
-
-
-
     OpenCvWebcam camera;
 
     public void runToPosition(int frontRightPosition, int frontLeftPosition, int backRightPosition, int backLeftPosition){
@@ -82,11 +57,11 @@ public class CenterStageAutoCV extends LinearOpMode {
         backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backLeftDrive.setPower(WHEEL_POWER);
         while(opModeIsActive() && (frontLeftDrive.isBusy() || frontRightDrive.isBusy() || backLeftDrive.isBusy() || backRightDrive.isBusy())){}
-        /*if(armIsReady) {
+        if(armIsReady) {
             armMotor.setTargetPosition(targetArmPosition);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             armMotor.setPower(0.1);
-        }*/
+        }
     }
     @Override
     public void runOpMode() throws InterruptedException {
@@ -96,10 +71,6 @@ public class CenterStageAutoCV extends LinearOpMode {
             backRightDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
             backLeftDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
             armMotor = hardwareMap.get(DcMotorEx.class, "arm_motor");
-            wristServo = hardwareMap.get(Servo.class, "wrist_servo");
-            leftClawServo = hardwareMap.get(Servo.class, "left_claw_servo");
-            rightClawServo = hardwareMap.get(Servo.class, "right_claw_servo");
-            touchSensor = hardwareMap.get(TouchSensor.class, "touch");
             telemetry.addData("Status", "Initialized");
             telemetry.update();
 
@@ -194,5 +165,7 @@ public class CenterStageAutoCV extends LinearOpMode {
         backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRightDrive.setPower(0);
         backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setPower(0);
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 }
