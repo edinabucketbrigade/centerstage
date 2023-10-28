@@ -82,14 +82,11 @@ enum TargetMode {
 
                 if (gamepad1.x) {
                     targetMode = TargetMode.LEFT;
-                }
-                else if (gamepad1.a) {
+                } else if (gamepad1.a) {
                     targetMode = TargetMode.CENTER;
-                }
-                else if (gamepad1.b) {
+                } else if (gamepad1.b) {
                     targetMode = TargetMode.RIGHT;
-                }
-                else {
+                } else {
                     targetMode = TargetMode.NONE;
                 }
 
@@ -105,17 +102,7 @@ enum TargetMode {
                     // Step through the list of detected tags and look for a matching tag
                     List<AprilTagDetection> currentDetections = aprilTag.getDetections();
                     for (AprilTagDetection detection : currentDetections) {
-                        if (detection.metadata == null) {
-                            continue;
-                        }
-                        telemetry.addData("Debug", "have a detection");
-
-                        targetFound =
-                                (targetMode == TargetMode.LEFT && (detection.id == 1 || detection.id == 4)) ||
-                                        (targetMode == TargetMode.CENTER && (detection.id == 2 || detection.id == 5)) ||
-                                        (targetMode == TargetMode.RIGHT && (detection.id == 3 || detection.id == 6));
-
-                        telemetry.addData("TargetFound", targetFound);
+                        targetFound = isMatch(detection);
 
                         if (targetFound) {
                             desiredTag = detection;
@@ -233,5 +220,21 @@ enum TargetMode {
                 gainControl.setGain(gain);
                 sleep(20);
             }
+        }
+
+        private boolean isMatch(AprilTagDetection detection) {
+            if (detection.metadata == null) {
+                return false;
+            }
+            telemetry.addData("Debug", "have a detection");
+
+            boolean isMatch =
+                    (targetMode == TargetMode.LEFT && (detection.id == 1 || detection.id == 4)) ||
+                            (targetMode == TargetMode.CENTER && (detection.id == 2 || detection.id == 5)) ||
+                            (targetMode == TargetMode.RIGHT && (detection.id == 3 || detection.id == 6));
+
+            telemetry.addData("TargetFound", isMatch);
+
+            return isMatch;
         }
     }
