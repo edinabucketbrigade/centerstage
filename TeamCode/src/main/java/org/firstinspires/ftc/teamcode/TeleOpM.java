@@ -106,7 +106,6 @@ enum TargetMode {
 
                         if (targetFound) {
                             desiredTag = detection;
-                            telemetry.addData(">", "HOLD Left-Bumper to Drive to Target\n");
                             telemetry.addData("Target", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
                             telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
                             telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
@@ -226,14 +225,10 @@ enum TargetMode {
             if (detection.metadata == null) {
                 return false;
             }
-            telemetry.addData("Debug", "have a detection");
-
             boolean isMatch =
                     (targetMode == TargetMode.LEFT && (detection.id == 1 || detection.id == 4)) ||
                             (targetMode == TargetMode.CENTER && (detection.id == 2 || detection.id == 5)) ||
                             (targetMode == TargetMode.RIGHT && (detection.id == 3 || detection.id == 6));
-
-            telemetry.addData("TargetFound", isMatch);
 
             return isMatch;
         }
