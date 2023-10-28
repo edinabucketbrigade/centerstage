@@ -170,11 +170,11 @@ public class CenterStageAutoCV extends LinearOpMode {
         switch (detector.getLocation()) {
             case Right:
                 runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION);
-                runToPosition(-RIGHT_POSITION,-RIGHT_POSITION, RIGHT_POSITION, RIGHT_POSITION);
+                runToPosition(-RIGHT_POSITION,RIGHT_POSITION, RIGHT_POSITION, -RIGHT_POSITION);
                 break;
             case Left:
                 runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION);
-                runToPosition(LEFT_POSITION, LEFT_POSITION,-LEFT_POSITION,-LEFT_POSITION);
+                runToPosition(LEFT_POSITION, -LEFT_POSITION,-LEFT_POSITION,LEFT_POSITION);
                 break;
             case Middle:
                 runToPosition(MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION);
