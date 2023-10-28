@@ -25,7 +25,8 @@ public class CenterStageAutoCV extends LinearOpMode {
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive =null;
     private DcMotorEx armMotor;
-    public static int FIELD_POSITION = 1000;
+    public static int FIELD_POSITION = 1500;
+    public static double WHEEL_POWER = 0.5;
     public static int targetArmPosition = 0;
     public static double LEFT_CLAW_MINIMUM = 0.275;
     public static double LEFT_CLAW_MAXIMUM = 0.6;
@@ -67,16 +68,16 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         frontRightDrive.setTargetPosition(frontRightPosition);
         frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRightDrive.setPower(0.5);
+        frontRightDrive.setPower(WHEEL_POWER);
         frontLeftDrive.setTargetPosition(frontLeftPosition);
         frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontLeftDrive.setPower(0.5);
+        frontLeftDrive.setPower(WHEEL_POWER);
         backRightDrive.setTargetPosition(backRightPosition);
         backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRightDrive.setPower(0.5);
+        backRightDrive.setPower(WHEEL_POWER);
         backLeftDrive.setTargetPosition(backLeftPosition);
         backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeftDrive.setPower(0.5);
+        backLeftDrive.setPower(WHEEL_POWER);
         while(opModeIsActive() && (frontLeftDrive.isBusy() || frontRightDrive.isBusy() || backLeftDrive.isBusy() || backRightDrive.isBusy())){}
         /*if(armIsReady) {
             armMotor.setTargetPosition(targetArmPosition);
@@ -164,13 +165,13 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         waitForStart();
         switch (detector.getLocation()) {
-            case Left:
-                runToPosition(FIELD_POSITION,FIELD_POSITION,FIELD_POSITION,FIELD_POSITION);
-                runToPosition(FIELD_POSITION/2,-FIELD_POSITION/2,-FIELD_POSITION/2,FIELD_POSITION/2);
-                break;
             case Right:
                 runToPosition(FIELD_POSITION,FIELD_POSITION,FIELD_POSITION,FIELD_POSITION);
-                runToPosition(-FIELD_POSITION/2,FIELD_POSITION/2,FIELD_POSITION/2,-FIELD_POSITION/2);
+                runToPosition(-FIELD_POSITION/2,-FIELD_POSITION/2,FIELD_POSITION/2,FIELD_POSITION/2);
+                break;
+            case Left:
+                runToPosition(FIELD_POSITION,FIELD_POSITION,FIELD_POSITION,FIELD_POSITION);
+                runToPosition(FIELD_POSITION/2,FIELD_POSITION/2,-FIELD_POSITION/2,-FIELD_POSITION/2);
                 break;
             case Middle:
                 runToPosition(FIELD_POSITION,FIELD_POSITION,FIELD_POSITION,FIELD_POSITION);
