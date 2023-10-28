@@ -96,10 +96,10 @@ public class CenterStageCVDetection extends OpenCvPipeline {
 
         if(leftValue >= rightValue && leftValue >= middleValue){
            location = Location.Left;
-            telemetry.addData("Prop Location:", "Right");
+            telemetry.addData("Prop Location:", "Left");
         } else if (rightValue >= middleValue) {
             location = Location.Right;
-            telemetry.addData("Prop Location:", "Left");
+            telemetry.addData("Prop Location:", "Right");
         } else{
             location = Location.Middle;
             telemetry.addData("Prop Location:", "Middle");
