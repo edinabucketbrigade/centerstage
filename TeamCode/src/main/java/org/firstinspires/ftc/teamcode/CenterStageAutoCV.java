@@ -25,7 +25,10 @@ public class CenterStageAutoCV extends LinearOpMode {
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive =null;
     private DcMotorEx armMotor;
-    public static int FIELD_POSITION = 1500;
+    public static int STRAFE_FORWARD_POSITION = 1800;
+    public static int MIDDLE_FORWARD_POSITION = 2150;
+    public static int LEFT_POSITION = 450;
+    public static int RIGHT_POSITION = 750;
     public static double WHEEL_POWER = 0.5;
     public static int targetArmPosition = 0;
     public static double LEFT_CLAW_MINIMUM = 0.275;
@@ -166,15 +169,15 @@ public class CenterStageAutoCV extends LinearOpMode {
         waitForStart();
         switch (detector.getLocation()) {
             case Right:
-                runToPosition(FIELD_POSITION,FIELD_POSITION,FIELD_POSITION,FIELD_POSITION);
-                runToPosition(-FIELD_POSITION/2,-FIELD_POSITION/2,FIELD_POSITION/2,FIELD_POSITION/2);
+                runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION);
+                runToPosition(-RIGHT_POSITION,-RIGHT_POSITION, RIGHT_POSITION, RIGHT_POSITION);
                 break;
             case Left:
-                runToPosition(FIELD_POSITION,FIELD_POSITION,FIELD_POSITION,FIELD_POSITION);
-                runToPosition(FIELD_POSITION/2,FIELD_POSITION/2,-FIELD_POSITION/2,-FIELD_POSITION/2);
+                runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION);
+                runToPosition(LEFT_POSITION, LEFT_POSITION,-LEFT_POSITION,-LEFT_POSITION);
                 break;
             case Middle:
-                runToPosition(FIELD_POSITION,FIELD_POSITION,FIELD_POSITION,FIELD_POSITION);
+                runToPosition(MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION);
                 break;
         }
         camera.stopStreaming();
