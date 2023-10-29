@@ -6,10 +6,6 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
@@ -25,8 +21,6 @@ public class TeleOpG extends LinearOpMode {
     public static int targetArmPosition = 0;
 
     public static double armPower = 0;
-
-    private TouchSensor touchSensor;
     private boolean isReady;
     public static int ARM_MINIMUM = 0;
     public static int ARM_MAXIMUM = 1300;
@@ -36,11 +30,6 @@ public class TeleOpG extends LinearOpMode {
     // Declare motors
     private ElapsedTime runtime = new ElapsedTime();
 
-    private DcMotor armMotor = null;
-    private Servo wristServo = null;
-    private Servo leftClawServo = null;
-    private Servo rightClawServo = null;
-
     private RobotHardwareA robotHardware = null;
 
     @Override
@@ -48,22 +37,6 @@ public class TeleOpG extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         robotHardware = new RobotHardwareA(this);
-
-        wristServo = hardwareMap.get(Servo.class, "wrist_servo");
-        leftClawServo = hardwareMap.get(Servo.class, "left_claw_servo");
-        rightClawServo = hardwareMap.get(Servo.class, "right_claw_servo");
-
-        // Initialize hardware variables
-        armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
-
-        // Wheel reversing (test for correct directions)
-
-        armMotor.setDirection(DcMotor.Direction.REVERSE);
-        armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        touchSensor = hardwareMap.get(TouchSensor.class, "touch");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -81,7 +54,7 @@ public class TeleOpG extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            boolean isPressed = touchSensor.isPressed();
+            boolean isPressed = robotHardware.touchSensor.isPressed();
 
             boolean currentB = gamepad1.b;
             boolean currentX = gamepad1.x;
@@ -135,8 +108,8 @@ public class TeleOpG extends LinearOpMode {
             rightFrontPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad*/
 
             if (isPressed && !isReady) {
-                armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robotHardware.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robotHardware.armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 isReady = true;
             }
 
@@ -144,26 +117,26 @@ public class TeleOpG extends LinearOpMode {
                 if (currentY && !previousY) {
                     if (armPosition == ARM_MINIMUM) {
                         armPosition = ARM_MAXIMUM;
-                        armMotor.setPower(ARM_RAISE_POWER);
+                        robotHardware.armMotor.setPower(ARM_RAISE_POWER);
                     } else {
                         armPosition = ARM_MINIMUM;
-                        armMotor.setPower(ARM_LOWER_POWER);
+                        robotHardware.armMotor.setPower(ARM_LOWER_POWER);
                     }
-                    armMotor.setTargetPosition(armPosition);
-                    armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robotHardware.armMotor.setTargetPosition(armPosition);
+                    robotHardware.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     wristPosition = wristPosition == WRIST_MINIMUM ? WRIST_MAXIMUM : WRIST_MINIMUM;
-                    wristServo.setPosition(wristPosition);
+                    robotHardware.wristServo.setPosition(wristPosition);
                 }
             }
 
 
             if (currentX && !previousX) {
                 rightClawPosition = rightClawPosition == RIGHT_CLAW_MINIMUM ? RIGHT_CLAW_MAXIMUM : RIGHT_CLAW_MINIMUM;
-                rightClawServo.setPosition(rightClawPosition);
+                robotHardware.rightClawServo.setPosition(rightClawPosition);
             }
             if (currentB && !previousB) {
                 leftClawPosition = leftClawPosition == LEFT_CLAW_MINIMUM ? LEFT_CLAW_MAXIMUM : LEFT_CLAW_MINIMUM;
-                leftClawServo.setPosition(leftClawPosition);
+                robotHardware.leftClawServo.setPosition(leftClawPosition);
             }
 
             // Send calculated power to wheels
@@ -172,7 +145,7 @@ public class TeleOpG extends LinearOpMode {
             robotHardware.leftBackDrive.setPower(leftBackPower);
             robotHardware.rightBackDrive.setPower(rightBackPower);
 
-            int currentArmPosition = armMotor.getCurrentPosition();
+            int currentArmPosition = robotHardware.armMotor.getCurrentPosition();
 
             telemetry.addData("Status", "Running");
 
@@ -181,9 +154,9 @@ public class TeleOpG extends LinearOpMode {
             telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/right pwoer", "%4.2f, %4.2f", leftBackPower, rightBackPower);
 
-            telemetry.addData("Left claw position", leftClawServo.getPosition());
-            telemetry.addData("Right claw position", rightClawServo.getPosition());
-            telemetry.addData("Wrist target position", wristServo.getPosition());
+            telemetry.addData("Left claw position", robotHardware.leftClawServo.getPosition());
+            telemetry.addData("Right claw position", robotHardware.rightClawServo.getPosition());
+            telemetry.addData("Wrist target position", robotHardware.wristServo.getPosition());
 
             telemetry.addData("Ready", isReady);
             telemetry.addData("Current Arm Position", currentArmPosition);
@@ -198,8 +171,8 @@ public class TeleOpG extends LinearOpMode {
             previousA = currentA;
         }
 
-        armMotor.setPower(0);
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robotHardware.armMotor.setPower(0);
+        robotHardware.armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
