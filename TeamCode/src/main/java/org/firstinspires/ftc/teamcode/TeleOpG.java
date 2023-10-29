@@ -11,8 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Config
 @TeleOp
 public class TeleOpG extends LinearOpMode {
-    // Declare servo positions (can be edited in FTC Dashboard)
-    private boolean isReady;
 
     // Declare motors
     private ElapsedTime runtime = new ElapsedTime();
@@ -33,7 +31,7 @@ public class TeleOpG extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            boolean isPressed = robotHardware.touchSensor.isPressed();
+            robotHardware.update();
 
             boolean currentB = gamepad1.b;
             boolean currentX = gamepad1.x;
@@ -86,16 +84,9 @@ public class TeleOpG extends LinearOpMode {
             rightBackPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             rightFrontPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad*/
 
-            if (isPressed && !isReady) {
-                robotHardware.initializeArm();
-                isReady = true;
-            }
-
-            if(isReady) {
-                if (currentY && !previousY) {
-                    robotHardware.toggleArm();
-                    robotHardware.toggleWrist();
-                }
+            if (currentY && !previousY) {
+                robotHardware.toggleArm();
+                robotHardware.toggleWrist();
             }
 
 
@@ -115,8 +106,6 @@ public class TeleOpG extends LinearOpMode {
 
             telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/right power", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-
-            telemetry.addData("Ready", isReady);
 
             telemetry.update();
 

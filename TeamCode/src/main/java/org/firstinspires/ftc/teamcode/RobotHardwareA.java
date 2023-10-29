@@ -31,13 +31,15 @@ public class RobotHardwareA {
     private Servo leftClawServo;
     private Servo rightClawServo;
 
-    public TouchSensor touchSensor;
+    private TouchSensor touchSensor;
 
     private double leftClawPosition;
     private double rightClawPosition;
     private double wristPosition;
 
     private int armPosition;
+
+    private boolean isReady;
 
     public RobotHardwareA (LinearOpMode opmode) {
         myOpMode = opmode;
@@ -95,11 +97,14 @@ public class RobotHardwareA {
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
     }
-    public void initializeArm() {
+    private void initializeArm() {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     public void toggleArm() {
+        if (!isReady) {
+            return;
+        }
         if (armPosition == ARM_MINIMUM) {
             armPosition = ARM_MAXIMUM;
             armMotor.setPower(ARM_RAISE_POWER);
@@ -109,5 +114,13 @@ public class RobotHardwareA {
         }
         armMotor.setTargetPosition(armPosition);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+    public void update() {
+        boolean isPressed = touchSensor.isPressed();
+        if (isPressed && !isReady) {
+            initializeArm();
+            isReady = true;
+        }
+        myOpMode.telemetry.addData("Ready", isReady);
     }
 }
