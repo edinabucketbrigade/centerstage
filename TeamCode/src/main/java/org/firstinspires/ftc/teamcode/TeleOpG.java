@@ -35,35 +35,28 @@ public class TeleOpG extends LinearOpMode {
 
     // Declare motors
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive = null;
+
     private DcMotor armMotor = null;
     private Servo wristServo = null;
     private Servo leftClawServo = null;
     private Servo rightClawServo = null;
 
+    private RobotHardwareA robotHardware = null;
+
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        robotHardware = new RobotHardwareA(this);
 
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
         leftClawServo = hardwareMap.get(Servo.class, "left_claw_servo");
         rightClawServo = hardwareMap.get(Servo.class, "right_claw_servo");
 
         // Initialize hardware variables
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front_drive");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
 
         // Wheel reversing (test for correct directions)
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         armMotor.setDirection(DcMotor.Direction.REVERSE);
         armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -174,10 +167,10 @@ public class TeleOpG extends LinearOpMode {
             }
 
             // Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
+            robotHardware.leftFrontDrive.setPower(leftFrontPower);
+            robotHardware.rightFrontDrive.setPower(rightFrontPower);
+            robotHardware.leftBackDrive.setPower(leftBackPower);
+            robotHardware.rightBackDrive.setPower(rightBackPower);
 
             int currentArmPosition = armMotor.getCurrentPosition();
 
