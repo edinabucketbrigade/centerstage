@@ -5,7 +5,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
 @TeleOp
@@ -22,6 +21,7 @@ public class TeleOpG extends LinearOpMode {
         boolean previousB = false;
         boolean previousX = false;
         boolean previousY = false;
+        boolean previousA = false;
 
         waitForStart();
 
@@ -32,6 +32,7 @@ public class TeleOpG extends LinearOpMode {
             boolean currentB = gamepad1.b;
             boolean currentX = gamepad1.x;
             boolean currentY = gamepad1.y;
+            boolean currentA = gamepad1.a;
 
             if (currentY && !previousY) {
                 robotHardware.toggleArm();
@@ -46,6 +47,10 @@ public class TeleOpG extends LinearOpMode {
                 robotHardware.toggleLeftClaw();
             }
 
+            if (currentA && !previousA) {
+                robotHardware.toggleWrist();
+            }
+
             telemetry.addData("Status", "Running");
 
             telemetry.update();
@@ -53,6 +58,7 @@ public class TeleOpG extends LinearOpMode {
             previousB = currentB;
             previousX = currentX;
             previousY = currentY;
+            previousA = currentA;
         }
 
     }
