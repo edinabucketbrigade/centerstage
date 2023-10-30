@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.acmerobotics.dashboard.config.Config;
 
-import org.checkerframework.checker.signedness.qual.Constant;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -66,12 +63,13 @@ public class CenterStageCVDetection extends OpenCvPipeline {
             Core.inRange(mat1, MINIMUM_RED_LOW, MAXIMUM_RED_LOW, mat1);
             Core.inRange(mat2, MINIMUM_RED_HIGH, MAXIMUM_RED_HIGH, mat2);
             Core.bitwise_or(mat1, mat2, mat);
+            mat1.release();
+            mat2.release();
         }
         //submat = submatrix - portion of original matrix
         Mat left = mat.submat(Left_ROI);
         Mat right = mat.submat(Right_ROI);
         Mat middle = mat.submat(Middle_ROI);
-
 
         /*
         *   We can determine the percentage of white in the image by
@@ -86,24 +84,23 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         double rightValue = Core.sumElems(right).val[0];
         double middleValue = Core.sumElems(middle).val[0];
 
-        telemetry.addData("Left Raw Value:",leftValue);
-        telemetry.addData("Right Raw Value:",rightValue);
-        telemetry.addData("Middle Raw Value:",middleValue);
+        telemetry.addData("Left Raw Value", leftValue);
+        telemetry.addData("Right Raw Value", rightValue);
+        telemetry.addData("Middle Raw Value", middleValue);
 
         left.release();
         right.release();
         middle.release();
 
         if(leftValue >= rightValue && leftValue >= middleValue){
-           location = Location.Left;
-            telemetry.addData("Prop Location:", "Left");
+            location = Location.Left;
         } else if (rightValue >= middleValue) {
             location = Location.Right;
-            telemetry.addData("Prop Location:", "Right");
-        } else{
+        } else {
             location = Location.Middle;
-            telemetry.addData("Prop Location:", "Middle");
         }
+
+        telemetry.addData("Location", location);
 
         telemetry.update();
 

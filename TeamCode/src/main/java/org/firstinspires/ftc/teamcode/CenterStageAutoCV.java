@@ -83,22 +83,31 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         FtcDashboard.getInstance().startCameraStream(camera, 0);
 
-        robotHardware.update();
-
         waitForStart();
-        switch (detector.getLocation()) {
+
+        CenterStageCVDetection.Location location = detector.getLocation();
+
+        camera.stopStreaming();
+
+        if(location == null) {
+            telemetry.addData("Note", "Location is missing.  Give it more time.");
+            telemetry.update();
+            sleep(5000);
+            return;
+        }
+
+        switch (location) {
             case Right:
                 robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
-                robotHardware.runToPosition(-RIGHT_POSITION,RIGHT_POSITION, RIGHT_POSITION, -RIGHT_POSITION, WHEEL_POWER);
+                robotHardware.runToPosition(-RIGHT_POSITION, RIGHT_POSITION, RIGHT_POSITION, -RIGHT_POSITION, WHEEL_POWER);
                 break;
             case Left:
                 robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
-                robotHardware.runToPosition(LEFT_POSITION, -LEFT_POSITION,-LEFT_POSITION,LEFT_POSITION, WHEEL_POWER);
+                robotHardware.runToPosition(LEFT_POSITION, -LEFT_POSITION, -LEFT_POSITION, LEFT_POSITION, WHEEL_POWER);
                 break;
             case Middle:
                 robotHardware.runToPosition(MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, WHEEL_POWER);
                 break;
         }
-        camera.stopStreaming();
     }
 }
