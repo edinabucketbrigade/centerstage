@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -38,20 +36,16 @@ public class TeleOpG extends LinearOpMode {
             }
 
             if (currentX && !previousX) {
-                robotHardware.toggleRightClaw();
+                robotHardware.toggleLeftClaw();
             }
 
             if (currentB && !previousB) {
-                robotHardware.toggleLeftClaw();
+                robotHardware.toggleRightClaw();
             }
 
             if (currentA && !previousA) {
                 robotHardware.toggleWrist();
             }
-
-            telemetry.addData("Status", "Running");
-
-            telemetry.update();
 
             previousB = currentB;
             previousX = currentX;

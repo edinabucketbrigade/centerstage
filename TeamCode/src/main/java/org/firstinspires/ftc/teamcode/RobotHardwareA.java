@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -94,7 +93,7 @@ public class RobotHardwareA {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        myOpMode.telemetry = new MultipleTelemetry(myOpMode.telemetry, FtcDashboard.getInstance().getTelemetry());
+        FtcDashboard.getInstance();
 
         Telemetry telemetry = myOpMode.telemetry;
 
@@ -165,19 +164,19 @@ public class RobotHardwareA {
         telemetry.addData("Status", "Running");
         telemetry.addData("Ready", isReady);
         telemetry.addData("Arm Motor Position", armMotor.getCurrentPosition());
-        telemetry.addData("Arm Motor Power", armMotor.getPower());
+        telemetry.addData("Arm Motor Power", "%.2f", armMotor.getPower());
         telemetry.addData("Left Front Motor Position", leftFrontDrive.getCurrentPosition());
-        telemetry.addData("Left Front Motor Power", leftFrontDrive.getPower());
+        telemetry.addData("Left Front Motor Power", "%.2f", leftFrontDrive.getPower());
         telemetry.addData("Left Back Motor Position", leftBackDrive.getCurrentPosition());
-        telemetry.addData("Left Back Motor Power", leftBackDrive.getPower());
+        telemetry.addData("Left Back Motor Power", "%.2f", leftBackDrive.getPower());
         telemetry.addData("Right Front Motor Position", rightFrontDrive.getCurrentPosition());
-        telemetry.addData("Right Front Motor Power", rightFrontDrive.getPower());
+        telemetry.addData("Right Front Motor Power", "%.2f", rightFrontDrive.getPower());
         telemetry.addData("Right Back Motor Position", rightBackDrive.getCurrentPosition());
-        telemetry.addData("Right Back Motor Power", rightBackDrive.getPower());
+        telemetry.addData("Right Back Motor Power", "%.2f", rightBackDrive.getPower());
         telemetry.addData("Touch Sensor Pressed", touchSensor.isPressed());
-        telemetry.addData("Left Claw Servo Position", leftClawServo.getPosition());
-        telemetry.addData("Right Claw Servo Position", rightClawServo.getPosition());
-        telemetry.addData("Wrist Servo Position", wristServo.getPosition());
+        telemetry.addData("Left Claw Servo Position", "%.2f", leftClawServo.getPosition());
+        telemetry.addData("Right Claw Servo Position", "%.2f", rightClawServo.getPosition());
+        telemetry.addData("Wrist Servo Position", "%.2f", wristServo.getPosition());
         telemetry.update();
     }
 
