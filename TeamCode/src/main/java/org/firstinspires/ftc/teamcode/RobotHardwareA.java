@@ -1,24 +1,52 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 @Config
 public class RobotHardwareA {
-    public static double LEFT_CLAW_MINIMUM = 0.275;
-    public static double LEFT_CLAW_MAXIMUM = 0.6;
-    public static double RIGHT_CLAW_MINIMUM = 0.7;
-    public static double RIGHT_CLAW_MAXIMUM = 1;
-    public static double WRIST_MINIMUM = 0;
-    public static double WRIST_MAXIMUM = 0.72;
-    public static int ARM_MINIMUM = 0;
-    public static int ARM_MAXIMUM = 1300;
+
+    /*
+    Control Hub Portal
+        Expansion Hub 2
+            Motors
+                0 - GoBILDA 5201 series - arm_motor
+            Digital Devices
+                7 - REV Touch Sensor - touch
+        Control Hub
+            Motors
+                0 - GoBILDA 5201 series - right_back_drive
+                1 - GoBILDA 5201 series - right_front_drive
+                2 - GoBILDA 5201 series - left_front_drive
+                3 - GoBILDA 5201 series - left_back_drive
+            Servos
+                0 - Servo - right_claw_servo
+                1 - Servo - left_claw_servo
+                2 - Servo - wrist_servo
+    Webcam 1
+    */
+
+    public static double LEFT_CLAW_OPEN_POSITION = 0.7;
+    public static double LEFT_CLAW_CLOSED_POSITION = 1;
+    public static double RIGHT_CLAW_CLOSED_POSITION = 0.275;
+    public static double RIGHT_CLAW_OPEN_POSITION = 0.6;
+    public static double WRIST_DOWN_POSITION = 0;
+    public static double WRIST_UP_POSITION = 0.72;
+    public static int ARM_DOWN_POSITION = 0;
+    public static int ARM_UP_POSITION = 1300;
     public static double ARM_RAISE_POWER = 0.8;
     public static double ARM_LOWER_POWER = 0.4;
+    private static final String TAG = "Bucket Brigade";
     private LinearOpMode myOpMode;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -33,11 +61,10 @@ public class RobotHardwareA {
 
     private TouchSensor touchSensor;
 
-    private double leftClawPosition;
-    private double rightClawPosition;
-    private double wristPosition;
-
-    private int armPosition;
+    private boolean leftClawIsOpen;
+    private boolean rightClawIsOpen;
+    private boolean wristIsUp;
+    private boolean armIsUp;
 
     private boolean isReady;
 
@@ -57,7 +84,6 @@ public class RobotHardwareA {
 
         armMotor = myOpMode.hardwareMap.get(DcMotor.class, "arm_motor");
 
-
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -68,61 +94,93 @@ public class RobotHardwareA {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        leftClawPosition = LEFT_CLAW_MINIMUM;
-        rightClawPosition = RIGHT_CLAW_MINIMUM;
-        wristPosition = WRIST_MINIMUM;
+        myOpMode.telemetry = new MultipleTelemetry(myOpMode.telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        armPosition = ARM_MINIMUM;
+        Telemetry telemetry = myOpMode.telemetry;
 
-        myOpMode.telemetry.addData(">", "Hardware Initialized");
-        myOpMode.telemetry.update();
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
-
 
     public void toggleLeftClaw() {
-        leftClawPosition = leftClawPosition == LEFT_CLAW_MINIMUM ? LEFT_CLAW_MAXIMUM : LEFT_CLAW_MINIMUM;
+        double leftClawPosition = leftClawIsOpen ? LEFT_CLAW_CLOSED_POSITION : LEFT_CLAW_OPEN_POSITION;
+        leftClawIsOpen = !leftClawIsOpen;
+        log("left claw position: " + leftClawPosition + ", left claw is open: " + leftClawIsOpen);
         leftClawServo.setPosition(leftClawPosition);
     }
+
     public void toggleRightClaw() {
-        rightClawPosition = rightClawPosition == RIGHT_CLAW_MINIMUM ? RIGHT_CLAW_MAXIMUM : RIGHT_CLAW_MINIMUM;
+        double rightClawPosition = rightClawIsOpen ? RIGHT_CLAW_CLOSED_POSITION : RIGHT_CLAW_OPEN_POSITION;
+        rightClawIsOpen = !rightClawIsOpen;
+        log("right claw position: " + rightClawPosition + ", right claw is open: " + rightClawIsOpen);
         rightClawServo.setPosition(rightClawPosition);
     }
+
     public void toggleWrist() {
-        wristPosition = wristPosition == WRIST_MINIMUM ? WRIST_MAXIMUM : WRIST_MINIMUM;
+        double wristPosition = wristIsUp ? WRIST_DOWN_POSITION : WRIST_UP_POSITION;
+        wristIsUp = !wristIsUp;
+        log("wrist position: " + wristPosition + ", wrist is up: " + wristIsUp);
         wristServo.setPosition(wristPosition);
     }
+
     public void setDrivePowerManually(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
         leftFrontDrive.setPower(leftFrontPower);
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
     }
+
     private void initializeArm() {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
+
     public void toggleArm() {
         if (!isReady) {
             return;
         }
-        if (armPosition == ARM_MINIMUM) {
-            armPosition = ARM_MAXIMUM;
-            armMotor.setPower(ARM_RAISE_POWER);
-        } else {
-            armPosition = ARM_MINIMUM;
+        int armPosition;
+        if (armIsUp) {
+            armPosition = ARM_DOWN_POSITION;
             armMotor.setPower(ARM_LOWER_POWER);
+        } else {
+            armPosition = ARM_UP_POSITION;
+            armMotor.setPower(ARM_RAISE_POWER);
         }
+        armIsUp = !armIsUp;
+        log("arm position: " + armPosition + ", arm is up: " + armIsUp);
         armMotor.setTargetPosition(armPosition);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
+
     public void update() {
         boolean isPressed = touchSensor.isPressed();
         if (isPressed && !isReady) {
             initializeArm();
             isReady = true;
         }
-        myOpMode.telemetry.addData("Ready", isReady);
+
+        Telemetry telemetry = myOpMode.telemetry;
+
+        telemetry.addData("Status", "Running");
+        telemetry.addData("Ready", isReady);
+        telemetry.addData("Arm Motor Position", armMotor.getCurrentPosition());
+        telemetry.addData("Arm Motor Power", armMotor.getPower());
+        telemetry.addData("Left Front Motor Position", leftFrontDrive.getCurrentPosition());
+        telemetry.addData("Left Front Motor Power", leftFrontDrive.getPower());
+        telemetry.addData("Left Back Motor Position", leftBackDrive.getCurrentPosition());
+        telemetry.addData("Left Back Motor Power", leftBackDrive.getPower());
+        telemetry.addData("Right Front Motor Position", rightFrontDrive.getCurrentPosition());
+        telemetry.addData("Right Front Motor Power", rightFrontDrive.getPower());
+        telemetry.addData("Right Back Motor Position", rightBackDrive.getCurrentPosition());
+        telemetry.addData("Right Back Motor Power", rightBackDrive.getPower());
+        telemetry.addData("Touch Sensor Pressed", touchSensor.isPressed());
+        telemetry.addData("Left Claw Servo Position", leftClawServo.getPosition());
+        telemetry.addData("Right Claw Servo Position", rightClawServo.getPosition());
+        telemetry.addData("Wrist Servo Position", wristServo.getPosition());
+        telemetry.update();
     }
+
     public void setDrivePowerAutomatically() {
         double max;
 
@@ -162,16 +220,16 @@ public class RobotHardwareA {
         //      the setDirection() calls above.
         // Once the correct motors move in the correct direction re-comment this code.
 
-
-            /*leftBackPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-            leftFrontPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            rightBackPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-            rightFrontPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad*/
+        /*leftBackPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
+        leftFrontPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
+        rightBackPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
+        rightFrontPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad*/
 
         // Send calculated power to wheels
         setDrivePowerManually(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+    }
 
-        myOpMode.telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-        myOpMode.telemetry.addData("Back  left/right power", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+    public void log(String message) {
+        Log.d(TAG, message);
     }
 }

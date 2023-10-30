@@ -15,8 +15,6 @@ public class TeleOpG extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
         robotHardware = new RobotHardwareA(this);
 
         boolean previousB = false;
@@ -39,16 +37,12 @@ public class TeleOpG extends LinearOpMode {
             }
 
             if (currentX && !previousX) {
-                robotHardware.toggleRightClaw();
-            }
-
-            if (currentB && !previousB) {
                 robotHardware.toggleLeftClaw();
             }
 
-            telemetry.addData("Status", "Running");
-
-            telemetry.update();
+            if (currentB && !previousB) {
+                robotHardware.toggleRightClaw();
+            }
 
             previousB = currentB;
             previousX = currentX;
