@@ -20,6 +20,8 @@ public class RobotHardwareA {
         Expansion Hub 2
             Motors
                 0 - GoBILDA 5201 series - arm_motor
+                1 - Unspecified Motor - perpendicular_encoder
+                2 - Unspecified Motor - parallel_encoder
             Digital Devices
                 7 - REV Touch Sensor - touch
         Control Hub
@@ -212,10 +214,10 @@ public class RobotHardwareA {
         //      the setDirection() calls above.
         // Once the correct motors move in the correct direction re-comment this code.
 
-        /*leftBackPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-        leftFrontPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-        rightBackPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-        rightFrontPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad*/
+        leftBackPower = myOpMode.gamepad1.x ? 1.0 : 0.0;  // X gamepad
+        leftFrontPower = myOpMode.gamepad1.a ? 1.0 : 0.0;  // A gamepad
+        rightBackPower = myOpMode.gamepad1.y ? 1.0 : 0.0;  // Y gamepad
+        rightFrontPower  = myOpMode.gamepad1.b ? 1.0 : 0.0;  // B gamepad
 
         // Send calculated power to wheels
         setDrivePowerManually(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
