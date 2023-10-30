@@ -12,7 +12,10 @@ public class TeleOpG extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+
         robotHardware = new RobotHardwareA(this);
+
+        telemetry.update();
 
         boolean previousB = false;
         boolean previousX = false;
@@ -22,7 +25,9 @@ public class TeleOpG extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+
             robotHardware.update();
+
             robotHardware.setDrivePowerAutomatically();
 
             boolean currentB = gamepad1.b;
@@ -51,6 +56,9 @@ public class TeleOpG extends LinearOpMode {
             previousX = currentX;
             previousY = currentY;
             previousA = currentA;
+
+            telemetry.update();
+
         }
 
     }
