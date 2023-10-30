@@ -37,10 +37,7 @@ enum TargetMode {
         final double MAX_AUTO_STRAFE = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)TeleOpC
         final double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
 
-        private DcMotor leftFrontDrive = null;  //  Used to control the left front drive wheel
-        private DcMotor rightFrontDrive = null;  //  Used to control the right front drive wheel
-        private DcMotor leftBackDrive = null;  //  Used to control the left back drive wheel
-        private DcMotor rightBackDrive = null;  //  Used to control the right back drive wheel
+        private RobotHardwareA robotHardware = null;
 
         private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
         private static final int DESIRED_TAG_ID = -1;     // Choose the tag you want to approach or set to -1 for ANY tag.
@@ -59,15 +56,7 @@ enum TargetMode {
             // Initialize the Apriltag Detection process
             initAprilTag();
 
-            leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
-            rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-            leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
-            rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-
-            leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-            leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-            rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-            rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+            robotHardware = new RobotHardwareA(this);
 
             if (USE_WEBCAM)
                 setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
@@ -166,10 +155,7 @@ enum TargetMode {
             }
 
             // Send powers to the wheels.
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
+            robotHardware.setDrivePowerManually(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
         }
 
         private void initAprilTag() {
