@@ -174,4 +174,30 @@ public class RobotHardwareA {
         myOpMode.telemetry.addData("Front left/right power", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
         myOpMode.telemetry.addData("Back  left/right power", "%4.2f, %4.2f", leftBackPower, rightBackPower);
     }
+    public void runToPosition(int frontRightPosition, int frontLeftPosition, int backRightPosition, int backLeftPosition, double power){
+        leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        rightFrontDrive.setTargetPosition(frontRightPosition);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFrontDrive.setPower(power);
+        leftFrontDrive.setTargetPosition(frontLeftPosition);
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFrontDrive.setPower(power);
+        leftBackDrive.setTargetPosition(backLeftPosition);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBackDrive.setPower(power);
+        rightBackDrive.setTargetPosition(backRightPosition);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBackDrive.setPower(power);
+
+        while(myOpMode.opModeIsActive() && (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() || leftBackDrive.isBusy() || rightBackDrive.isBusy())){}
+    }
 }
+

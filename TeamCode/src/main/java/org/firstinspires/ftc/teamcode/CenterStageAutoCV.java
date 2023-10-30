@@ -20,72 +20,18 @@ public class CenterStageAutoCV extends LinearOpMode {
     /*
     * If program has a build folder error try clearing the build
     */
-    private DcMotor frontRightDrive = null;
-    private DcMotor frontLeftDrive = null;
-    private DcMotor backLeftDrive = null;
-    private DcMotor backRightDrive =null;
-    private DcMotorEx armMotor;
     public static int STRAFE_FORWARD_POSITION = 1800;
     public static int MIDDLE_FORWARD_POSITION = 2150;
     public static int LEFT_POSITION = 450;
     public static int RIGHT_POSITION = 750;
     public static double WHEEL_POWER = 0.5;
-    public static int targetArmPosition = 0;
-    public boolean armIsReady;
     OpenCvWebcam camera;
 
-    public void runToPosition(int frontRightPosition, int frontLeftPosition, int backRightPosition, int backLeftPosition){
-        frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    private RobotHardwareA robotHardware = null;
 
-        frontRightDrive.setTargetPosition(frontRightPosition);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRightDrive.setPower(WHEEL_POWER);
-        frontLeftDrive.setTargetPosition(frontLeftPosition);
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontLeftDrive.setPower(WHEEL_POWER);
-        backRightDrive.setTargetPosition(backRightPosition);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRightDrive.setPower(WHEEL_POWER);
-        backLeftDrive.setTargetPosition(backLeftPosition);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeftDrive.setPower(WHEEL_POWER);
-        while(opModeIsActive() && (frontLeftDrive.isBusy() || frontRightDrive.isBusy() || backLeftDrive.isBusy() || backRightDrive.isBusy())){}
-        if(armIsReady) {
-            armMotor.setTargetPosition(targetArmPosition);
-            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            armMotor.setPower(0.1);
-        }
-    }
     @Override
     public void runOpMode() throws InterruptedException {
-        // Initialize hardware variables
-            frontRightDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-            frontLeftDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
-            backRightDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-            backLeftDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
-            armMotor = hardwareMap.get(DcMotorEx.class, "arm_motor");
-            telemetry.addData("Status", "Initialized");
-            telemetry.update();
-
-        armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        armMotor.setDirection(DcMotor.Direction.FORWARD);
-        armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
+        robotHardware = new RobotHardwareA(this);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -140,32 +86,17 @@ public class CenterStageAutoCV extends LinearOpMode {
         waitForStart();
         switch (detector.getLocation()) {
             case Right:
-                runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION);
-                runToPosition(-RIGHT_POSITION,RIGHT_POSITION, RIGHT_POSITION, -RIGHT_POSITION);
+                robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
+                robotHardware.runToPosition(-RIGHT_POSITION,RIGHT_POSITION, RIGHT_POSITION, -RIGHT_POSITION, WHEEL_POWER);
                 break;
             case Left:
-                runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION);
-                runToPosition(LEFT_POSITION, -LEFT_POSITION,-LEFT_POSITION,LEFT_POSITION);
+                robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
+                robotHardware.runToPosition(LEFT_POSITION, -LEFT_POSITION,-LEFT_POSITION,LEFT_POSITION, WHEEL_POWER);
                 break;
             case Middle:
-                runToPosition(MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION);
+                robotHardware.runToPosition(MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, WHEEL_POWER);
                 break;
         }
         camera.stopStreaming();
-
-        while(opModeIsActive() && (frontLeftDrive.isBusy() || frontRightDrive.isBusy() || backLeftDrive.isBusy() || backRightDrive.isBusy())){
-
-        }
-        armMotor.setPower(0);
-        frontLeftDrive.setPower(0);
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightDrive.setPower(0);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftDrive.setPower(0);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightDrive.setPower(0);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armMotor.setPower(0);
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 }
