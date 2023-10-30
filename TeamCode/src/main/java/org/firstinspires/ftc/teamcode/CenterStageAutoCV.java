@@ -83,6 +83,8 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         FtcDashboard.getInstance().startCameraStream(camera, 0);
 
+        robotHardware.update();
+
         waitForStart();
         switch (detector.getLocation()) {
             case Right:
