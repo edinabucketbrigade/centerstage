@@ -28,7 +28,7 @@ public class TeleOpG extends LinearOpMode {
 
             robotHardware.update();
 
-            robotHardware.setDrivePowerAutomatically();
+            robotHardware.moveRobot();
 
             boolean currentB = gamepad1.b;
             boolean currentX = gamepad1.x;

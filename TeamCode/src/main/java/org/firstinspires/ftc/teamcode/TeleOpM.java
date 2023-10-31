@@ -75,7 +75,7 @@ public class TeleOpM extends LinearOpMode {
             }
 
             if(detection == null) {
-                robotHardware.setDrivePowerAutomatically();
+                robotHardware.moveRobot();
             }
             else {
                 driveTowardTarget(detection);
@@ -105,7 +105,7 @@ public class TeleOpM extends LinearOpMode {
         }
 
         // Send powers to the wheels.
-        robotHardware.setDrivePowerManually(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+        robotHardware.moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
     }
 
     private void initAprilTag() {

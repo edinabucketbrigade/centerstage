@@ -123,7 +123,7 @@ public class RobotHardwareA {
         wristServo.setPosition(wristPosition);
     }
 
-    public void setDrivePowerManually(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
+    public void moveRobot(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
         leftFrontDrive.setPower(leftFrontPower);
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
@@ -175,7 +175,7 @@ public class RobotHardwareA {
         telemetry.addData("Wrist Servo Position", "%.2f", wristServo.getPosition());
     }
 
-    public void setDrivePowerAutomatically() {
+    public void moveRobot() {
         double max;
 
         // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
@@ -220,7 +220,7 @@ public class RobotHardwareA {
         rightFrontPower  = myOpMode.gamepad1.b ? 1.0 : 0.0;  // B gamepad
 
         // Send calculated power to wheels
-        setDrivePowerManually(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+        moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
     }
 
     public void log(String message) {
