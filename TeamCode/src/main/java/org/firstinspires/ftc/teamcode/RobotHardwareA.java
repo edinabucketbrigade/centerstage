@@ -53,21 +53,16 @@ public class RobotHardwareA {
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
-
     private DcMotor armMotor;
-
     private Servo wristServo;
     private Servo leftClawServo;
     private Servo rightClawServo;
-
     private TouchSensor touchSensor;
-
     private boolean leftClawIsOpen;
     private boolean rightClawIsOpen;
     private boolean wristIsUp;
     private boolean armIsUp;
-
-    private boolean isReady;
+    private boolean isArmReady;
 
     public RobotHardwareA (LinearOpMode opmode) {
         myOpMode = opmode;
@@ -103,24 +98,66 @@ public class RobotHardwareA {
     }
 
     public void toggleLeftClaw() {
-        double leftClawPosition = leftClawIsOpen ? LEFT_CLAW_CLOSED_POSITION : LEFT_CLAW_OPEN_POSITION;
-        leftClawIsOpen = !leftClawIsOpen;
-        log("left claw position: " + leftClawPosition + ", left claw is open: " + leftClawIsOpen);
-        leftClawServo.setPosition(leftClawPosition);
+        if(leftClawIsOpen) {
+            closeLeftClaw();
+        }
+        else {
+            openLeftClaw();
+        }
+    }
+
+    public void openLeftClaw() {
+        log("open left claw");
+        leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
+        leftClawIsOpen = true;
+    }
+
+    public void closeLeftClaw() {
+        log("close left claw");
+        leftClawServo.setPosition(LEFT_CLAW_CLOSED_POSITION);
+        leftClawIsOpen = false;
     }
 
     public void toggleRightClaw() {
-        double rightClawPosition = rightClawIsOpen ? RIGHT_CLAW_CLOSED_POSITION : RIGHT_CLAW_OPEN_POSITION;
-        rightClawIsOpen = !rightClawIsOpen;
-        log("right claw position: " + rightClawPosition + ", right claw is open: " + rightClawIsOpen);
-        rightClawServo.setPosition(rightClawPosition);
+        if(rightClawIsOpen) {
+            closeRightClaw();
+        }
+        else {
+            openRightClaw();
+        }
+    }
+
+    public void openRightClaw() {
+        log("open right claw");
+        rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
+        rightClawIsOpen = true;
+    }
+
+    public void closeRightClaw() {
+        log("close right claw");
+        rightClawServo.setPosition(RIGHT_CLAW_CLOSED_POSITION);
+        rightClawIsOpen = false;
     }
 
     public void toggleWrist() {
-        double wristPosition = wristIsUp ? WRIST_DOWN_POSITION : WRIST_UP_POSITION;
-        wristIsUp = !wristIsUp;
-        log("wrist position: " + wristPosition + ", wrist is up: " + wristIsUp);
-        wristServo.setPosition(wristPosition);
+        if(wristIsUp) {
+            lowerWrist();
+        }
+        else {
+            raiseWrist();
+        }
+    }
+
+    public void raiseWrist() {
+        log("raise wrist");
+        wristServo.setPosition(WRIST_UP_POSITION);
+        wristIsUp = true;
+    }
+
+    public void lowerWrist() {
+        log("lower wrist");
+        wristServo.setPosition(WRIST_DOWN_POSITION);
+        wristIsUp = false;
     }
 
     public void moveRobot(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
@@ -136,34 +173,47 @@ public class RobotHardwareA {
     }
 
     public void toggleArm() {
-        if (!isReady) {
+        if(armIsUp) {
+            lowerArm();
+        }
+        else {
+            raiseArm();
+        }
+    }
+
+    public void raiseArm() {
+        if (!isArmReady) {
             return;
         }
-        int armPosition;
-        if (armIsUp) {
-            armPosition = ARM_DOWN_POSITION;
-            armMotor.setPower(ARM_LOWER_POWER);
-        } else {
-            armPosition = ARM_UP_POSITION;
-            armMotor.setPower(ARM_RAISE_POWER);
-        }
-        armIsUp = !armIsUp;
-        log("arm position: " + armPosition + ", arm is up: " + armIsUp);
-        armMotor.setTargetPosition(armPosition);
+        log("raise arm");
+        armMotor.setTargetPosition(ARM_UP_POSITION);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(ARM_RAISE_POWER);
+        armIsUp = true;
+    }
+
+    public void lowerArm() {
+        if (!isArmReady) {
+            return;
+        }
+        log("lower arm");
+        armMotor.setTargetPosition(ARM_DOWN_POSITION);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(ARM_LOWER_POWER);
+        armIsUp = false;
     }
 
     public void update() {
         boolean isPressed = touchSensor.isPressed();
-        if (isPressed && !isReady) {
+        if (isPressed && !isArmReady) {
             initializeArm();
-            isReady = true;
+            isArmReady = true;
         }
 
         Telemetry telemetry = myOpMode.telemetry;
 
         telemetry.addData("Status", "Running");
-        telemetry.addData("Ready", isReady);
+        telemetry.addData("Arm Ready", isArmReady);
         telemetry.addData("Left Front Motor Position/Power", "%d, %.2f", leftFrontDrive.getCurrentPosition(), leftFrontDrive.getPower());
         telemetry.addData("Left Back Motor Position/Power", "%d, %.2f", leftBackDrive.getCurrentPosition(), leftBackDrive.getPower());
         telemetry.addData("Right Front Motor Position/Power", "%d, %.2f", rightFrontDrive.getCurrentPosition(), rightFrontDrive.getPower());
@@ -195,7 +245,6 @@ public class RobotHardwareA {
         max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
         max = Math.max(max, Math.abs(leftBackPower));
         max = Math.max(max, Math.abs(rightBackPower));
-        //lift.setPower(liftPower);
 
         if (max > 1.0) {
             leftFrontPower  /= max;
@@ -213,12 +262,12 @@ public class RobotHardwareA {
         //   2) Then make sure they run in the correct direction by modifying the
         //      the setDirection() calls above.
         // Once the correct motors move in the correct direction re-comment this code.
-
+        /*
         leftBackPower = myOpMode.gamepad1.x ? 1.0 : 0.0;  // X gamepad
         leftFrontPower = myOpMode.gamepad1.a ? 1.0 : 0.0;  // A gamepad
         rightBackPower = myOpMode.gamepad1.y ? 1.0 : 0.0;  // Y gamepad
         rightFrontPower  = myOpMode.gamepad1.b ? 1.0 : 0.0;  // B gamepad
-
+        */
         // Send calculated power to wheels
         moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
     }
@@ -226,6 +275,7 @@ public class RobotHardwareA {
     public void log(String message) {
         Log.d(TAG, message);
     }
+
     public void runToPosition(int frontRightPosition, int frontLeftPosition, int backRightPosition, int backLeftPosition, double power){
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
