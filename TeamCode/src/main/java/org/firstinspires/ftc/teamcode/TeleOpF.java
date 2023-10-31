@@ -10,7 +10,7 @@ public class TeleOpF extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        motor  = hardwareMap.get(DcMotor.class, "parallelEncoder");
+        motor  = hardwareMap.get(DcMotor.class, "parallel_encoder");
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
