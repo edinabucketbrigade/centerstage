@@ -7,10 +7,12 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 @Config
 public class RobotHardwareA {
@@ -48,11 +50,13 @@ public class RobotHardwareA {
     public static double ARM_RAISE_POWER = 0.8;
     public static double ARM_LOWER_POWER = 0.4;
     private static final String TAG = "Bucket Brigade";
-    private LinearOpMode myOpMode;
+    private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
+    private Encoder parallelEncoder;
+    private Encoder perpendicularEncoder;
     private DcMotor armMotor;
     private Servo wristServo;
     private Servo leftClawServo;
@@ -64,26 +68,34 @@ public class RobotHardwareA {
     private boolean armIsUp;
     private boolean isArmReady;
 
-    public RobotHardwareA (LinearOpMode opmode) {
-        myOpMode = opmode;
+    public RobotHardwareA (LinearOpMode opMode) {
+        this.opMode = opMode;
 
-        leftFrontDrive = myOpMode.hardwareMap.get(DcMotor.class, "left_front_drive");
-        leftBackDrive = myOpMode.hardwareMap.get(DcMotor.class, "left_back_drive");
-        rightFrontDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_front_drive");
-        rightBackDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_back_drive");
+        HardwareMap hardwareMap = opMode.hardwareMap;
 
-        wristServo = myOpMode.hardwareMap.get(Servo.class, "wrist_servo");
-        leftClawServo = myOpMode.hardwareMap.get(Servo.class, "left_claw_servo");
-        rightClawServo = myOpMode.hardwareMap.get(Servo.class, "right_claw_servo");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
 
-        touchSensor = myOpMode.hardwareMap.get(TouchSensor.class, "touch");
+        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "parallel_encoder"));
+        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "perpendicular_encoder"));
 
-        armMotor = myOpMode.hardwareMap.get(DcMotor.class, "arm_motor");
+        wristServo = hardwareMap.get(Servo.class, "wrist_servo");
+        leftClawServo = hardwareMap.get(Servo.class, "left_claw_servo");
+        rightClawServo = hardwareMap.get(Servo.class, "right_claw_servo");
+
+        touchSensor = hardwareMap.get(TouchSensor.class, "touch");
+
+        armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        perpendicularEncoder.setDirection(Encoder.Direction.REVERSE);
+        parallelEncoder.setDirection(Encoder.Direction.REVERSE);
 
         armMotor.setDirection(DcMotor.Direction.REVERSE);
         armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -92,7 +104,7 @@ public class RobotHardwareA {
 
         FtcDashboard.getInstance();
 
-        Telemetry telemetry = myOpMode.telemetry;
+        Telemetry telemetry = opMode.telemetry;
 
         telemetry.addData("Status", "Initialized");
     }
@@ -210,7 +222,7 @@ public class RobotHardwareA {
             isArmReady = true;
         }
 
-        Telemetry telemetry = myOpMode.telemetry;
+        Telemetry telemetry = opMode.telemetry;
 
         telemetry.addData("Status", "Running");
         telemetry.addData("Arm Ready", isArmReady);
@@ -218,6 +230,8 @@ public class RobotHardwareA {
         telemetry.addData("Left Back Motor Position/Power", "%d, %.2f", leftBackDrive.getCurrentPosition(), leftBackDrive.getPower());
         telemetry.addData("Right Front Motor Position/Power", "%d, %.2f", rightFrontDrive.getCurrentPosition(), rightFrontDrive.getPower());
         telemetry.addData("Right Back Motor Position/Power", "%d, %.2f", rightBackDrive.getCurrentPosition(), rightBackDrive.getPower());
+        telemetry.addData("Parallel Encoder Position", parallelEncoder.getCurrentPosition());
+        telemetry.addData("Perpendicular Encoder Position", perpendicularEncoder.getCurrentPosition());
         telemetry.addData("Arm Motor Position/Power", "%d, %.2f", armMotor.getCurrentPosition(), armMotor.getPower());
         telemetry.addData("Touch Sensor Pressed", touchSensor.isPressed());
         telemetry.addData("Left Claw Servo Position", "%.2f", leftClawServo.getPosition());
@@ -229,9 +243,9 @@ public class RobotHardwareA {
         double max;
 
         // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-        double axial = -myOpMode.gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-        double lateral = myOpMode.gamepad1.left_stick_x;
-        double yaw = myOpMode.gamepad1.right_stick_x;
+        double axial = -opMode.gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+        double lateral = opMode.gamepad1.left_stick_x;
+        double yaw = opMode.gamepad1.right_stick_x;
 
         // Combine the joystick requests for each axis-motion to determine each wheel's power.
         // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -299,9 +313,9 @@ public class RobotHardwareA {
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBackDrive.setPower(power);
 
-        while(myOpMode.opModeIsActive() && (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() || leftBackDrive.isBusy() || rightBackDrive.isBusy())) {
+        while(opMode.opModeIsActive() && (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() || leftBackDrive.isBusy() || rightBackDrive.isBusy())) {
             update();
-            myOpMode.telemetry.update();
+            opMode.telemetry.update();
         }
     }
 }
