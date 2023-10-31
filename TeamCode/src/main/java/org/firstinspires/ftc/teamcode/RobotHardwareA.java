@@ -277,10 +277,10 @@ public class RobotHardwareA {
         //      the setDirection() calls above.
         // Once the correct motors move in the correct direction re-comment this code.
         /*
-        leftBackPower = myOpMode.gamepad1.x ? 1.0 : 0.0;  // X gamepad
-        leftFrontPower = myOpMode.gamepad1.a ? 1.0 : 0.0;  // A gamepad
-        rightBackPower = myOpMode.gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-        rightFrontPower  = myOpMode.gamepad1.b ? 1.0 : 0.0;  // B gamepad
+        leftBackPower = opMode.gamepad1.x ? 1.0 : 0.0;  // X gamepad
+        leftFrontPower = opMode.gamepad1.a ? 1.0 : 0.0;  // A gamepad
+        rightBackPower = opMode.gamepad1.y ? 1.0 : 0.0;  // Y gamepad
+        rightFrontPower  = opMode.gamepad1.b ? 1.0 : 0.0;  // B gamepad
         */
         // Send calculated power to wheels
         moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
