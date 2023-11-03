@@ -37,7 +37,7 @@ public class CenterStageAutoCV extends LinearOpMode {
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         CenterStageCVDetection detector = new CenterStageCVDetection(telemetry);
         camera.setPipeline(detector);
-        camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
+        camera.setMillisecondsPermissionTimeout(1000); // Timeout for obtaining permission is configurable. Set before opening.
         /*
          *   Below is an example of a lambda expression which is in simply an anonymous function.
          *   Since we are only executing one statement we are able to remove the curly braces and semicolon
@@ -82,6 +82,9 @@ public class CenterStageAutoCV extends LinearOpMode {
         });
 
         FtcDashboard.getInstance().startCameraStream(camera, 0);
+        robotHardware.closeLeftClaw();
+        robotHardware.closeRightClaw();
+        robotHardware.raiseWrist();
 
         waitForStart();
 
@@ -99,15 +102,21 @@ public class CenterStageAutoCV extends LinearOpMode {
         switch (location) {
             case Right:
                 robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
+                robotHardware.lowerWrist();
                 robotHardware.runToPosition(-RIGHT_POSITION, RIGHT_POSITION, RIGHT_POSITION, -RIGHT_POSITION, WHEEL_POWER);
                 break;
             case Left:
                 robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
+                robotHardware.lowerWrist();
                 robotHardware.runToPosition(LEFT_POSITION, -LEFT_POSITION, -LEFT_POSITION, LEFT_POSITION, WHEEL_POWER);
                 break;
             case Middle:
+                robotHardware.lowerWrist();
                 robotHardware.runToPosition(MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, WHEEL_POWER);
                 break;
         }
+        robotHardware.openLeftClaw();
+        robotHardware.openRightClaw();
+        while(opModeIsActive()){}
     }
 }
