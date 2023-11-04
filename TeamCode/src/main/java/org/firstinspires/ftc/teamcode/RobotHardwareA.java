@@ -250,6 +250,7 @@ public class RobotHardwareA {
         telemetry.addData("Left Claw Servo Position", "%.2f", leftClawServo.getPosition());
         telemetry.addData("Right Claw Servo Position", "%.2f", rightClawServo.getPosition());
         telemetry.addData("Wrist Servo Position", "%.2f", wristServo.getPosition());
+        telemetry.addData("Field Centric", isFieldCentric);
     }
 
     public void moveRobot() {
