@@ -24,7 +24,9 @@ public class TeleOpG extends LinearOpMode {
         boolean previousX = false;
         boolean previousY = false;
         boolean previousA = false;
+        boolean previousRightBumper = false;
         boolean previousDpadLeft = false;
+        boolean previousDpadDown = false;
 
         waitForStart();
 
@@ -38,7 +40,9 @@ public class TeleOpG extends LinearOpMode {
             boolean currentX = gamepad1.x;
             boolean currentY = gamepad1.y;
             boolean currentA = gamepad1.a;
-            boolean currentDpadLeft = gamepad1.dpad_left;;
+            boolean currentRightBumper = gamepad1.right_bumper;
+            boolean currentDpadLeft = gamepad1.dpad_left;
+            boolean currentDpadDown = gamepad1.dpad_down;
 
             if (currentY && !previousY) {
                 robotHardware.toggleArm();
@@ -57,15 +61,25 @@ public class TeleOpG extends LinearOpMode {
                 robotHardware.toggleWrist();
             }
 
+            if (currentRightBumper && !previousRightBumper) {
+                robotHardware.toggleTurtleMode();
+            }
+
             if (currentDpadLeft && !previousDpadLeft) {
                 robotHardware.toggleFieldCentric();
+            }
+
+            if (currentDpadDown && !previousDpadDown) {
+                robotHardware.toggleTelemetry();
             }
 
             previousB = currentB;
             previousX = currentX;
             previousY = currentY;
             previousA = currentA;
+            previousRightBumper = currentRightBumper;
             previousDpadLeft = currentDpadLeft;
+            previousDpadDown = currentDpadDown;
 
             telemetry.update();
 

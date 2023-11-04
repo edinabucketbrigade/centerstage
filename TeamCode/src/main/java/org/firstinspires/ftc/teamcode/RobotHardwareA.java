@@ -54,6 +54,7 @@ public class RobotHardwareA {
     public static int ARM_UP_POSITION = 1300;
     public static double ARM_RAISE_POWER = 0.8;
     public static double ARM_LOWER_POWER = 0.4;
+    public static double TURTLE_FACTOR = 2;
     private static final String TAG = "Bucket Brigade";
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -74,6 +75,8 @@ public class RobotHardwareA {
     private boolean armIsUp;
     private boolean isArmReady;
     private boolean isFieldCentric;
+    private boolean showTelemetry;
+    private boolean isTurtleMode;
 
     public RobotHardwareA (LinearOpMode opMode) {
         this.opMode = opMode;
@@ -236,21 +239,23 @@ public class RobotHardwareA {
         }
 
         Telemetry telemetry = opMode.telemetry;
-
-        telemetry.addData("Status", "Running");
-        telemetry.addData("Arm Ready", isArmReady);
-        telemetry.addData("Left Front Motor Position/Power", "%d, %.2f", leftFrontDrive.getCurrentPosition(), leftFrontDrive.getPower());
-        telemetry.addData("Left Back Motor Position/Power", "%d, %.2f", leftBackDrive.getCurrentPosition(), leftBackDrive.getPower());
-        telemetry.addData("Right Front Motor Position/Power", "%d, %.2f", rightFrontDrive.getCurrentPosition(), rightFrontDrive.getPower());
-        telemetry.addData("Right Back Motor Position/Power", "%d, %.2f", rightBackDrive.getCurrentPosition(), rightBackDrive.getPower());
-        telemetry.addData("Parallel Encoder Position", parallelEncoder.getCurrentPosition());
-        telemetry.addData("Perpendicular Encoder Position", perpendicularEncoder.getCurrentPosition());
-        telemetry.addData("Arm Motor Position/Power", "%d, %.2f", armMotor.getCurrentPosition(), armMotor.getPower());
-        telemetry.addData("Touch Sensor Pressed", touchSensor.isPressed());
-        telemetry.addData("Left Claw Servo Position", "%.2f", leftClawServo.getPosition());
-        telemetry.addData("Right Claw Servo Position", "%.2f", rightClawServo.getPosition());
-        telemetry.addData("Wrist Servo Position", "%.2f", wristServo.getPosition());
-        telemetry.addData("Field Centric", isFieldCentric);
+        if (showTelemetry){
+            telemetry.addData("Status", "Running");
+            telemetry.addData("Arm Ready", isArmReady);
+            telemetry.addData("Left Front Motor Position/Power", "%d, %.2f", leftFrontDrive.getCurrentPosition(), leftFrontDrive.getPower());
+            telemetry.addData("Left Back Motor Position/Power", "%d, %.2f", leftBackDrive.getCurrentPosition(), leftBackDrive.getPower());
+            telemetry.addData("Right Front Motor Position/Power", "%d, %.2f", rightFrontDrive.getCurrentPosition(), rightFrontDrive.getPower());
+            telemetry.addData("Right Back Motor Position/Power", "%d, %.2f", rightBackDrive.getCurrentPosition(), rightBackDrive.getPower());
+            telemetry.addData("Parallel Encoder Position", parallelEncoder.getCurrentPosition());
+            telemetry.addData("Perpendicular Encoder Position", perpendicularEncoder.getCurrentPosition());
+            telemetry.addData("Arm Motor Position/Power", "%d, %.2f", armMotor.getCurrentPosition(), armMotor.getPower());
+            telemetry.addData("Touch Sensor Pressed", touchSensor.isPressed());
+            telemetry.addData("Left Claw Servo Position", "%.2f", leftClawServo.getPosition());
+            telemetry.addData("Right Claw Servo Position", "%.2f", rightClawServo.getPosition());
+            telemetry.addData("Wrist Servo Position", "%.2f", wristServo.getPosition());
+            telemetry.addData("Field Centric", isFieldCentric);
+            telemetry.addData("Turtle Mode", isTurtleMode);
+        }
     }
 
     public void moveRobot() {
@@ -313,6 +318,13 @@ public class RobotHardwareA {
                 leftBackPower /= max;
                 rightBackPower /= max;
             }
+
+        }
+        if (isTurtleMode) {
+            leftFrontPower /= TURTLE_FACTOR;
+            leftBackPower /= TURTLE_FACTOR;
+            rightBackPower /= TURTLE_FACTOR;
+            rightFrontPower /= TURTLE_FACTOR;
         }
         // This is test code:
         //
@@ -371,6 +383,10 @@ public class RobotHardwareA {
     public void toggleFieldCentric(){
         this.isFieldCentric=!isFieldCentric;
     }
+    public void toggleTelemetry() {
+        showTelemetry = !showTelemetry;
+    }
+
     public boolean isArmRaised() {
         int difference = Math.abs(armMotor.getCurrentPosition() - ARM_UP_POSITION);
 
@@ -380,6 +396,9 @@ public class RobotHardwareA {
         else {
             return false;
         }
+    }
+    public void toggleTurtleMode(){
+        isTurtleMode = !isTurtleMode;
     }
 
 }
