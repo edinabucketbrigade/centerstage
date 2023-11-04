@@ -68,7 +68,7 @@ public class RobotHardwareA {
     private boolean armIsUp;
     private boolean isArmReady;
 
-    public RobotHardwareA (LinearOpMode opMode) {
+    public RobotHardwareA(LinearOpMode opMode) {
         this.opMode = opMode;
 
         HardwareMap hardwareMap = opMode.hardwareMap;
@@ -110,10 +110,9 @@ public class RobotHardwareA {
     }
 
     public void toggleLeftClaw() {
-        if(leftClawIsOpen) {
+        if (leftClawIsOpen) {
             closeLeftClaw();
-        }
-        else {
+        } else {
             openLeftClaw();
         }
     }
@@ -131,10 +130,9 @@ public class RobotHardwareA {
     }
 
     public void toggleRightClaw() {
-        if(rightClawIsOpen) {
+        if (rightClawIsOpen) {
             closeRightClaw();
-        }
-        else {
+        } else {
             openRightClaw();
         }
     }
@@ -152,10 +150,9 @@ public class RobotHardwareA {
     }
 
     public void toggleWrist() {
-        if(wristIsUp) {
+        if (wristIsUp) {
             lowerWrist();
-        }
-        else {
+        } else {
             raiseWrist();
         }
     }
@@ -185,10 +182,9 @@ public class RobotHardwareA {
     }
 
     public void toggleArm() {
-        if(armIsUp) {
+        if (armIsUp) {
             lowerArm();
-        }
-        else {
+        } else {
             raiseArm();
         }
     }
@@ -249,10 +245,10 @@ public class RobotHardwareA {
 
         // Combine the joystick requests for each axis-motion to determine each wheel's power.
         // Set up a variable for each drive wheel to save the power level for telemetry.
-        double leftFrontPower  = axial + lateral + yaw;
+        double leftFrontPower = axial + lateral + yaw;
         double rightFrontPower = axial - lateral - yaw;
-        double leftBackPower   = axial - lateral + yaw;
-        double rightBackPower  = axial + lateral - yaw;
+        double leftBackPower = axial - lateral + yaw;
+        double rightBackPower = axial + lateral - yaw;
 
         // Normalize the values so no wheel power exceeds 100%
         // This ensures that the robot maintains the desired motion.
@@ -261,10 +257,10 @@ public class RobotHardwareA {
         max = Math.max(max, Math.abs(rightBackPower));
 
         if (max > 1.0) {
-            leftFrontPower  /= max;
+            leftFrontPower /= max;
             rightFrontPower /= max;
-            leftBackPower   /= max;
-            rightBackPower  /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
         }
 
         // This is test code:
@@ -290,7 +286,7 @@ public class RobotHardwareA {
         Log.d(TAG, message);
     }
 
-    public void runToPosition(int frontRightPosition, int frontLeftPosition, int backRightPosition, int backLeftPosition, double power){
+    public void runToPosition(int frontRightPosition, int frontLeftPosition, int backRightPosition, int backLeftPosition, double power) {
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -313,9 +309,20 @@ public class RobotHardwareA {
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBackDrive.setPower(power);
 
-        while(opMode.opModeIsActive() && (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() || leftBackDrive.isBusy() || rightBackDrive.isBusy())) {
+        while (opMode.opModeIsActive() && (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() || leftBackDrive.isBusy() || rightBackDrive.isBusy())) {
             update();
             opMode.telemetry.update();
+        }
+    }
+
+    public boolean isArmRaised() {
+        int difference = Math.abs(armMotor.getCurrentPosition() - ARM_UP_POSITION);
+
+        if (difference < 50) {
+            return true;
+        }
+        else {
+            return false;
         }
     }
 }
