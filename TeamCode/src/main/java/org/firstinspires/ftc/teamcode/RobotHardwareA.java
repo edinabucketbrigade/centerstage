@@ -4,15 +4,20 @@ import android.util.Log;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.Encoder;
+import com.qualcomm.robotcore.hardware.IMU;
 
 @Config
 public class RobotHardwareA {
@@ -55,6 +60,7 @@ public class RobotHardwareA {
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
+    private IMU imu;
     private Encoder parallelEncoder;
     private Encoder perpendicularEncoder;
     private DcMotor armMotor;
@@ -67,8 +73,9 @@ public class RobotHardwareA {
     private boolean wristIsUp;
     private boolean armIsUp;
     private boolean isArmReady;
+    private boolean isFieldCentric;
 
-    public RobotHardwareA(LinearOpMode opMode) {
+    public RobotHardwareA (LinearOpMode opMode) {
         this.opMode = opMode;
 
         HardwareMap hardwareMap = opMode.hardwareMap;
@@ -77,6 +84,12 @@ public class RobotHardwareA {
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+        imu.initialize(parameters);
 
         parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "parallel_encoder"));
         perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "perpendicular_encoder"));
@@ -110,9 +123,10 @@ public class RobotHardwareA {
     }
 
     public void toggleLeftClaw() {
-        if (leftClawIsOpen) {
+        if(leftClawIsOpen) {
             closeLeftClaw();
-        } else {
+        }
+        else {
             openLeftClaw();
         }
     }
@@ -130,9 +144,10 @@ public class RobotHardwareA {
     }
 
     public void toggleRightClaw() {
-        if (rightClawIsOpen) {
+        if(rightClawIsOpen) {
             closeRightClaw();
-        } else {
+        }
+        else {
             openRightClaw();
         }
     }
@@ -150,9 +165,10 @@ public class RobotHardwareA {
     }
 
     public void toggleWrist() {
-        if (wristIsUp) {
+        if(wristIsUp) {
             lowerWrist();
-        } else {
+        }
+        else {
             raiseWrist();
         }
     }
@@ -182,9 +198,10 @@ public class RobotHardwareA {
     }
 
     public void toggleArm() {
-        if (armIsUp) {
+        if(armIsUp) {
             lowerArm();
-        } else {
+        }
+        else {
             raiseArm();
         }
     }
@@ -236,33 +253,66 @@ public class RobotHardwareA {
     }
 
     public void moveRobot() {
-        double max;
+        double leftFrontPower;
+        double leftBackPower;
+        double rightFrontPower;
+        double rightBackPower;
+        if (isFieldCentric) {
 
-        // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-        double axial = -opMode.gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-        double lateral = opMode.gamepad1.left_stick_x;
-        double yaw = opMode.gamepad1.right_stick_x;
+            double y = -opMode.gamepad1.left_stick_y; // Remember, Y stick value is reversed
+            double x = opMode.gamepad1.left_stick_x;
+            double rx = opMode.gamepad1.right_stick_x;
 
-        // Combine the joystick requests for each axis-motion to determine each wheel's power.
-        // Set up a variable for each drive wheel to save the power level for telemetry.
-        double leftFrontPower = axial + lateral + yaw;
-        double rightFrontPower = axial - lateral - yaw;
-        double leftBackPower = axial - lateral + yaw;
-        double rightBackPower = axial + lateral - yaw;
+            // This button choice was made so that it is hard to hit on accident,
+            // it can be freely changed based on preference.
+            // The equivalent button is start on Xbox-style controllers.
+            if (opMode.gamepad1.options) {
+                imu.resetYaw();
+            }
 
-        // Normalize the values so no wheel power exceeds 100%
-        // This ensures that the robot maintains the desired motion.
-        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
+            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
+            // Rotate the movement direction counter to the bot's rotation
+            double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+            double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+
+            rotX = rotX * 1.1;  // Counteract imperfect strafing
+
+            // Denominator is the largest motor power (absolute value) or 1
+            // This ensures all the powers maintain the same ratio,
+            // but only if at least one is out of the range [-1, 1]
+            double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+            leftFrontPower = (rotY + rotX + rx) / denominator;
+            leftBackPower = (rotY - rotX + rx) / denominator;
+            rightFrontPower = (rotY - rotX - rx) / denominator;
+            rightBackPower = (rotY + rotX - rx) / denominator;
+        } else {
+            double max;
+            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+            double axial = -opMode.gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double lateral = opMode.gamepad1.left_stick_x;
+            double yaw = opMode.gamepad1.right_stick_x;
+
+            // Combine the joystick requests for each axis-motion to determine each wheel's power.
+            // Set up a variable for each drive wheel to save the power level for telemetry.
+            leftFrontPower = axial + lateral + yaw;
+            rightFrontPower = axial - lateral - yaw;
+            leftBackPower = axial - lateral + yaw;
+            rightBackPower = axial + lateral - yaw;
+
+            // Normalize the values so no wheel power exceeds 100%
+            // This ensures that the robot maintains the desired motion.
+            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+            max = Math.max(max, Math.abs(leftBackPower));
+            max = Math.max(max, Math.abs(rightBackPower));
+
+            if (max > 1.0) {
+                leftFrontPower /= max;
+                rightFrontPower /= max;
+                leftBackPower /= max;
+                rightBackPower /= max;
+            }
         }
-
         // This is test code:
         //
         // Uncomment the following code to test your motor directions.
@@ -272,12 +322,12 @@ public class RobotHardwareA {
         //   2) Then make sure they run in the correct direction by modifying the
         //      the setDirection() calls above.
         // Once the correct motors move in the correct direction re-comment this code.
-        /*
-        leftBackPower = opMode.gamepad1.x ? 1.0 : 0.0;  // X gamepad
-        leftFrontPower = opMode.gamepad1.a ? 1.0 : 0.0;  // A gamepad
-        rightBackPower = opMode.gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-        rightFrontPower  = opMode.gamepad1.b ? 1.0 : 0.0;  // B gamepad
-        */
+            /*
+            leftBackPower = opMode.gamepad1.x ? 1.0 : 0.0;  // X gamepad
+            leftFrontPower = opMode.gamepad1.a ? 1.0 : 0.0;  // A gamepad
+            rightBackPower = opMode.gamepad1.y ? 1.0 : 0.0;  // Y gamepad
+            rightFrontPower  = opMode.gamepad1.b ? 1.0 : 0.0;  // B gamepad
+            */
         // Send calculated power to wheels
         moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
     }
@@ -286,7 +336,7 @@ public class RobotHardwareA {
         Log.d(TAG, message);
     }
 
-    public void runToPosition(int frontRightPosition, int frontLeftPosition, int backRightPosition, int backLeftPosition, double power) {
+    public void runToPosition(int frontRightPosition, int frontLeftPosition, int backRightPosition, int backLeftPosition, double power){
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -309,21 +359,15 @@ public class RobotHardwareA {
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBackDrive.setPower(power);
 
-        while (opMode.opModeIsActive() && (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() || leftBackDrive.isBusy() || rightBackDrive.isBusy())) {
+        while(opMode.opModeIsActive() && (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() || leftBackDrive.isBusy() || rightBackDrive.isBusy())) {
             update();
             opMode.telemetry.update();
         }
     }
-
-    public boolean isArmRaised() {
-        int difference = Math.abs(armMotor.getCurrentPosition() - ARM_UP_POSITION);
-
-        if (difference < 50) {
-            return true;
-        }
-        else {
-            return false;
-        }
+    public void setIsFieldCentric(boolean isFieldCentric){
+        this.isFieldCentric=isFieldCentric;
+    }
+    public void toggleFieldCentric(){
+        this.isFieldCentric=!isFieldCentric;
     }
 }
-
