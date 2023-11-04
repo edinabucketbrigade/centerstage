@@ -370,4 +370,15 @@ public class RobotHardwareA {
     public void toggleFieldCentric(){
         this.isFieldCentric=!isFieldCentric;
     }
+    public boolean isArmRaised() {
+        int difference = Math.abs(armMotor.getCurrentPosition() - ARM_UP_POSITION);
+
+        if (difference < 50) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
