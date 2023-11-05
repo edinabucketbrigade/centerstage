@@ -55,6 +55,8 @@ public class RobotHardwareA {
     public static double ARM_RAISE_POWER = 0.8;
     public static double ARM_LOWER_POWER = 0.4;
     public static double TURTLE_FACTOR = 4;
+    public static final int CAMERA_WIDTH = 640;
+    public static final int CAMERA_HEIGHT = 360;
     private static final String TAG = "Bucket Brigade";
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
