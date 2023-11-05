@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,15 +16,17 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+@Config
 @Autonomous
 public class CenterStageAutoCV extends LinearOpMode {
     /*
     * If program has a build folder error try clearing the build
     */
-    public static int STRAFE_FORWARD_POSITION = 1800;
+    public static int STRAFE_FORWARD_POSITION = 1000;
     public static int MIDDLE_FORWARD_POSITION = 2150;
     public static int LEFT_POSITION = 450;
     public static int RIGHT_POSITION = 750;
+    public static int ROTATE_POSITION = 1400;
     public static double WHEEL_POWER = 0.5;
     OpenCvWebcam camera;
 
@@ -102,13 +105,15 @@ public class CenterStageAutoCV extends LinearOpMode {
         switch (location) {
             case Right:
                 robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
+                robotHardware.runToPosition(ROTATE_POSITION,ROTATE_POSITION,-ROTATE_POSITION,-ROTATE_POSITION,WHEEL_POWER);
                 robotHardware.lowerWrist();
-                robotHardware.runToPosition(-RIGHT_POSITION, RIGHT_POSITION, RIGHT_POSITION, -RIGHT_POSITION, WHEEL_POWER);
+                robotHardware.runToPosition(RIGHT_POSITION, RIGHT_POSITION, RIGHT_POSITION, RIGHT_POSITION, WHEEL_POWER);
                 break;
             case Left:
                 robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
+                robotHardware.runToPosition(ROTATE_POSITION,ROTATE_POSITION,-ROTATE_POSITION,-ROTATE_POSITION,WHEEL_POWER);
                 robotHardware.lowerWrist();
-                robotHardware.runToPosition(LEFT_POSITION, -LEFT_POSITION, -LEFT_POSITION, LEFT_POSITION, WHEEL_POWER);
+                robotHardware.runToPosition(LEFT_POSITION, LEFT_POSITION, LEFT_POSITION, LEFT_POSITION, WHEEL_POWER);
                 break;
             case Middle:
                 robotHardware.lowerWrist();

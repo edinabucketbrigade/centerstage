@@ -4,6 +4,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+
+
+
 @Config
 @TeleOp
 public class TeleOpG extends LinearOpMode {
@@ -21,6 +24,7 @@ public class TeleOpG extends LinearOpMode {
         boolean previousX = false;
         boolean previousY = false;
         boolean previousA = false;
+        boolean previousDpadLeft = false;
 
         waitForStart();
 
@@ -34,6 +38,7 @@ public class TeleOpG extends LinearOpMode {
             boolean currentX = gamepad1.x;
             boolean currentY = gamepad1.y;
             boolean currentA = gamepad1.a;
+            boolean currentDpadLeft = gamepad1.dpad_left;
 
             if (currentY && !previousY) {
                 robotHardware.toggleArm();
@@ -52,10 +57,17 @@ public class TeleOpG extends LinearOpMode {
                 robotHardware.toggleWrist();
             }
 
+            robotHardware.setTurtleMode(gamepad1.right_bumper);
+
+            if (currentDpadLeft && !previousDpadLeft) {
+                robotHardware.toggleFieldCentric();
+            }
+
             previousB = currentB;
             previousX = currentX;
             previousY = currentY;
             previousA = currentA;
+            previousDpadLeft = currentDpadLeft;
 
             telemetry.update();
 

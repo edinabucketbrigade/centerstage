@@ -49,6 +49,10 @@ public class TeleOpM extends LinearOpMode {
 
         telemetry.update();
 
+        robotHardware.closeLeftClaw();
+        robotHardware.closeRightClaw();
+        robotHardware.raiseWrist();
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -175,6 +179,17 @@ public class TeleOpM extends LinearOpMode {
         double rangeError = (detection.ftcPose.range - DESIRED_DISTANCE);
         double headingError = detection.ftcPose.bearing;
         double yawError = detection.ftcPose.yaw;
+
+        if (rangeError < 2) {
+            robotHardware.raiseArm();
+        }
+        if (robotHardware.isArmRaised()) {
+            robotHardware.openLeftClaw();
+            robotHardware.openRightClaw();
+        }
+
+
+        telemetry.addData("Range Error", "%5.1f inches", rangeError);
 
         // Use the speed and turn "gains" to calculate how we want the robot to move.
         double drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
