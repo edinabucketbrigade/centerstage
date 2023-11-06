@@ -48,8 +48,8 @@ public class RobotHardwareA {
     public static double LEFT_CLAW_CLOSED_POSITION = 1;
     public static double RIGHT_CLAW_CLOSED_POSITION = 0.275;
     public static double RIGHT_CLAW_OPEN_POSITION = 0.6;
-    public static double WRIST_DOWN_POSITION = 0.03;
-    public static double WRIST_UP_POSITION = 0.72;
+    public static double WRIST_DOWN_POSITION = 0.12;
+    public static double WRIST_UP_POSITION = 0.8;
     public static int ARM_DOWN_POSITION = 0;
     public static int ARM_UP_POSITION = 1300;
     public static double ARM_RAISE_POWER = 0.8;
