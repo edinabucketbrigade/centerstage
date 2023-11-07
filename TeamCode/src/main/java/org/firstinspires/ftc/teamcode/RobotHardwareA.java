@@ -12,12 +12,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.Encoder;
-import com.qualcomm.robotcore.hardware.IMU;
 
 @Config
 public class RobotHardwareA {
@@ -52,12 +50,14 @@ public class RobotHardwareA {
     public static double WRIST_UP_POSITION = 0.8;
     public static int ARM_DOWN_POSITION = 0;
     public static int ARM_UP_POSITION = 1300;
-    public static double ARM_RAISE_POWER = 0.8;
-    public static double ARM_LOWER_POWER = 0.4;
+    public static double ARM_RAISE_POWER = 1;
+    public static double ARM_LOWER_POWER = 0.9;
     public static double TURTLE_FACTOR = 4;
     public static final int CAMERA_WIDTH = 640;
     public static final int CAMERA_HEIGHT = 360;
     private static final String TAG = "Bucket Brigade";
+    public static double ARM_GAIN = 0.0012;
+    public static int ARM_POSITION_EPSILON = 20;
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -73,8 +73,8 @@ public class RobotHardwareA {
     private TouchSensor touchSensor;
     private boolean leftClawIsOpen;
     private boolean rightClawIsOpen;
-    private boolean wristIsUp;
-    private boolean armIsUp;
+    private boolean isWristTargetUp;
+    private boolean isArmTargetUp;
     private boolean isArmReady;
     private boolean isFieldCentric;
     private boolean isTurtleMode;
@@ -169,7 +169,7 @@ public class RobotHardwareA {
     }
 
     public void toggleWrist() {
-        if(wristIsUp) {
+        if(isWristTargetUp) {
             lowerWrist();
         }
         else {
@@ -180,13 +180,13 @@ public class RobotHardwareA {
     public void raiseWrist() {
         log("raise wrist");
         wristServo.setPosition(WRIST_UP_POSITION);
-        wristIsUp = true;
+        isWristTargetUp = true;
     }
 
     public void lowerWrist() {
         log("lower wrist");
         wristServo.setPosition(WRIST_DOWN_POSITION);
-        wristIsUp = false;
+        isWristTargetUp = false;
     }
 
     public void moveRobot(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
@@ -202,7 +202,7 @@ public class RobotHardwareA {
     }
 
     public void toggleArm() {
-        if(armIsUp) {
+        if(isArmTargetUp) {
             lowerArm();
         }
         else {
@@ -217,8 +217,7 @@ public class RobotHardwareA {
         log("raise arm");
         armMotor.setTargetPosition(ARM_UP_POSITION);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(ARM_RAISE_POWER);
-        armIsUp = true;
+        isArmTargetUp = true;
     }
 
     public void lowerArm() {
@@ -229,7 +228,7 @@ public class RobotHardwareA {
         armMotor.setTargetPosition(ARM_DOWN_POSITION);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setPower(ARM_LOWER_POWER);
-        armIsUp = false;
+        isArmTargetUp = false;
     }
 
     public void update() {
@@ -238,6 +237,27 @@ public class RobotHardwareA {
             initializeArm();
             isArmReady = true;
         }
+
+        double armPower;
+        if (isArmTargetUp) {
+            if (isArmRaised()) {
+                armPower = 0;
+            }
+            else {
+                double positionError = Math.abs(ARM_UP_POSITION - armMotor.getCurrentPosition());
+                armPower = Math.min(positionError * ARM_GAIN, ARM_RAISE_POWER);
+            }
+        }
+        else {
+            if (isArmLowered()) {
+                armPower = 0;
+            }
+            else {
+                double positionError = Math.abs(ARM_DOWN_POSITION - armMotor.getCurrentPosition());
+                armPower = Math.min(positionError * ARM_GAIN, ARM_LOWER_POWER);
+            }
+        }
+        armMotor.setPower(armPower);
 
         Telemetry telemetry = opMode.telemetry;
         telemetry.addData("Status", "Running");
@@ -386,12 +406,12 @@ public class RobotHardwareA {
     public boolean isArmRaised() {
         int difference = Math.abs(armMotor.getCurrentPosition() - ARM_UP_POSITION);
 
-        if (difference < 50) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return difference < ARM_POSITION_EPSILON;
+    }
+    public boolean isArmLowered() {
+        int difference = Math.abs(armMotor.getCurrentPosition() - ARM_DOWN_POSITION);
+
+        return difference < ARM_POSITION_EPSILON;
     }
     public void setTurtleMode(boolean isTurtleMode){
         this.isTurtleMode = isTurtleMode;
