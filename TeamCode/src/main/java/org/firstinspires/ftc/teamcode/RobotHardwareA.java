@@ -52,7 +52,9 @@ public class RobotHardwareA {
     public static int ARM_UP_POSITION = 1300;
     public static double ARM_RAISE_POWER = 1;
     public static double ARM_LOWER_POWER = 0.9;
-    public static double TURTLE_FACTOR = 4;
+    public static double TURTLE_FACTOR = 6;
+    public static double NORMAL_FACTOR = 2;
+    public static double BUNNY_FACTOR = 1;
     public static final int CAMERA_WIDTH = 640;
     public static final int CAMERA_HEIGHT = 360;
     private static final String TAG = "Bucket Brigade";
@@ -78,6 +80,7 @@ public class RobotHardwareA {
     private boolean isArmReady;
     private boolean isFieldCentric = true;
     private boolean isTurtleMode;
+    private boolean isBunnyMode;
 
     public RobotHardwareA (LinearOpMode opMode) {
         this.opMode = opMode;
@@ -339,12 +342,12 @@ public class RobotHardwareA {
             }
 
         }
-        if (isTurtleMode) {
-            leftFrontPower /= TURTLE_FACTOR;
-            leftBackPower /= TURTLE_FACTOR;
-            rightBackPower /= TURTLE_FACTOR;
-            rightFrontPower /= TURTLE_FACTOR;
-        }
+        double factor = isTurtleMode ? TURTLE_FACTOR : NORMAL_FACTOR;
+        factor = isBunnyMode ? BUNNY_FACTOR : factor;
+        leftFrontPower /= factor;
+        leftBackPower /= factor;
+        rightBackPower /= factor;
+        rightFrontPower /= factor;
         // This is test code:
         //
         // Uncomment the following code to test your motor directions.
@@ -415,6 +418,9 @@ public class RobotHardwareA {
     }
     public void setTurtleMode(boolean isTurtleMode){
         this.isTurtleMode = isTurtleMode;
+    }
+    public void setBunnyMode(boolean isBunnyMode){
+        this.isBunnyMode = isBunnyMode;
     }
 
 }

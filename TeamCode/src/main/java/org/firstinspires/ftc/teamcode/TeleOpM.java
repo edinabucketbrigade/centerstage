@@ -37,9 +37,9 @@ public class TeleOpM extends LinearOpMode {
     }
 
     public static double DESIRED_DISTANCE = 8.0; //  this is how close the camera should get to the target (inches)
-    public static double SPEED_GAIN = 0.03;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
+    public static double SPEED_GAIN = 0.05;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     public static double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
-    public static double TURN_GAIN = 0.02;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
+    public static double TURN_GAIN = 0.03;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 
     public static double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     public static double MAX_AUTO_STRAFE = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
@@ -51,6 +51,7 @@ public class TeleOpM extends LinearOpMode {
     private TargetState targetState = TargetState.POSITIONING;
     private ElapsedTime timer = new ElapsedTime();
     private boolean startedTimer;
+    private int framesInPosition;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -75,48 +76,45 @@ public class TeleOpM extends LinearOpMode {
             robotHardware.update();
 
             robotHardware.setTurtleMode(gamepad1.left_bumper);
+            robotHardware.setBunnyMode(gamepad1.right_bumper);
 
-            if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
+            if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
                 robotHardware.toggleFieldCentric();
             }
 
             if (currentGamepad.x && !previousGamepad.x) {
-                if (gamepad1.right_bumper) {
-                    targetMode = TargetMode.LEFT;
-                    initializeTargetState();
-                }
-                else {
-                    robotHardware.toggleLeftClaw();
-                }
+                robotHardware.toggleLeftClaw();
             }
 
             if (currentGamepad.a && !previousGamepad.a) {
-                if (gamepad1.right_bumper) {
-                    targetMode = TargetMode.CENTER;
-                    initializeTargetState();
-                }
-                else {
-                    robotHardware.toggleWrist();
-                }
+                robotHardware.toggleWrist();
             }
 
             if (currentGamepad.b && !previousGamepad.b) {
-                if (gamepad1.right_bumper) {
-                    targetMode = TargetMode.RIGHT;
-                    initializeTargetState();
-                }
-                else {
-                    robotHardware.toggleRightClaw();
-                }
+                robotHardware.toggleRightClaw();
             }
 
             if (currentGamepad.y && !previousGamepad.y){
-                if (gamepad1.right_bumper) {
-                    targetMode = TargetMode.NONE;
-                }
-                else {
-                    robotHardware.toggleArm();
-                }
+                robotHardware.toggleArm();
+            }
+
+            if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
+                targetMode = TargetMode.LEFT;
+                initializeTargetState();
+            }
+
+            if (currentGamepad.dpad_right && !previousGamepad.dpad_right) {
+                targetMode = TargetMode.RIGHT;
+                initializeTargetState();
+            }
+
+            if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
+                targetMode = TargetMode.CENTER;
+                initializeTargetState();
+            }
+
+            if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+                targetMode = TargetMode.NONE;
             }
 
             if (targetMode == TargetMode.NONE) {
@@ -144,6 +142,7 @@ public class TeleOpM extends LinearOpMode {
     }
 
     private void initializeTargetState() {
+        framesInPosition = 0;
         targetState = TargetState.POSITIONING;
         startedTimer = false;
     }
@@ -241,18 +240,25 @@ public class TeleOpM extends LinearOpMode {
         double headingError = detection.ftcPose.bearing;
         double yawError = detection.ftcPose.yaw;
 
-        if (startedTimer && timer.milliseconds() > 1000) {
-            startedTimer = false;
+        if (framesInPosition > 10) {
             targetState = TargetState.LIFTING;
             return;
         }
 
-        if (rangeError < 2 && !startedTimer) {
-            startedTimer = true;
-            timer.reset();
+        boolean isInPosition = Math.abs(rangeError) < 1 && Math.abs(headingError) < 2;
+
+        if (isInPosition) {
+            framesInPosition++;
+        }
+        else {
+            framesInPosition = 0;
         }
 
         telemetry.addData("Range Error", "%5.1f inches", rangeError);
+        telemetry.addData("Heading Error", "%5.1f degrees", headingError);
+        telemetry.addData("Yaw Error", "%5.1f degrees", yawError);
+
+        telemetry.addData("Frames In Position", framesInPosition);
 
         // Use the speed and turn "gains" to calculate how we want the robot to move.
         double drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
@@ -264,10 +270,6 @@ public class TeleOpM extends LinearOpMode {
         telemetry.addData("Bearing", "%3.0f degrees", detection.ftcPose.bearing);
         telemetry.addData("Yaw", "%3.0f degrees", detection.ftcPose.yaw);
         telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
-        telemetry.addData("Target Mode", targetMode);
-        telemetry.addData("Target State", targetState);
-        telemetry.addData("Started Timer", startedTimer);
-        telemetry.addData("Timer", timer);
 
         moveRobot(drive, strafe, turn);
 
@@ -313,5 +315,9 @@ public class TeleOpM extends LinearOpMode {
             default:
                 throw new InterruptedException("Unrecognized target state.");
         }
+        telemetry.addData("Target Mode", targetMode);
+        telemetry.addData("Target State", targetState);
+        telemetry.addData("Started Timer", startedTimer);
+        telemetry.addData("Timer", timer);
     }
 }
