@@ -5,6 +5,7 @@ import android.util.Size;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -53,10 +54,8 @@ public class TeleOpM extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        boolean previousB = false;
-        boolean previousX = false;
-        boolean previousY = false;
-        boolean previousA = false;
+        Gamepad previousGamepad = new Gamepad();
+        Gamepad currentGamepad = new Gamepad();
 
         // Initialize the AprilTag Detection process
         initAprilTag();
@@ -70,30 +69,27 @@ public class TeleOpM extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            previousGamepad.copy(currentGamepad);
+            currentGamepad.copy(gamepad1);
 
             robotHardware.update();
 
-            boolean currentB = gamepad1.b;
-            boolean currentX = gamepad1.x;
-            boolean currentY = gamepad1.y;
-            boolean currentA = gamepad1.a;
-
-            if (currentX && !previousX) {
+            if (currentGamepad.x && !previousGamepad.x) {
                 targetMode = TargetMode.LEFT;
                 initializeTargetState();
             }
 
-            if (currentA && !previousA) {
+            if (currentGamepad.a && !previousGamepad.a) {
                 targetMode = TargetMode.CENTER;
                 initializeTargetState();
             }
 
-            if (currentB && !previousB) {
+            if (currentGamepad.b && !previousGamepad.b) {
                 targetMode = TargetMode.RIGHT;
                 initializeTargetState();
             }
 
-            if (currentY && !previousY){
+            if (currentGamepad.y && !previousGamepad.y){
                 targetMode = TargetMode.NONE;
             }
 
@@ -115,11 +111,6 @@ public class TeleOpM extends LinearOpMode {
                     updateRobot(null);
                 }
             }
-
-            previousB = currentB;
-            previousX = currentX;
-            previousY = currentY;
-            previousA = currentA;
 
             telemetry.update();
 
