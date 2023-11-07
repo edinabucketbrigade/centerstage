@@ -57,7 +57,7 @@ public class RobotHardwareA {
     public static final int CAMERA_HEIGHT = 360;
     private static final String TAG = "Bucket Brigade";
     public static double ARM_GAIN = 0.0012;
-    public static int ARM_POSITION_EPSILON = 20;
+    public static int ARM_POSITION_EPSILON = 50;
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;

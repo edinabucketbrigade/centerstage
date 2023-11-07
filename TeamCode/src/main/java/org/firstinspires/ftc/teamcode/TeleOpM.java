@@ -35,7 +35,7 @@ public class TeleOpM extends LinearOpMode {
         LOWERING
     }
 
-    public static double DESIRED_DISTANCE = 6.0; //  this is how close the camera should get to the target (inches)
+    public static double DESIRED_DISTANCE = 8.0; //  this is how close the camera should get to the target (inches)
     public static double SPEED_GAIN = 0.03;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     public static double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     public static double TURN_GAIN = 0.02;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
@@ -97,20 +97,23 @@ public class TeleOpM extends LinearOpMode {
                 targetMode = TargetMode.NONE;
             }
 
-            AprilTagDetection detection = null;
-
-            if (targetMode != TargetMode.NONE) {
-                detection = getDetection();
-                if(detection == null) {
-                    telemetry.addData("Note", "Target is missing");
-                }
-            }
-
-            if(detection == null) {
+            if (targetMode == TargetMode.NONE) {
                 robotHardware.moveRobot();
             }
             else {
-                updateRobot(detection);
+                if (targetState == TargetState.POSITIONING) {
+                    AprilTagDetection detection = getDetection();
+                    if(detection == null) {
+                        robotHardware.moveRobot();
+                        telemetry.addData("Note", "Target is missing");
+                    }
+                    else {
+                        updateRobot(detection);
+                    }
+                }
+                else {
+                    updateRobot(null);
+                }
             }
 
             previousB = currentB;
@@ -257,15 +260,8 @@ public class TeleOpM extends LinearOpMode {
     private void handleLifting() {
         robotHardware.raiseArm();
         if (robotHardware.isArmRaised()) {
-            if (startedTimer && timer.milliseconds() > 500) {
-                timer.reset();
-                targetState = TargetState.DROPPING;
-            }
-
-            if (!startedTimer) {
-                startedTimer = true;
-                timer.reset();
-            }
+            timer.reset();
+            targetState = TargetState.DROPPING;
         }
     }
 
