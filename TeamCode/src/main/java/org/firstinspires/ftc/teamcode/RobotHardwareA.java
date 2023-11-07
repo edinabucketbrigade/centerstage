@@ -76,7 +76,7 @@ public class RobotHardwareA {
     private boolean isWristTargetUp;
     private boolean isArmTargetUp;
     private boolean isArmReady;
-    private boolean isFieldCentric;
+    private boolean isFieldCentric = true;
     private boolean isTurtleMode;
 
     public RobotHardwareA (LinearOpMode opMode) {

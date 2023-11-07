@@ -74,23 +74,49 @@ public class TeleOpM extends LinearOpMode {
 
             robotHardware.update();
 
+            robotHardware.setTurtleMode(gamepad1.left_bumper);
+
+            if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
+                robotHardware.toggleFieldCentric();
+            }
+
             if (currentGamepad.x && !previousGamepad.x) {
-                targetMode = TargetMode.LEFT;
-                initializeTargetState();
+                if (gamepad1.right_bumper) {
+                    targetMode = TargetMode.LEFT;
+                    initializeTargetState();
+                }
+                else {
+                    robotHardware.toggleLeftClaw();
+                }
             }
 
             if (currentGamepad.a && !previousGamepad.a) {
-                targetMode = TargetMode.CENTER;
-                initializeTargetState();
+                if (gamepad1.right_bumper) {
+                    targetMode = TargetMode.CENTER;
+                    initializeTargetState();
+                }
+                else {
+                    robotHardware.toggleWrist();
+                }
             }
 
             if (currentGamepad.b && !previousGamepad.b) {
-                targetMode = TargetMode.RIGHT;
-                initializeTargetState();
+                if (gamepad1.right_bumper) {
+                    targetMode = TargetMode.RIGHT;
+                    initializeTargetState();
+                }
+                else {
+                    robotHardware.toggleRightClaw();
+                }
             }
 
             if (currentGamepad.y && !previousGamepad.y){
-                targetMode = TargetMode.NONE;
+                if (gamepad1.right_bumper) {
+                    targetMode = TargetMode.NONE;
+                }
+                else {
+                    robotHardware.toggleArm();
+                }
             }
 
             if (targetMode == TargetMode.NONE) {

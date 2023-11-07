@@ -42,7 +42,6 @@ public class TeleOpG extends LinearOpMode {
 
             if (currentY && !previousY) {
                 robotHardware.toggleArm();
-                robotHardware.toggleWrist();
             }
 
             if (currentX && !previousX) {
@@ -57,7 +56,7 @@ public class TeleOpG extends LinearOpMode {
                 robotHardware.toggleWrist();
             }
 
-            robotHardware.setTurtleMode(gamepad1.right_bumper);
+            robotHardware.setTurtleMode(gamepad1.left_bumper);
 
             if (currentDpadLeft && !previousDpadLeft) {
                 robotHardware.toggleFieldCentric();
