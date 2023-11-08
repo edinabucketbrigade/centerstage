@@ -12,9 +12,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
 @Config
@@ -52,14 +54,17 @@ public class RobotHardwareA {
     public static int ARM_UP_POSITION = 1300;
     public static double ARM_RAISE_POWER = 1;
     public static double ARM_LOWER_POWER = 0.9;
-    public static double TURTLE_FACTOR = 6;
-    public static double NORMAL_FACTOR = 2;
-    public static double BUNNY_FACTOR = 1;
+    public static double TURTLE_MULTIPLIER = 0.3;
+    public static double NORMAL_MULTIPLIER = 0.6;
+    public static double BUNNY_MULTIPLIER = 1;
     public static final int CAMERA_WIDTH = 640;
     public static final int CAMERA_HEIGHT = 360;
     private static final String TAG = "Bucket Brigade";
     public static double ARM_GAIN = 0.0012;
-    public static int ARM_POSITION_EPSILON = 50;
+    public static int ARM_POSITION_THRESHOLD = 50;
+    public static double HEADING_THRESHOLD = 1.0;
+    public static double TURN_GAIN = 0.03;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
+    public static double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -81,6 +86,8 @@ public class RobotHardwareA {
     private boolean isFieldCentric = true;
     private boolean isTurtleMode;
     private boolean isBunnyMode;
+    private double headingError = 0;
+    private double  targetHeading = 0;
 
     public RobotHardwareA (LinearOpMode opMode) {
         this.opMode = opMode;
@@ -291,13 +298,6 @@ public class RobotHardwareA {
             double x = opMode.gamepad1.left_stick_x;
             double rx = opMode.gamepad1.right_stick_x;
 
-            // This button choice was made so that it is hard to hit on accident,
-            // it can be freely changed based on preference.
-            // The equivalent button is start on Xbox-style controllers.
-            if (opMode.gamepad1.options) {
-                imu.resetYaw();
-            }
-
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
             // Rotate the movement direction counter to the bot's rotation
@@ -342,12 +342,20 @@ public class RobotHardwareA {
             }
 
         }
-        double factor = isTurtleMode ? TURTLE_FACTOR : NORMAL_FACTOR;
-        factor = isBunnyMode ? BUNNY_FACTOR : factor;
-        leftFrontPower /= factor;
-        leftBackPower /= factor;
-        rightBackPower /= factor;
-        rightFrontPower /= factor;
+        double multiplier;
+        if (isTurtleMode) {
+            multiplier = TURTLE_MULTIPLIER;
+        }
+        else if (isBunnyMode) {
+            multiplier = BUNNY_MULTIPLIER;
+        }
+        else {
+            multiplier = NORMAL_MULTIPLIER;
+        }
+        leftFrontPower *= multiplier;
+        leftBackPower *= multiplier;
+        rightBackPower *= multiplier;
+        rightFrontPower *= multiplier;
         // This is test code:
         //
         // Uncomment the following code to test your motor directions.
@@ -409,12 +417,12 @@ public class RobotHardwareA {
     public boolean isArmRaised() {
         int difference = Math.abs(armMotor.getCurrentPosition() - ARM_UP_POSITION);
 
-        return difference < ARM_POSITION_EPSILON;
+        return difference < ARM_POSITION_THRESHOLD;
     }
     public boolean isArmLowered() {
         int difference = Math.abs(armMotor.getCurrentPosition() - ARM_DOWN_POSITION);
 
-        return difference < ARM_POSITION_EPSILON;
+        return difference < ARM_POSITION_THRESHOLD;
     }
     public void setTurtleMode(boolean isTurtleMode){
         this.isTurtleMode = isTurtleMode;
@@ -423,4 +431,79 @@ public class RobotHardwareA {
         this.isBunnyMode = isBunnyMode;
     }
 
+    private double getSteeringCorrection(double desiredHeading, double proportionalGain) {
+        targetHeading = desiredHeading;  // Save for telemetry
+
+        // Determine the heading current error
+        headingError = targetHeading - getHeading();
+
+        // Normalize the error to be within +/- 180 degrees
+        while (headingError > 180)  headingError -= 360;
+        while (headingError <= -180) headingError += 360;
+
+        // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
+        return Range.clip(headingError * proportionalGain, -1, 1);
+    }
+
+    public void turnToHeading(double heading) {
+
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Run getSteeringCorrection() once to pre-calculate the current error
+        getSteeringCorrection(heading, TURN_GAIN);
+
+        // keep looping while we are still active, and not on heading.
+        while (opMode.opModeIsActive() && (Math.abs(headingError) > HEADING_THRESHOLD)) {
+            getSteeringCorrection(heading, TURN_GAIN);
+
+            // Pivot in place by applying the turning correction
+            double turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+
+            moveRobot(0, 0, turn);
+            double currentHeading = getHeading();
+
+            opMode.telemetry.addData("Target Heading", targetHeading);
+            opMode.telemetry.addData("Heading Error", headingError);
+            opMode.telemetry.addData("Turn", turn);
+            opMode.telemetry.addData("Current Heading", currentHeading);
+
+            update();
+            opMode.telemetry.update();
+        }
+
+        // Stop all motion;
+        moveRobot(0, 0, 0);
+    }
+
+    public void moveRobot(double x, double y, double yaw) {
+        // Calculate wheel powers.
+        double leftFrontPower = x - y - yaw;
+        double rightFrontPower = x + y + yaw;
+        double leftBackPower = x + y - yaw;
+        double rightBackPower = x - y + yaw;
+
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        // Send powers to the wheels.
+        moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+    }
+    private double getHeading() {
+        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+        return orientation.getYaw(AngleUnit.DEGREES);
+    }
+    public void resetYaw() {
+        imu.resetYaw();
+    }
 }

@@ -102,6 +102,8 @@ public class CenterStageAutoCV extends LinearOpMode {
             return;
         }
 
+        robotHardware.resetYaw();
+
         switch (location) {
             case Right:
                 robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
@@ -118,6 +120,7 @@ public class CenterStageAutoCV extends LinearOpMode {
             case Middle:
                 robotHardware.lowerWrist();
                 robotHardware.runToPosition(MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, WHEEL_POWER);
+                robotHardware.turnToHeading(90);
                 break;
         }
         robotHardware.openLeftClaw();

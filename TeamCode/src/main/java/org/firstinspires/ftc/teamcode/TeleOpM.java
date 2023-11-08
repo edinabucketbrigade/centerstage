@@ -39,11 +39,9 @@ public class TeleOpM extends LinearOpMode {
     public static double DESIRED_DISTANCE = 8.0; //  this is how close the camera should get to the target (inches)
     public static double SPEED_GAIN = 0.05;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     public static double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
-    public static double TURN_GAIN = 0.03;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 
     public static double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     public static double MAX_AUTO_STRAFE = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-    public static double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
     private RobotHardwareA robotHardware = null;
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
@@ -78,8 +76,12 @@ public class TeleOpM extends LinearOpMode {
             robotHardware.setTurtleMode(gamepad1.left_bumper);
             robotHardware.setBunnyMode(gamepad1.right_bumper);
 
-            if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
+            if (currentGamepad.back && !previousGamepad.back) {
                 robotHardware.toggleFieldCentric();
+            }
+
+            if (currentGamepad.options && !previousGamepad.options) {
+                robotHardware.resetYaw();
             }
 
             if (currentGamepad.x && !previousGamepad.x) {
@@ -145,28 +147,6 @@ public class TeleOpM extends LinearOpMode {
         framesInPosition = 0;
         targetState = TargetState.POSITIONING;
         startedTimer = false;
-    }
-
-    public void moveRobot(double x, double y, double yaw) {
-        // Calculate wheel powers.
-        double leftFrontPower = x - y - yaw;
-        double rightFrontPower = x + y + yaw;
-        double leftBackPower = x + y - yaw;
-        double rightBackPower = x - y + yaw;
-
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
-        }
-
-        // Send powers to the wheels.
-        robotHardware.moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
     }
 
     private void initAprilTag() {
@@ -262,7 +242,7 @@ public class TeleOpM extends LinearOpMode {
 
         // Use the speed and turn "gains" to calculate how we want the robot to move.
         double drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-        double turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+        double turn = Range.clip(headingError * RobotHardwareA.TURN_GAIN, -RobotHardwareA.MAX_AUTO_TURN, RobotHardwareA.MAX_AUTO_TURN);
         double strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
 
         telemetry.addData("Target", "ID %d (%s)", detection.id, detection.metadata.name);
@@ -271,7 +251,7 @@ public class TeleOpM extends LinearOpMode {
         telemetry.addData("Yaw", "%3.0f degrees", detection.ftcPose.yaw);
         telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
 
-        moveRobot(drive, strafe, turn);
+        robotHardware.moveRobot(drive, strafe, turn);
 
         sleep(10);
     }
