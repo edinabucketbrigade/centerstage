@@ -34,9 +34,9 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     *   ROI is an abbreviation of Region of Interest.
     *   This creates a rectangle of areas in the camera where a game element may be placed
     */
-    static final Rect Left_ROI = new Rect(new Point(10,100),new Point(105,200));
-    static final Rect Middle_ROI = new Rect(new Point(120,100),new Point(205,200));
-    static final Rect Right_ROI = new Rect(new Point(220,100),new Point(310,200));
+    public static Rect LEFT_ROI = new Rect(30,160, 150,120);
+    public static Rect MIDDLE_ROI = new Rect(225,150, 150,120);
+    public static Rect RIGHT_ROI = new Rect(435,165, 150,120);
 
     public CenterStageCVDetection(Telemetry t) {
         telemetry = t;
@@ -67,9 +67,9 @@ public class CenterStageCVDetection extends OpenCvPipeline {
             mat2.release();
         }
         //submat = submatrix - portion of original matrix
-        Mat left = mat.submat(Left_ROI);
-        Mat right = mat.submat(Right_ROI);
-        Mat middle = mat.submat(Middle_ROI);
+        Mat left = mat.submat(LEFT_ROI);
+        Mat right = mat.submat(RIGHT_ROI);
+        Mat middle = mat.submat(MIDDLE_ROI);
 
         /*
         *   We can determine the percentage of white in the image by
@@ -118,9 +118,9 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         *   just a mini if statement that chooses which colors to use based
         *   on the location of the prop.
         */
-        Imgproc.rectangle(mat, Left_ROI, location == Location.Left? pixelColor:propColor);
-        Imgproc.rectangle(mat, Middle_ROI, location == Location.Middle? pixelColor:propColor);
-        Imgproc.rectangle(mat, Right_ROI, location == Location.Right? pixelColor:propColor);
+        Imgproc.rectangle(mat, LEFT_ROI, location == Location.Left? pixelColor:propColor);
+        Imgproc.rectangle(mat, MIDDLE_ROI, location == Location.Middle? pixelColor:propColor);
+        Imgproc.rectangle(mat, RIGHT_ROI, location == Location.Right? pixelColor:propColor);
 
         return mat;
     }
