@@ -17,11 +17,9 @@ public class CenterStageAutoCV extends LinearOpMode {
     /*
     * If program has a build folder error try clearing the build
     */
-    public static int STRAFE_FORWARD_POSITION = 1000;
-    public static int MIDDLE_FORWARD_POSITION = 2150;
-    public static int LEFT_POSITION = 450;
-    public static int RIGHT_POSITION = 750;
-    public static int ROTATE_POSITION = 1400;
+    public static int STRAFE_FORWARD_POSITION = 1450;
+    public static int MIDDLE_FORWARD_POSITION = 1265;
+    public static int OFFSET_POSITION = -75;
     public static double WHEEL_POWER = 0.5;
     OpenCvWebcam camera;
 
@@ -87,6 +85,7 @@ public class CenterStageAutoCV extends LinearOpMode {
         FtcDashboard.getInstance().startCameraStream(camera, 0);
         robotHardware.closeLeftClaw();
         robotHardware.closeRightClaw();
+        sleep(2000);
         robotHardware.raiseWrist();
 
         while(opModeIsActive() && !startedStreaming) {
@@ -112,25 +111,25 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         switch (location) {
             case Right:
-                robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
-                robotHardware.runToPosition(ROTATE_POSITION,ROTATE_POSITION,-ROTATE_POSITION,-ROTATE_POSITION,WHEEL_POWER);
+                moveForward(STRAFE_FORWARD_POSITION);
                 robotHardware.lowerWrist();
-                robotHardware.runToPosition(RIGHT_POSITION, RIGHT_POSITION, RIGHT_POSITION, RIGHT_POSITION, WHEEL_POWER);
+                robotHardware.turnToHeading(90);
+                moveForward(OFFSET_POSITION);
                 break;
             case Left:
-                robotHardware.runToPosition(STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, STRAFE_FORWARD_POSITION, WHEEL_POWER);
-                robotHardware.runToPosition(ROTATE_POSITION,ROTATE_POSITION,-ROTATE_POSITION,-ROTATE_POSITION,WHEEL_POWER);
+                moveForward(STRAFE_FORWARD_POSITION);
                 robotHardware.lowerWrist();
-                robotHardware.runToPosition(LEFT_POSITION, LEFT_POSITION, LEFT_POSITION, LEFT_POSITION, WHEEL_POWER);
+                robotHardware.turnToHeading(-90);
+                moveForward(OFFSET_POSITION);
                 break;
             case Middle:
+                moveForward(MIDDLE_FORWARD_POSITION / 2);
                 robotHardware.lowerWrist();
-                robotHardware.runToPosition(MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, MIDDLE_FORWARD_POSITION, WHEEL_POWER);
-                robotHardware.turnToHeading(90);
+                robotHardware.turnToHeading(180);
+                moveForward(-MIDDLE_FORWARD_POSITION / 2);
                 break;
         }
         robotHardware.openLeftClaw();
-        robotHardware.openRightClaw();
         while(opModeIsActive()){}
     }
 
@@ -138,5 +137,9 @@ public class CenterStageAutoCV extends LinearOpMode {
         robotHardware.log(message);
         telemetry.addData("Message", message);
         telemetry.update();
+    }
+
+    private void moveForward(int position) {
+        robotHardware.runToPosition(position, position, position, position, WHEEL_POWER);
     }
 }
