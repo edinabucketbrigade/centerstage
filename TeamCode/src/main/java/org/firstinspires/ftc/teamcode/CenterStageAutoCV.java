@@ -4,11 +4,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -31,6 +26,7 @@ public class CenterStageAutoCV extends LinearOpMode {
     OpenCvWebcam camera;
 
     private RobotHardwareA robotHardware = null;
+    private boolean startedStreaming;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -40,7 +36,8 @@ public class CenterStageAutoCV extends LinearOpMode {
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         CenterStageCVDetection detector = new CenterStageCVDetection(telemetry);
         camera.setPipeline(detector);
-        camera.setMillisecondsPermissionTimeout(1000); // Timeout for obtaining permission is configurable. Set before opening.
+        camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
+        log("opening camera");
         /*
          *   Below is an example of a lambda expression which is in simply an anonymous function.
          *   Since we are only executing one statement we are able to remove the curly braces and semicolon
@@ -73,6 +70,8 @@ public class CenterStageAutoCV extends LinearOpMode {
                  * away from the user.
                  */
                 camera.startStreaming(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+                startedStreaming = true;
+                log("started camera streaming");
             }
 
             @Override
@@ -81,6 +80,7 @@ public class CenterStageAutoCV extends LinearOpMode {
                 /*
                  * This will be called if the camera could not be opened
                  */
+                log("error opening camera: " + errorCode);
             }
         });
 
@@ -89,18 +89,24 @@ public class CenterStageAutoCV extends LinearOpMode {
         robotHardware.closeRightClaw();
         robotHardware.raiseWrist();
 
+        while(opModeIsActive() && !startedStreaming) {
+            log("waiting for camera streaming to start");
+            sleep(50);
+        }
+
+        CenterStageCVDetection.Location location = null;
+
+        while(opModeIsActive() && location == null) {
+            log("waiting for location detection");
+            sleep(50);
+            location = detector.getLocation();
+        }
+
         waitForStart();
 
-        CenterStageCVDetection.Location location = detector.getLocation();
+        location = detector.getLocation();
 
         camera.stopStreaming();
-
-        if(location == null) {
-            telemetry.addData("Note", "Location is missing.  Give it more time.");
-            telemetry.update();
-            sleep(5000);
-            return;
-        }
 
         robotHardware.resetYaw();
 
@@ -126,5 +132,11 @@ public class CenterStageAutoCV extends LinearOpMode {
         robotHardware.openLeftClaw();
         robotHardware.openRightClaw();
         while(opModeIsActive()){}
+    }
+
+    private void log(String message) {
+        robotHardware.log(message);
+        telemetry.addData("Message", message);
+        telemetry.update();
     }
 }
