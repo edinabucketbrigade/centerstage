@@ -17,10 +17,16 @@ public class CenterStageAutoCV extends LinearOpMode {
     /*
     * If program has a build folder error try clearing the build
     */
-    public static int STRAFE_FORWARD_POSITION = 1450;
-    public static int MIDDLE_FORWARD_POSITION = 1265;
-    public static int OFFSET_POSITION = -75;
+    public static int AWAY_FORWARD = 820;
+    public static int TOWARD_FORWARD = 1350;
+    public static int MIDDLE_FORWARD_POSITION = 1245;
+    public static int TOWARD_STRAFE = -620;
     public static double WHEEL_POWER = 0.5;
+    public static int OFFSET_STRAFE = 640;
+    public static int FAR_DISTANCE_TO_BACKDROP;
+    public static int CLOSE_DISTANCE_TO_BACKDROP;
+    public static String COLOR; // red or blue
+    public static String SIDE; // left or right
     OpenCvWebcam camera;
 
     private RobotHardwareA robotHardware = null;
@@ -111,25 +117,48 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         switch (location) {
             case Right:
-                moveForward(STRAFE_FORWARD_POSITION);
+                moveForward(AWAY_FORWARD / 2);
+                moveRight(OFFSET_STRAFE);
                 robotHardware.lowerWrist();
-                robotHardware.turnToHeading(90);
-                moveForward(OFFSET_POSITION);
+                robotHardware.turnToHeading(180);
+                moveForward(-AWAY_FORWARD / 2);
                 break;
             case Left:
-                moveForward(STRAFE_FORWARD_POSITION);
+                moveForward(TOWARD_FORWARD);
+                moveRight(OFFSET_STRAFE);
                 robotHardware.lowerWrist();
                 robotHardware.turnToHeading(-90);
-                moveForward(OFFSET_POSITION);
+                moveForward(TOWARD_STRAFE);
                 break;
             case Middle:
                 moveForward(MIDDLE_FORWARD_POSITION / 2);
+                moveRight(OFFSET_STRAFE);
                 robotHardware.lowerWrist();
-                robotHardware.turnToHeading(180);
+                robotHardware.turnToHeading(-180);
                 moveForward(-MIDDLE_FORWARD_POSITION / 2);
+                moveRight(OFFSET_STRAFE);
                 break;
         }
-        robotHardware.openLeftClaw();
+        robotHardware.openRightClaw();
+        /*if (COLOR.equals("red")) {
+            robotHardware.turnToHeading(90);
+            if (SIDE.equals("right")) {
+                moveForward(CLOSE_DISTANCE_TO_BACKDROP);
+            }
+            else {
+                moveForward(FAR_DISTANCE_TO_BACKDROP);
+            }
+        }
+        if (COLOR.equals("blue")) {
+            robotHardware.turnToHeading(-90);
+            if (SIDE.equals("right")) {
+                moveForward(FAR_DISTANCE_TO_BACKDROP);
+            }
+            else {
+                moveForward(CLOSE_DISTANCE_TO_BACKDROP);
+            }
+        }
+        robotHardware.turnToHeading(0);*/
         while(opModeIsActive()){}
     }
 
@@ -141,5 +170,8 @@ public class CenterStageAutoCV extends LinearOpMode {
 
     private void moveForward(int position) {
         robotHardware.runToPosition(position, position, position, position, WHEEL_POWER);
+    }
+    private void moveRight(int position) {
+        robotHardware.runToPosition(-position, position, position, -position, WHEEL_POWER);
     }
 }
