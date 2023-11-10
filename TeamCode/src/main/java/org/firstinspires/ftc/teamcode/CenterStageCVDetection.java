@@ -12,7 +12,6 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 @Config
 public class CenterStageCVDetection extends OpenCvPipeline {
-    public static boolean DETECT_RED = true;
     public static double MINIMUM_VALUES = 100;
     public static double MAXIMUM_VALUES = 255;
     public static double MINIMUM_BLUE_HUE = 100;
@@ -23,6 +22,8 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     public static double MAXIMUM_RED_HIGH_HUE = 255;
 
     Telemetry telemetry;
+    boolean redAlliance;
+    boolean startLeft;
     Mat mat = new Mat();
     public enum Location{
         Left,
@@ -38,11 +39,17 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     public static Rect MIDDLE_ROI = new Rect(225,150, 150,120);
     public static Rect RIGHT_ROI = new Rect(435,165, 150,120);
 
-    public CenterStageCVDetection(Telemetry t) {
-        telemetry = t;
+    public CenterStageCVDetection(boolean redAlliance, boolean startLeft, Telemetry telemetry) {
+        this.redAlliance = redAlliance;
+        this.startLeft = startLeft;
+        this.telemetry = telemetry;
     }
     @Override
     public Mat processFrame(Mat input) {
+
+        telemetry.addData("Alliance", redAlliance ? "Red" : "Blue");
+        telemetry.addData("Start", startLeft ? "Left" : "Right");
+
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
         Scalar MINIMUM_BLUE = new Scalar(MINIMUM_BLUE_HUE,MINIMUM_VALUES,MINIMUM_VALUES);
@@ -52,12 +59,7 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         Scalar MINIMUM_RED_HIGH = new Scalar(MINIMUM_RED_HIGH_HUE,MINIMUM_VALUES,MINIMUM_VALUES);
         Scalar MAXIMUM_RED_HIGH = new Scalar(MAXIMUM_RED_HIGH_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
 
-        if (!DETECT_RED){
-            //Blue value
-            Core.inRange(mat, MINIMUM_BLUE, MAXIMUM_BLUE, mat);
-        }
-        else {
-            //Red value
+        if (redAlliance){
             Mat mat1 = mat.clone();
             Mat mat2 = mat.clone();
             Core.inRange(mat1, MINIMUM_RED_LOW, MAXIMUM_RED_LOW, mat1);
@@ -65,6 +67,9 @@ public class CenterStageCVDetection extends OpenCvPipeline {
             Core.bitwise_or(mat1, mat2, mat);
             mat1.release();
             mat2.release();
+        }
+        else {
+            Core.inRange(mat, MINIMUM_BLUE, MAXIMUM_BLUE, mat);
         }
         //submat = submatrix - portion of original matrix
         Mat left = mat.submat(LEFT_ROI);

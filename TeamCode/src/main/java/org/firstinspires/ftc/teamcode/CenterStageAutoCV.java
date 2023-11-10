@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -18,15 +19,18 @@ public class CenterStageAutoCV extends LinearOpMode {
     * If program has a build folder error try clearing the build
     */
     public static int AWAY_FORWARD = 820;
-    public static int TOWARD_FORWARD = 1350;
+    public static int TOWARD_FORWARD = 1310;
     public static int MIDDLE_FORWARD_POSITION = 1245;
-    public static int TOWARD_STRAFE = -620;
+    public static int LEFT_TOWARD_STRAFE = -520;
+    public static int RIGHT_TOWARD_STRAFE = -600;
     public static double WHEEL_POWER = 0.5;
-    public static int OFFSET_STRAFE = 640;
+    public static int RIGHT_OFFSET_STRAFE = 640;
+    public static int LEFT_OFFSET_STRAFE = 520;
+    public static int MIDDLE_OFFSET_STRAFE = 200;
     public static int FAR_DISTANCE_TO_BACKDROP;
     public static int CLOSE_DISTANCE_TO_BACKDROP;
-    public static String COLOR; // red or blue
-    public static String SIDE; // left or right
+    private Boolean redAlliance = null;
+    private Boolean startLeft = null;
     OpenCvWebcam camera;
 
     private RobotHardwareA robotHardware = null;
@@ -34,11 +38,43 @@ public class CenterStageAutoCV extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        Gamepad previousGamepad = new Gamepad();
+        Gamepad currentGamepad = new Gamepad();
+
+        while (true) {
+            previousGamepad.copy(currentGamepad);
+            currentGamepad.copy(gamepad1);
+
+            if (redAlliance == null) {
+                telemetry.addData("Alliance", "X = blue, B = red");
+                telemetry.update();
+                if (currentGamepad.x && !previousGamepad.x) {
+                    redAlliance = false;
+                }
+                if (currentGamepad.b && !previousGamepad.b) {
+                    redAlliance = true;
+                }
+            }
+            else if (startLeft == null){
+                telemetry.addData("Start", "X = left, B = right");
+                telemetry.update();
+                if (currentGamepad.x && !previousGamepad.x) {
+                    startLeft = true;
+                }
+                if (currentGamepad.b && !previousGamepad.b) {
+                    startLeft = false;
+                }
+            }
+            else {
+                break;
+            }
+        }
+
         robotHardware = new RobotHardwareA(this);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        CenterStageCVDetection detector = new CenterStageCVDetection(telemetry);
+        CenterStageCVDetection detector = new CenterStageCVDetection(redAlliance, startLeft, telemetry);
         camera.setPipeline(detector);
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
         log("opening camera");
@@ -117,26 +153,13 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         switch (location) {
             case Right:
-                moveForward(AWAY_FORWARD / 2);
-                moveRight(OFFSET_STRAFE);
-                robotHardware.lowerWrist();
-                robotHardware.turnToHeading(180);
-                moveForward(-AWAY_FORWARD / 2);
+                placePixelRight();
                 break;
             case Left:
-                moveForward(TOWARD_FORWARD);
-                moveRight(OFFSET_STRAFE);
-                robotHardware.lowerWrist();
-                robotHardware.turnToHeading(-90);
-                moveForward(TOWARD_STRAFE);
+                placePixelLeft();
                 break;
             case Middle:
-                moveForward(MIDDLE_FORWARD_POSITION / 2);
-                moveRight(OFFSET_STRAFE);
-                robotHardware.lowerWrist();
-                robotHardware.turnToHeading(-180);
-                moveForward(-MIDDLE_FORWARD_POSITION / 2);
-                moveRight(OFFSET_STRAFE);
+                placePixelMiddle();
                 break;
         }
         robotHardware.openRightClaw();
@@ -160,6 +183,52 @@ public class CenterStageAutoCV extends LinearOpMode {
         }
         robotHardware.turnToHeading(0);*/
         while(opModeIsActive()){}
+    }
+
+    private void placePixelMiddle() {
+        moveForward(MIDDLE_FORWARD_POSITION / 2);
+        int offsetStrafe = startLeft ? -MIDDLE_OFFSET_STRAFE : MIDDLE_OFFSET_STRAFE;
+        moveRight(offsetStrafe);
+        robotHardware.lowerWrist();
+        robotHardware.turnToHeading(-180);
+        moveRight(offsetStrafe);
+        moveForward(-MIDDLE_FORWARD_POSITION / 2);
+    }
+
+    private void placePixelLeft() {
+        int offsetStrafe = startLeft ? -LEFT_OFFSET_STRAFE : LEFT_OFFSET_STRAFE;
+        if(startLeft) {
+            moveForward(AWAY_FORWARD / 2);
+            moveRight(offsetStrafe);
+            robotHardware.lowerWrist();
+            robotHardware.turnToHeading(180);
+            moveForward(-AWAY_FORWARD / 2);
+        }
+        else {
+            moveForward(TOWARD_FORWARD);
+            moveRight(offsetStrafe);
+            robotHardware.lowerWrist();
+            robotHardware.turnToHeading(-90);
+            moveForward(LEFT_TOWARD_STRAFE);
+        }
+    }
+
+    private void placePixelRight() {
+        int offsetStrafe = startLeft ? -RIGHT_OFFSET_STRAFE : RIGHT_OFFSET_STRAFE;
+        if(startLeft) {
+            moveForward(TOWARD_FORWARD);
+            moveRight(offsetStrafe);
+            robotHardware.lowerWrist();
+            robotHardware.turnToHeading(90);
+            moveForward(RIGHT_TOWARD_STRAFE);
+        }
+        else {
+            moveForward(AWAY_FORWARD / 2);
+            moveRight(offsetStrafe);
+            robotHardware.lowerWrist();
+            robotHardware.turnToHeading(180);
+            moveForward(-AWAY_FORWARD / 2);
+        }
     }
 
     private void log(String message) {
