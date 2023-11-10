@@ -48,8 +48,8 @@ public class RobotHardwareA {
     public static double LEFT_CLAW_CLOSED_POSITION = 1;
     public static double RIGHT_CLAW_CLOSED_POSITION = 0.275;
     public static double RIGHT_CLAW_OPEN_POSITION = 0.6;
-    public static double WRIST_DOWN_POSITION = 0.12;
-    public static double WRIST_UP_POSITION = 0.8;
+    public static double WRIST_DOWN_POSITION = 0.185;
+    public static double WRIST_UP_POSITION = 0.865;
     public static int ARM_DOWN_POSITION = 0;
     public static int ARM_UP_POSITION = 1300;
     public static double ARM_RAISE_POWER = 1;
@@ -83,7 +83,7 @@ public class RobotHardwareA {
     private boolean isWristTargetUp;
     private boolean isArmTargetUp;
     private boolean isArmReady;
-    private boolean isFieldCentric = true;
+    private boolean isFieldCentric = false;
     private boolean isTurtleMode;
     private boolean isBunnyMode;
     private double headingError = 0;

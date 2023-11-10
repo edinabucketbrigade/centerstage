@@ -36,7 +36,7 @@ public class TeleOpM extends LinearOpMode {
         LOWERING
     }
 
-    public static double DESIRED_DISTANCE = 8.0; //  this is how close the camera should get to the target (inches)
+    public static double DESIRED_DISTANCE = 7.0; //  this is how close the camera should get to the target (inches)
     public static double SPEED_GAIN = 0.05;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     public static double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
 
@@ -66,6 +66,8 @@ public class TeleOpM extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
+
+        robotHardware.resetYaw();
 
         while (opModeIsActive()) {
             previousGamepad.copy(currentGamepad);
