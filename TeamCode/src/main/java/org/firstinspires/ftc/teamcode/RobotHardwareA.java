@@ -48,10 +48,10 @@ public class RobotHardwareA {
     public static double LEFT_CLAW_CLOSED_POSITION = 1;
     public static double RIGHT_CLAW_CLOSED_POSITION = 0.275;
     public static double RIGHT_CLAW_OPEN_POSITION = 0.6;
-    public static double WRIST_DOWN_POSITION = 0.065;
-    public static double WRIST_UP_POSITION = 0.72;
+    public static double WRIST_DOWN_POSITION = 0.09;
+    public static double WRIST_UP_POSITION = 0.8;
     public static int ARM_DOWN_POSITION = 0;
-    public static int ARM_UP_POSITION = 1350;
+    public static int ARM_UP_POSITION = 1200;
     public static double ARM_RAISE_POWER = 1;
     public static double ARM_LOWER_POWER = 0.9;
     public static double TURTLE_MULTIPLIER = 0.3;
@@ -83,7 +83,7 @@ public class RobotHardwareA {
     private boolean isWristTargetUp;
     private boolean isArmTargetUp;
     private boolean isArmReady;
-    private boolean isFieldCentric = true;
+    private boolean isFieldCentric = false;
     private boolean isTurtleMode;
     private boolean isBunnyMode;
     private double headingError = 0;
@@ -292,13 +292,14 @@ public class RobotHardwareA {
         double leftBackPower;
         double rightFrontPower;
         double rightBackPower;
-        //if (isFieldCentric) {
+        if (isFieldCentric) {
 
             double y = -opMode.gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = opMode.gamepad1.left_stick_x;
             double rx = opMode.gamepad1.right_stick_x;
 
-            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + Math.PI;
+            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            // + Math.PI
 
             // Rotate the movement direction counter to the bot's rotation
             double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -314,7 +315,7 @@ public class RobotHardwareA {
             leftBackPower = (rotY - rotX + rx) / denominator;
             rightFrontPower = (rotY - rotX - rx) / denominator;
             rightBackPower = (rotY + rotX - rx) / denominator;
-            /*
+
         } else {
             double max;
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
@@ -343,7 +344,7 @@ public class RobotHardwareA {
             }
 
         }
-        */
+
         double multiplier;
         if (isTurtleMode) {
             multiplier = TURTLE_MULTIPLIER;
