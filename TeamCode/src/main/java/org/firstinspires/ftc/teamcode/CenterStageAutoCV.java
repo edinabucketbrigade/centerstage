@@ -13,7 +13,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @Config
-@Autonomous
+@Autonomous(preselectTeleOp = "TeleOpM")
 public class CenterStageAutoCV extends LinearOpMode {
     /*
     * If program has a build folder error try clearing the build
