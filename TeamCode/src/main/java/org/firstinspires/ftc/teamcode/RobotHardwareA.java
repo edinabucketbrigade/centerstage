@@ -52,12 +52,8 @@ public class RobotHardwareA {
     public static double WRIST_DOWN_POSITION = 0.065;
     public static double WRIST_UP_POSITION = 0.72;
     public static int ARM_DOWN_POSITION = 0;
-<<<<<<< Updated upstream
     public static int ARM_UP_POSITION = 1350;
-=======
-    public static int ARM_UP_POSITION = 1300;
     public static int HOOK_TARGET = 1000;
->>>>>>> Stashed changes
     public static double ARM_RAISE_POWER = 1;
     public static double ARM_LOWER_POWER = 0.9;
     public static double TURTLE_MULTIPLIER = 0.3;
