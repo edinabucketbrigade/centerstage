@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -52,6 +53,7 @@ public class RobotHardwareA {
     public static double WRIST_UP_POSITION = 0.8;
     public static int ARM_DOWN_POSITION = 0;
     public static int ARM_UP_POSITION = 1200;
+    public static int HOOK_TARGET = 1000;
     public static double ARM_RAISE_POWER = 1;
     public static double ARM_LOWER_POWER = 0.9;
     public static double TURTLE_MULTIPLIER = 0.3;
@@ -65,6 +67,7 @@ public class RobotHardwareA {
     public static double HEADING_THRESHOLD = 1.0;
     public static double TURN_GAIN = 0.03;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
     public static double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
+    private ElapsedTime timer = new ElapsedTime();
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -88,6 +91,8 @@ public class RobotHardwareA {
     private boolean isBunnyMode;
     private double headingError = 0;
     private double  targetHeading = 0;
+    private DcMotor hookMotor;
+    private Servo launcher;
 
     public RobotHardwareA (LinearOpMode opMode) {
         this.opMode = opMode;
@@ -115,6 +120,9 @@ public class RobotHardwareA {
         touchSensor = hardwareMap.get(TouchSensor.class, "touch");
 
         armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
+
+        hookMotor = hardwareMap.get(DcMotor.class, "hook_motor");
+        launcher = hardwareMap.get(Servo.class,"launcher");
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -197,6 +205,25 @@ public class RobotHardwareA {
         log("lower wrist");
         wristServo.setPosition(WRIST_DOWN_POSITION);
         isWristTargetUp = false;
+    }
+
+    public void toLaunch(){
+        launcher.setPosition(0.8);
+        if (timer.milliseconds() == 1000){
+            launcher.setPosition(0.0);
+        }
+    }
+    public void toHang(){
+        hookMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hookMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        runToPosition(500,-500,500,-500,0.5);
+        hookMotor.setTargetPosition(HOOK_TARGET);
+        runToPosition(-500,500,-500,500,0.5);
+        while(opMode.opModeIsActive() && (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() || leftBackDrive.isBusy() || rightBackDrive.isBusy())) {
+            update();
+            opMode.telemetry.update();
+        }
+        hookMotor.setTargetPosition(100);
     }
 
     public void moveRobot(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
