@@ -27,8 +27,9 @@ public class CenterStageAutoCV extends LinearOpMode {
     public static int RIGHT_OFFSET_STRAFE = 640;
     public static int LEFT_OFFSET_STRAFE = 520;
     public static int MIDDLE_OFFSET_STRAFE = 200;
-    public static int FAR_DISTANCE_TO_BACKDROP;
-    public static int CLOSE_DISTANCE_TO_BACKDROP;
+    public static int FAR_DISTANCE_TO_BACKDROP = 3900;
+    public static int CLOSE_DISTANCE_TO_BACKDROP = 1300;
+    public static int MIDDLE_BACK_UP = 300;
     private Boolean redAlliance = null;
     private Boolean startLeft = null;
     OpenCvWebcam camera;
@@ -151,6 +152,13 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         robotHardware.resetYaw();
 
+        placePixelOnSpikeMark(location);
+        placePixelOnBackdrop(location);
+
+        while(opModeIsActive()){}
+    }
+
+    private void placePixelOnSpikeMark(CenterStageCVDetection.Location location) {
         switch (location) {
             case Right:
                 placePixelRight();
@@ -163,26 +171,19 @@ public class CenterStageAutoCV extends LinearOpMode {
                 break;
         }
         robotHardware.openRightClaw();
-        /*if (COLOR.equals("red")) {
-            robotHardware.turnToHeading(90);
-            if (SIDE.equals("right")) {
-                moveForward(CLOSE_DISTANCE_TO_BACKDROP);
-            }
-            else {
-                moveForward(FAR_DISTANCE_TO_BACKDROP);
-            }
+    }
+
+    private void placePixelOnBackdrop (CenterStageCVDetection.Location location) {
+        moveForward(MIDDLE_BACK_UP);
+        moveRight(CLOSE_DISTANCE_TO_BACKDROP);
+        robotHardware.turnToHeading(redAlliance ? -90 : 90);
+
+        /*if (redAlliance == startLeft) {
+            moveForward(FAR_DISTANCE_TO_BACKDROP);
         }
-        if (COLOR.equals("blue")) {
-            robotHardware.turnToHeading(-90);
-            if (SIDE.equals("right")) {
-                moveForward(FAR_DISTANCE_TO_BACKDROP);
-            }
-            else {
-                moveForward(CLOSE_DISTANCE_TO_BACKDROP);
-            }
-        }
-        robotHardware.turnToHeading(0);*/
-        while(opModeIsActive()){}
+        else {
+            moveForward(CLOSE_DISTANCE_TO_BACKDROP);
+        }*/
     }
 
     private void placePixelMiddle() {
