@@ -5,14 +5,14 @@ import com.acmerobotics.dashboard.config.Config;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 @Config
 public class CenterStageCVDetection extends OpenCvPipeline {
-    public static double MINIMUM_VALUES = 100;
+    public static double MINIMUM_BLUE_VALUES = 40;
+    public static double MINIMUM_RED_VALUES = 100;
     public static double MAXIMUM_VALUES = 255;
     public static double MINIMUM_BLUE_HUE = 100;
     public static double MAXIMUM_BLUE_HUE = 115;
@@ -52,11 +52,11 @@ public class CenterStageCVDetection extends OpenCvPipeline {
 
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
-        Scalar MINIMUM_BLUE = new Scalar(MINIMUM_BLUE_HUE,MINIMUM_VALUES,MINIMUM_VALUES);
+        Scalar MINIMUM_BLUE = new Scalar(MINIMUM_BLUE_HUE, MINIMUM_BLUE_VALUES, MINIMUM_BLUE_VALUES);
         Scalar MAXIMUM_BLUE = new Scalar(MAXIMUM_BLUE_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
-        Scalar MINIMUM_RED_LOW = new Scalar(MINIMUM_RED_LOW_HUE,MINIMUM_VALUES,MINIMUM_VALUES);
+        Scalar MINIMUM_RED_LOW = new Scalar(MINIMUM_RED_LOW_HUE, MINIMUM_RED_VALUES, MINIMUM_RED_VALUES);
         Scalar MAXIMUM_RED_LOW = new Scalar(MAXIMUM_RED_LOW_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
-        Scalar MINIMUM_RED_HIGH = new Scalar(MINIMUM_RED_HIGH_HUE,MINIMUM_VALUES,MINIMUM_VALUES);
+        Scalar MINIMUM_RED_HIGH = new Scalar(MINIMUM_RED_HIGH_HUE, MINIMUM_RED_VALUES, MINIMUM_RED_VALUES);
         Scalar MAXIMUM_RED_HIGH = new Scalar(MAXIMUM_RED_HIGH_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
 
         if (redAlliance){

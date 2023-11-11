@@ -153,7 +153,7 @@ public class CenterStageAutoCV extends LinearOpMode {
         robotHardware.resetYaw();
 
         placePixelOnSpikeMark(location);
-        placePixelOnBackdrop(location);
+        //placePixelOnBackdrop(location);
 
         while(opModeIsActive()){}
     }
