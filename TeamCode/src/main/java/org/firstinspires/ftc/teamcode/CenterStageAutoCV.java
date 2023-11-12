@@ -196,7 +196,9 @@ public class CenterStageAutoCV extends LinearOpMode {
         }
 
         while(opModeIsActive()) {
+            robotHardware.update();
             heatSeek.update();
+            telemetry.update();
         }
     }
 
