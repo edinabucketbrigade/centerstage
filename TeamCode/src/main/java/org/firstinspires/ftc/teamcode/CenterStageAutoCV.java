@@ -150,10 +150,12 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         camera.stopStreaming();
 
+        camera.closeCameraDevice();
+
         robotHardware.resetYaw();
 
         placePixelOnSpikeMark(location);
-        //placePixelOnBackdrop(location);
+        placePixelOnBackdrop(location);
 
         while(opModeIsActive()){}
     }
@@ -173,17 +175,29 @@ public class CenterStageAutoCV extends LinearOpMode {
         robotHardware.openRightClaw();
     }
 
-    private void placePixelOnBackdrop (CenterStageCVDetection.Location location) {
+    private void placePixelOnBackdrop (CenterStageCVDetection.Location location) throws InterruptedException {
         moveForward(MIDDLE_BACK_UP);
         moveRight(CLOSE_DISTANCE_TO_BACKDROP);
         robotHardware.turnToHeading(redAlliance ? -90 : 90);
 
-        /*if (redAlliance == startLeft) {
-            moveForward(FAR_DISTANCE_TO_BACKDROP);
+        HeatSeek heatSeek = new HeatSeek(robotHardware);
+
+        if(location == CenterStageCVDetection.Location.Left) {
+            heatSeek.startLeft();
+        }
+        else if(location == CenterStageCVDetection.Location.Middle) {
+            heatSeek.startMiddle();
+        }
+        else if(location == CenterStageCVDetection.Location.Right) {
+            heatSeek.startRight();
         }
         else {
-            moveForward(CLOSE_DISTANCE_TO_BACKDROP);
-        }*/
+            throw new InterruptedException("Unrecognized location.");
+        }
+
+        while(opModeIsActive()) {
+            heatSeek.update();
+        }
     }
 
     private void placePixelMiddle() {

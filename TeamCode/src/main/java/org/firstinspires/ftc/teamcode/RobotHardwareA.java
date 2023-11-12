@@ -49,10 +49,10 @@ public class RobotHardwareA {
     public static double LEFT_CLAW_CLOSED_POSITION = 1;
     public static double RIGHT_CLAW_CLOSED_POSITION = 0.275;
     public static double RIGHT_CLAW_OPEN_POSITION = 0.6;
-    public static double WRIST_DOWN_POSITION = 0.09;
+    public static double WRIST_DOWN_POSITION = 0.13;
     public static double WRIST_UP_POSITION = 0.8;
     public static int ARM_DOWN_POSITION = 0;
-    public static int ARM_UP_POSITION = 1200;
+    public static int ARM_UP_POSITION = 1300;
     public static int HOOK_TARGET = 1000;
     public static double ARM_RAISE_POWER = 1;
     public static double ARM_LOWER_POWER = 0.9;
@@ -68,7 +68,7 @@ public class RobotHardwareA {
     public static double TURN_GAIN = 0.03;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
     public static double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
     private ElapsedTime timer = new ElapsedTime();
-    private LinearOpMode opMode;
+    public LinearOpMode opMode;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
@@ -91,8 +91,8 @@ public class RobotHardwareA {
     private boolean isBunnyMode;
     private double headingError = 0;
     private double  targetHeading = 0;
-    private DcMotor hookMotor;
-    private Servo launcher;
+    /*private DcMotor hookMotor;
+    private Servo launcher;*/
 
     public RobotHardwareA (LinearOpMode opMode) {
         this.opMode = opMode;
@@ -121,8 +121,8 @@ public class RobotHardwareA {
 
         armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
 
-        hookMotor = hardwareMap.get(DcMotor.class, "hook_motor");
-        launcher = hardwareMap.get(Servo.class,"launcher");
+        /*hookMotor = hardwareMap.get(DcMotor.class, "hook_motor");
+        launcher = hardwareMap.get(Servo.class,"launcher");*/
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -207,7 +207,7 @@ public class RobotHardwareA {
         isWristTargetUp = false;
     }
 
-    public void toLaunch(){
+    /*public void toLaunch(){
         launcher.setPosition(0.8);
         if (timer.milliseconds() == 1000){
             launcher.setPosition(0.0);
@@ -224,7 +224,7 @@ public class RobotHardwareA {
             opMode.telemetry.update();
         }
         hookMotor.setTargetPosition(100);
-    }
+    }*/
 
     public void moveRobot(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
         leftFrontDrive.setPower(leftFrontPower);

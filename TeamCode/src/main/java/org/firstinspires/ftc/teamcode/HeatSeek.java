@@ -4,13 +4,10 @@ import android.util.Size;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
@@ -22,15 +19,15 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Config
-@TeleOp
-public class TeleOp_TestRoboA extends LinearOpMode {
+public class HeatSeek {
 
     enum TargetMode {
         LEFT,
-        CENTER,
+        MIDDLE,
         RIGHT,
         NONE
     }
+
     enum TargetState {
         POSITIONING,
         LIFTING,
@@ -38,134 +35,65 @@ public class TeleOp_TestRoboA extends LinearOpMode {
         LOWERING
     }
 
-    public static double DESIRED_DISTANCE = 7.0; //  this is how close the camera should get to the target (inches)
-    public static double SPEED_GAIN = 0.05;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
-    public static double STRAFE_GAIN = 0.015;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
+    public static double DESIRED_DISTANCE = 5.5; // This is how close the camera should get to the target (inches)
+    public static double SPEED_GAIN = 0.05; // Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
+    public static double STRAFE_GAIN = 0.015; // Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
+    public static double MAX_AUTO_SPEED = 0.5; // Clip the approach speed to this max value (adjust for your robot)
+    public static double MAX_AUTO_STRAFE = 0.5; // Clip the approach speed to this max value (adjust for your robot)
 
-    public static double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-    public static double MAX_AUTO_STRAFE = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-    private VisionPortal visionPortal;               // Used to manage the video source.
-    private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
+    private VisionPortal visionPortal; // Used to manage the video source.
+    private AprilTagProcessor aprilTag; // Used for managing the AprilTag detection process.
     private TargetMode targetMode = TargetMode.NONE;
     private TargetState targetState = TargetState.POSITIONING;
     private ElapsedTime timer = new ElapsedTime();
     private boolean startedTimer;
     private int framesInPosition;
+    private RobotHardwareA robotHardware;
 
-    RobotHardwareA robotHardware = new RobotHardwareA(this);
+    public HeatSeek(RobotHardwareA robotHardware) {
 
-    @Override
-    public void runOpMode() throws InterruptedException {
-        Gamepad previousGamepad = new Gamepad();
-        Gamepad currentGamepad = new Gamepad();
+        this.robotHardware = robotHardware;
 
-        // Initialize the AprilTag Detection process
-        initAprilTag();
+        aprilTag = new AprilTagProcessor.Builder().build();
 
-        setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+        visionPortal = new VisionPortal.Builder()
+                .setCamera(robotHardware.opMode.hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT))
+                .addProcessor(aprilTag)
+                .build();
 
-        telemetry.update();
+        // Use low exposure time to reduce motion blur
+        setManualExposure(6, 250);
 
-        waitForStart();
+    }
 
-        robotHardware.resetYaw();
+    public void update() throws InterruptedException {
 
-        while (opModeIsActive()) {
-            previousGamepad.copy(currentGamepad);
-            currentGamepad.copy(gamepad1);
-
-            robotHardware.update();
-
-            robotHardware.setTurtleMode(gamepad1.left_bumper);
-            robotHardware.setBunnyMode(gamepad1.right_bumper);
-
-            if (currentGamepad.back && !previousGamepad.back) {
-                robotHardware.toggleFieldCentric();
-            }
-
-            if (currentGamepad.options && !previousGamepad.options) {
-                robotHardware.resetYaw();
-            }
-
-            if (currentGamepad.x && !previousGamepad.x) {
-                robotHardware.toggleLeftClaw();
-            }
-            /*if (currentGamepad.a && !previousGamepad.a && currentGamepad.left_bumper && !previousGamepad.left_bumper){
-                robotHardware.toHang();
-            }
-            if (currentGamepad.b && !previousGamepad.b && currentGamepad.left_bumper && !previousGamepad.left_bumper){
-                robotHardware.toLaunch();
-            }*/
-            if (currentGamepad.a && !previousGamepad.a) {
-                robotHardware.toggleWrist();
-            }
-
-            if (currentGamepad.b && !previousGamepad.b) {
-                robotHardware.toggleRightClaw();
-            }
-
-            if (currentGamepad.y && !previousGamepad.y){
-                robotHardware.toggleArm();
-            }
-
-            if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
-                targetMode = TargetMode.LEFT;
-                initializeTargetState();
-            }
-
-            if (currentGamepad.dpad_right && !previousGamepad.dpad_right) {
-                targetMode = TargetMode.RIGHT;
-                initializeTargetState();
-            }
-
-            if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
-                targetMode = TargetMode.CENTER;
-                initializeTargetState();
-            }
-
-            if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
-                targetMode = TargetMode.NONE;
-            }
-
-            if (targetMode == TargetMode.NONE) {
-                robotHardware.moveRobot();
-            }
-            else {
-                if (targetState == TargetState.POSITIONING) {
-                    AprilTagDetection detection = getDetection();
-                    if(detection == null) {
-                        robotHardware.moveRobot();
-                        telemetry.addData("Note", "Target is missing");
-                    }
-                    else {
-                        updateRobot(detection);
-                    }
+        if (targetMode == TargetMode.NONE) {
+            robotHardware.moveRobot();
+        }
+        else {
+            if (targetState == TargetState.POSITIONING) {
+                AprilTagDetection detection = getDetection();
+                if(detection == null) {
+                    robotHardware.moveRobot();
+                    robotHardware.opMode.telemetry.addData("Note", "Target is missing");
                 }
                 else {
-                    updateRobot(null);
+                    updateRobot(detection);
                 }
             }
-
-            telemetry.update();
-
+            else {
+                updateRobot(null);
+            }
         }
+
     }
 
     private void initializeTargetState() {
         framesInPosition = 0;
         targetState = TargetState.POSITIONING;
         startedTimer = false;
-    }
-
-    private void initAprilTag() {
-        // Create the AprilTag processor by using a builder.
-        aprilTag = new AprilTagProcessor.Builder().build();
-
-        visionPortal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .setCameraResolution(new Size(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT))
-                .addProcessor(aprilTag)
-                .build();
     }
 
     private void setManualExposure(int exposureMS, int gain) {
@@ -175,23 +103,25 @@ public class TeleOp_TestRoboA extends LinearOpMode {
             return;
         }
 
+        LinearOpMode opMode = robotHardware.opMode;
+
         // Make sure camera is streaming before we try to set the exposure controls
         if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
-                sleep(20);
+            while (!opMode.isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                opMode.sleep(20);
             }
         }
-        if (!isStopRequested()) {
+        if (!opMode.isStopRequested()) {
             ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
             if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
                 exposureControl.setMode(ExposureControl.Mode.Manual);
-                sleep(50);
+                opMode.sleep(50);
             }
             exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
-            sleep(20);
+            opMode.sleep(20);
             GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
             gainControl.setGain(gain);
-            sleep(20);
+            opMode.sleep(20);
         }
     }
 
@@ -201,7 +131,7 @@ public class TeleOp_TestRoboA extends LinearOpMode {
         }
         boolean isMatch =
                 (targetMode == TargetMode.LEFT && (detection.id == 1 || detection.id == 4)) ||
-                        (targetMode == TargetMode.CENTER && (detection.id == 2 || detection.id == 5)) ||
+                        (targetMode == TargetMode.MIDDLE && (detection.id == 2 || detection.id == 5)) ||
                         (targetMode == TargetMode.RIGHT && (detection.id == 3 || detection.id == 6));
 
         return isMatch;
@@ -242,6 +172,10 @@ public class TeleOp_TestRoboA extends LinearOpMode {
             framesInPosition = 0;
         }
 
+        LinearOpMode opMode = robotHardware.opMode;
+
+        Telemetry telemetry = opMode.telemetry;
+
         telemetry.addData("Range Error", "%5.1f inches", rangeError);
         telemetry.addData("Heading Error", "%5.1f degrees", headingError);
         telemetry.addData("Yaw Error", "%5.1f degrees", yawError);
@@ -261,7 +195,7 @@ public class TeleOp_TestRoboA extends LinearOpMode {
 
         robotHardware.moveRobot(drive, strafe, turn);
 
-        sleep(10);
+        opMode.sleep(10);
     }
 
     private void handleLifting() {
@@ -303,9 +237,29 @@ public class TeleOp_TestRoboA extends LinearOpMode {
             default:
                 throw new InterruptedException("Unrecognized target state.");
         }
+        Telemetry telemetry = robotHardware.opMode.telemetry;
         telemetry.addData("Target Mode", targetMode);
         telemetry.addData("Target State", targetState);
         telemetry.addData("Started Timer", startedTimer);
         telemetry.addData("Timer", timer);
+    }
+
+    public void startLeft() {
+        targetMode = TargetMode.LEFT;
+        initializeTargetState();
+    }
+
+    public void startRight() {
+        targetMode = TargetMode.RIGHT;
+        initializeTargetState();
+    }
+
+    public void startMiddle() {
+        targetMode = TargetMode.MIDDLE;
+        initializeTargetState();
+    }
+
+    public void cancel() {
+        targetMode = TargetMode.NONE;
     }
 }
