@@ -43,6 +43,8 @@ public class RobotHardwareA {
                 0 - Servo - right_claw_servo
                 1 - Servo - left_claw_servo
                 2 - Servo - wrist_servo
+                3 - Servo - drone_launch_servo
+                4 - Servo - drone_lift_servo
             Digital Devices
                 4 - Digital Device - green_light_a
                 5 - Digital Device - red_light_a
