@@ -32,6 +32,7 @@ public class CenterStageAutoCV extends LinearOpMode {
     public static int MIDDLE_BACK_UP = 300;
     private Boolean redAlliance = null;
     private Boolean startLeft = null;
+    private Boolean parkLeft = null;
     OpenCvWebcam camera;
 
     private RobotHardwareA robotHardware = null;
@@ -66,6 +67,16 @@ public class CenterStageAutoCV extends LinearOpMode {
                     startLeft = false;
                 }
             }
+            else if (parkLeft == null) {
+                telemetry.addData("Park", "X = left, B = right");
+                telemetry.update();
+                if (currentGamepad.x && !previousGamepad.x) {
+                    parkLeft = true;
+                }
+                if (currentGamepad.b && !previousGamepad.b) {
+                    parkLeft = false;
+                }
+            }
             else {
                 break;
             }
@@ -75,7 +86,7 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        CenterStageCVDetection detector = new CenterStageCVDetection(redAlliance, startLeft, telemetry);
+        CenterStageCVDetection detector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry);
         camera.setPipeline(detector);
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
         log("opening camera");
@@ -200,6 +211,8 @@ public class CenterStageAutoCV extends LinearOpMode {
             heatSeek.update();
             telemetry.update();
         }
+
+        // Make parkLeft do something
     }
 
     private void placePixelMiddle() {

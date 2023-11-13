@@ -8,6 +8,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -42,6 +43,11 @@ public class RobotHardwareA {
                 0 - Servo - right_claw_servo
                 1 - Servo - left_claw_servo
                 2 - Servo - wrist_servo
+            Digital Devices
+                4 - Digital Device - green_light_a
+                5 - Digital Device - red_light_a
+                6 - Digital Device - green_light_b
+                7 - Digital Device - red_light_b
     Webcam 1
     */
 
@@ -50,9 +56,11 @@ public class RobotHardwareA {
     public static double RIGHT_CLAW_CLOSED_POSITION = 0.275;
     public static double RIGHT_CLAW_OPEN_POSITION = 0.6;
     public static double WRIST_DOWN_POSITION = 0.13;
-    public static double WRIST_UP_POSITION = 0.8;
+    public static double HIGH_WRIST_UP_POSITION = 0.8;
+    public static double LOW_WRIST_UP_POSITION = 0.5;
     public static int ARM_DOWN_POSITION = 0;
-    public static int ARM_UP_POSITION = 1300;
+    public static int HIGH_ARM_UP_POSITION = 1300;
+    public static int LOW_ARM_UP_POSITION = 1600;
     public static int HOOK_TARGET = 1000;
     public static double ARM_RAISE_POWER = 1;
     public static double ARM_LOWER_POWER = 0.9;
@@ -93,6 +101,12 @@ public class RobotHardwareA {
     private double  targetHeading = 0;
     /*private DcMotor hookMotor;
     private Servo launcher;*/
+    private DigitalChannel greenLightA;
+    private DigitalChannel redLightA;
+    private DigitalChannel greenLightB;
+    private DigitalChannel redLightB;
+    private boolean isReverse;
+    public boolean isHighDrop;
 
     public RobotHardwareA (LinearOpMode opMode) {
         this.opMode = opMode;
@@ -103,6 +117,16 @@ public class RobotHardwareA {
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+
+        greenLightA = hardwareMap.get(DigitalChannel.class, "green_light_a");
+        redLightA = hardwareMap.get(DigitalChannel.class, "red_light_a");
+        greenLightB = hardwareMap.get(DigitalChannel.class, "green_light_b");
+        redLightB = hardwareMap.get(DigitalChannel.class, "red_light_b");
+
+        greenLightA.setMode(DigitalChannel.Mode.OUTPUT);
+        redLightA.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLightB.setMode(DigitalChannel.Mode.OUTPUT);
+        redLightB.setMode(DigitalChannel.Mode.OUTPUT);
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -155,13 +179,23 @@ public class RobotHardwareA {
 
     public void openLeftClaw() {
         log("open left claw");
-        leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
+        if (isReverse) {
+            rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
+        }
+        else {
+            leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
+        }
         leftClawIsOpen = true;
     }
 
     public void closeLeftClaw() {
         log("close left claw");
-        leftClawServo.setPosition(LEFT_CLAW_CLOSED_POSITION);
+        if (isReverse) {
+            rightClawServo.setPosition(RIGHT_CLAW_CLOSED_POSITION);
+        }
+        else {
+            leftClawServo.setPosition(LEFT_CLAW_CLOSED_POSITION);
+        }
         leftClawIsOpen = false;
     }
 
@@ -176,13 +210,23 @@ public class RobotHardwareA {
 
     public void openRightClaw() {
         log("open right claw");
-        rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
+        if (isReverse) {
+            leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
+        }
+        else {
+            rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
+        }
         rightClawIsOpen = true;
     }
 
     public void closeRightClaw() {
         log("close right claw");
-        rightClawServo.setPosition(RIGHT_CLAW_CLOSED_POSITION);
+        if (isReverse) {
+            leftClawServo.setPosition(LEFT_CLAW_CLOSED_POSITION);
+        }
+        else {
+            rightClawServo.setPosition(RIGHT_CLAW_CLOSED_POSITION);
+        }
         rightClawIsOpen = false;
     }
 
@@ -197,7 +241,8 @@ public class RobotHardwareA {
 
     public void raiseWrist() {
         log("raise wrist");
-        wristServo.setPosition(WRIST_UP_POSITION);
+        double wristUpPosition = getWristUpPosition();
+        wristServo.setPosition(wristUpPosition);
         isWristTargetUp = true;
     }
 
@@ -205,6 +250,23 @@ public class RobotHardwareA {
         log("lower wrist");
         wristServo.setPosition(WRIST_DOWN_POSITION);
         isWristTargetUp = false;
+    }
+
+    public void toggleReverse() {
+        if (isReverse) {
+            setForward();
+        }
+        else {
+            setReverse();
+        }
+    }
+
+    public void setReverse() {
+        isReverse = true;
+    }
+
+    public void setForward() {
+        isReverse = false;
     }
 
     /*public void toLaunch(){
@@ -247,12 +309,21 @@ public class RobotHardwareA {
         }
     }
 
+    private int getArmUpPosition() {
+        return isHighDrop ? HIGH_ARM_UP_POSITION : LOW_ARM_UP_POSITION;
+    }
+
+    private double getWristUpPosition() {
+        return isHighDrop ? HIGH_WRIST_UP_POSITION : LOW_WRIST_UP_POSITION;
+    }
+
     public void raiseArm() {
         if (!isArmReady) {
             return;
         }
         log("raise arm");
-        armMotor.setTargetPosition(ARM_UP_POSITION);
+        int armUpPosition = getArmUpPosition();
+        armMotor.setTargetPosition(armUpPosition);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         isArmTargetUp = true;
     }
@@ -281,7 +352,8 @@ public class RobotHardwareA {
                 armPower = 0;
             }
             else {
-                double positionError = Math.abs(ARM_UP_POSITION - armMotor.getCurrentPosition());
+                int armUpPosition = getArmUpPosition();
+                double positionError = Math.abs(armUpPosition - armMotor.getCurrentPosition());
                 armPower = Math.min(positionError * ARM_GAIN, ARM_RAISE_POWER);
             }
         }
@@ -295,6 +367,11 @@ public class RobotHardwareA {
             }
         }
         armMotor.setPower(armPower);
+
+        greenLightA.setState(!isReverse);
+        redLightA.setState(isReverse);
+        greenLightB.setState(!isReverse);
+        redLightB.setState(isReverse);
 
         Telemetry telemetry = opMode.telemetry;
         telemetry.addData("Status", "Running");
@@ -312,6 +389,7 @@ public class RobotHardwareA {
         telemetry.addData("Wrist Servo Position", "%.2f", wristServo.getPosition());
         telemetry.addData("Field Centric", isFieldCentric);
         telemetry.addData("Turtle Mode", isTurtleMode);
+        telemetry.addData("Reverse", isReverse);
     }
 
     public void moveRobot() {
@@ -319,36 +397,39 @@ public class RobotHardwareA {
         double leftBackPower;
         double rightFrontPower;
         double rightBackPower;
+
+        double axial = -opMode.gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+        double lateral = opMode.gamepad1.left_stick_x;
+        double yaw = opMode.gamepad1.right_stick_x;
+
+        if(isReverse) {
+            yaw = -yaw;
+        }
+
         if (isFieldCentric) {
 
-            double y = -opMode.gamepad1.left_stick_y; // Remember, Y stick value is reversed
-            double x = opMode.gamepad1.left_stick_x;
-            double rx = opMode.gamepad1.right_stick_x;
-
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            // + Math.PI
 
             // Rotate the movement direction counter to the bot's rotation
-            double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-            double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+            double rotX = lateral * Math.cos(-botHeading) - axial * Math.sin(-botHeading);
+            double rotY = lateral * Math.sin(-botHeading) + axial * Math.cos(-botHeading);
 
             rotX = rotX * 1.1;  // Counteract imperfect strafing
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
             // but only if at least one is out of the range [-1, 1]
-            double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-            leftFrontPower = (rotY + rotX + rx) / denominator;
-            leftBackPower = (rotY - rotX + rx) / denominator;
-            rightFrontPower = (rotY - rotX - rx) / denominator;
-            rightBackPower = (rotY + rotX - rx) / denominator;
+            double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(yaw), 1);
+            leftFrontPower = (rotY + rotX + yaw) / denominator;
+            leftBackPower = (rotY - rotX + yaw) / denominator;
+            rightFrontPower = (rotY - rotX - yaw) / denominator;
+            rightBackPower = (rotY + rotX - yaw) / denominator;
 
-        } else {
+        }
+
+        else {
+
             double max;
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial = -opMode.gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral = opMode.gamepad1.left_stick_x;
-            double yaw = opMode.gamepad1.right_stick_x;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -373,6 +454,7 @@ public class RobotHardwareA {
         }
 
         double multiplier;
+
         if (isTurtleMode) {
             multiplier = TURTLE_MULTIPLIER;
         }
@@ -382,10 +464,12 @@ public class RobotHardwareA {
         else {
             multiplier = NORMAL_MULTIPLIER;
         }
+
         leftFrontPower *= multiplier;
         leftBackPower *= multiplier;
         rightBackPower *= multiplier;
         rightFrontPower *= multiplier;
+
         // This is test code:
         //
         // Uncomment the following code to test your motor directions.
@@ -402,7 +486,13 @@ public class RobotHardwareA {
             rightFrontPower  = opMode.gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
         // Send calculated power to wheels
-        moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+
+        if (isReverse) {
+            moveRobot(-leftFrontPower, -rightFrontPower, -leftBackPower, -rightBackPower);
+        }
+        else {
+            moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+        }
     }
 
     public void log(String message) {
@@ -445,7 +535,8 @@ public class RobotHardwareA {
     }
 
     public boolean isArmRaised() {
-        int difference = Math.abs(armMotor.getCurrentPosition() - ARM_UP_POSITION);
+        int armUpPosition = getArmUpPosition();
+        int difference = Math.abs(armMotor.getCurrentPosition() - armUpPosition);
 
         return difference < ARM_POSITION_THRESHOLD;
     }

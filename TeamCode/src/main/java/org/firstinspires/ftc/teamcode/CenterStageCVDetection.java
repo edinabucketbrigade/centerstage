@@ -24,6 +24,7 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     Telemetry telemetry;
     boolean redAlliance;
     boolean startLeft;
+    boolean parkLeft;
     Mat mat = new Mat();
     public enum Location{
         Left,
@@ -39,7 +40,8 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     public static Rect MIDDLE_ROI = new Rect(225,150, 150,120);
     public static Rect RIGHT_ROI = new Rect(435,165, 150,120);
 
-    public CenterStageCVDetection(boolean redAlliance, boolean startLeft, Telemetry telemetry) {
+    public CenterStageCVDetection(boolean parkLeft, boolean redAlliance, boolean startLeft, Telemetry telemetry) {
+        this.parkLeft = parkLeft;
         this.redAlliance = redAlliance;
         this.startLeft = startLeft;
         this.telemetry = telemetry;
@@ -49,6 +51,7 @@ public class CenterStageCVDetection extends OpenCvPipeline {
 
         telemetry.addData("Alliance", redAlliance ? "Red" : "Blue");
         telemetry.addData("Start", startLeft ? "Left" : "Right");
+        telemetry.addData("Park", parkLeft ? "Left" : "Right");
 
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 

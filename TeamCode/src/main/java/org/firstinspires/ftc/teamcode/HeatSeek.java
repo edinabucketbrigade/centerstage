@@ -35,7 +35,8 @@ public class HeatSeek {
         LOWERING
     }
 
-    public static double DESIRED_DISTANCE = 5.5; // This is how close the camera should get to the target (inches)
+    public static double HIGH_DESIRED_DISTANCE = 5.5; // This is how close the camera should get to the target (inches)
+    public static double LOW_DESIRED_DISTANCE = 8;
     public static double SPEED_GAIN = 0.05; // Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     public static double STRAFE_GAIN = 0.015; // Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     public static double MAX_AUTO_SPEED = 0.5; // Clip the approach speed to this max value (adjust for your robot)
@@ -71,19 +72,16 @@ public class HeatSeek {
 
         if (targetMode == TargetMode.NONE) {
             robotHardware.moveRobot();
-        }
-        else {
+        } else {
             if (targetState == TargetState.POSITIONING) {
                 AprilTagDetection detection = getDetection();
-                if(detection == null) {
+                if (detection == null) {
                     robotHardware.moveRobot();
                     robotHardware.opMode.telemetry.addData("Note", "Target is missing");
-                }
-                else {
+                } else {
                     updateRobot(detection);
                 }
-            }
-            else {
+            } else {
                 updateRobot(null);
             }
         }
@@ -142,7 +140,7 @@ public class HeatSeek {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
         for (AprilTagDetection detection : currentDetections) {
-            if(isMatch(detection)) {
+            if (isMatch(detection)) {
                 return detection;
             }
         }
@@ -154,7 +152,8 @@ public class HeatSeek {
         robotHardware.raiseWrist();
 
         // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-        double rangeError = (detection.ftcPose.range - DESIRED_DISTANCE);
+        double desiredDistance = getDesiredDistance();
+        double rangeError = (detection.ftcPose.range - desiredDistance);
         double headingError = detection.ftcPose.bearing;
         double yawError = detection.ftcPose.yaw;
 
@@ -167,8 +166,7 @@ public class HeatSeek {
 
         if (isInPosition) {
             framesInPosition++;
-        }
-        else {
+        } else {
             framesInPosition = 0;
         }
 
@@ -221,7 +219,7 @@ public class HeatSeek {
     }
 
     private void updateRobot(AprilTagDetection detection) throws InterruptedException {
-        switch(targetState) {
+        switch (targetState) {
             case POSITIONING:
                 handlePositioning(detection);
                 break;
@@ -261,5 +259,10 @@ public class HeatSeek {
 
     public void cancel() {
         targetMode = TargetMode.NONE;
+    }
+
+    private double getDesiredDistance() {
+        boolean isHighDrop = robotHardware.isHighDrop;
+        return isHighDrop ? HIGH_DESIRED_DISTANCE : LOW_DESIRED_DISTANCE;
     }
 }

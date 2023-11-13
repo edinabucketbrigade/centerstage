@@ -20,6 +20,8 @@ public class TeleOpM extends LinearOpMode {
         robotHardware = new RobotHardwareA(this);
         heatSeek = new HeatSeek(robotHardware);
 
+        robotHardware.isHighDrop = true;
+
         telemetry.update();
 
         waitForStart();
@@ -74,6 +76,10 @@ public class TeleOpM extends LinearOpMode {
 
             if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
                 heatSeek.cancel();
+            }
+
+            if (currentGamepad.right_trigger > 0.5 && previousGamepad.right_trigger <= 0.5) {
+                robotHardware.toggleReverse();
             }
 
             telemetry.update();
