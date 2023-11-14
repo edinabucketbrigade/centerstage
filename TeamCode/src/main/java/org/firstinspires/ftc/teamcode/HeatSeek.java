@@ -265,4 +265,8 @@ public class HeatSeek {
         boolean isHighDrop = robotHardware.isHighDrop;
         return isHighDrop ? HIGH_DESIRED_DISTANCE : LOW_DESIRED_DISTANCE;
     }
+
+    public boolean isActive() {
+        return targetMode != TargetMode.NONE;
+    }
 }
