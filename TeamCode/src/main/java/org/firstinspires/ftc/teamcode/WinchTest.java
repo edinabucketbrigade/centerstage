@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class WinchTest extends LinearOpMode {
     public static double WINCH_MOTOR_SPEED = 1;
     public static double WINCH_SERVO_UP_POSITION = 0.5;
-    public static double WINCH_SERVO_DOWN_POSITION = 0;
+    public static double WINCH_SERVO_DOWN_POSITION = 0.05;
     private DcMotor winchMotor;
     private Servo winchServo;
 
