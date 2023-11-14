@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 @TeleOp
 public class DroneTest extends LinearOpMode {
-    public static double INCREMENT = 0.05;
+    public static double INCREMENT = 0.01;
     public static double LAUNCH_POSITION = 0.8; // 0.6 - 1
     public static double LIFT_POSITION = 0.5; // 0.25 - 0.75
 
