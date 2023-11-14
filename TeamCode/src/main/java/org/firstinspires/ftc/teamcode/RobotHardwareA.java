@@ -35,7 +35,7 @@ public class RobotHardwareA {
             Digital Devices
                 7 - REV Touch Sensor - touch
             Servos
-                0 - Continuous Rotation Servo - winch_servo
+                0 - Servo - winch_servo
         Control Hub
             Motors
                 0 - GoBILDA 5201 series - right_back_drive
