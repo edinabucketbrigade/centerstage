@@ -35,12 +35,12 @@ public class DroneTest extends LinearOpMode {
             previousGamepad.copy(currentGamepad);
             currentGamepad.copy(gamepad1);
 
-            if (currentGamepad.a && !previousGamepad.a) {
+            if (currentGamepad.b && !previousGamepad.b) {
                 launchPosition += INCREMENT;
                 droneLaunchServo.setPosition(launchPosition);
             }
 
-            if (currentGamepad.b && !previousGamepad.b) {
+            if (currentGamepad.a && !previousGamepad.a) {
                 launchPosition -= INCREMENT;
                 droneLaunchServo.setPosition(launchPosition);
             }
