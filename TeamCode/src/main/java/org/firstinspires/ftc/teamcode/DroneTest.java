@@ -1,13 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Config
 @TeleOp
 public class DroneTest extends LinearOpMode {
-    private static final double INCREMENT = 0.05;
+    public static double INCREMENT = 0.05;
+    public static double LAUNCH_POSITION = 0.8; // 0.6 - 1
+    public static double LIFT_POSITION = 0.5; // 0.25 - 0.75
 
     private Servo droneLaunchServo;
     private Servo droneLiftServo;
@@ -17,9 +21,6 @@ public class DroneTest extends LinearOpMode {
         Gamepad previousGamepad = new Gamepad();
         Gamepad currentGamepad = new Gamepad();
 
-        double launchPosition = 0.8; // 0.6 - 1
-        double liftPosition = 0.5; // 0.25 - 0.75
-
         droneLaunchServo = hardwareMap.get(Servo.class, "drone_launch_servo");
         droneLiftServo = hardwareMap.get(Servo.class, "drone_lift_servo");
 
@@ -28,36 +29,36 @@ public class DroneTest extends LinearOpMode {
 
         waitForStart();
 
-        droneLaunchServo.setPosition(launchPosition);
-        droneLiftServo.setPosition(liftPosition);
+        droneLaunchServo.setPosition(LAUNCH_POSITION);
+        droneLiftServo.setPosition(LIFT_POSITION);
 
         while (opModeIsActive()) {
             previousGamepad.copy(currentGamepad);
             currentGamepad.copy(gamepad1);
 
             if (currentGamepad.b && !previousGamepad.b) {
-                launchPosition += INCREMENT;
-                droneLaunchServo.setPosition(launchPosition);
+                LAUNCH_POSITION += INCREMENT;
+                droneLaunchServo.setPosition(LAUNCH_POSITION);
             }
 
             if (currentGamepad.a && !previousGamepad.a) {
-                launchPosition -= INCREMENT;
-                droneLaunchServo.setPosition(launchPosition);
+                LAUNCH_POSITION -= INCREMENT;
+                droneLaunchServo.setPosition(LAUNCH_POSITION);
             }
 
             if (currentGamepad.y && !previousGamepad.y) {
-                liftPosition += INCREMENT;
-                droneLiftServo.setPosition(liftPosition);
+                LIFT_POSITION += INCREMENT;
+                droneLiftServo.setPosition(LIFT_POSITION);
             }
 
             if (currentGamepad.x && !previousGamepad.x) {
-                liftPosition -= INCREMENT;
-                droneLiftServo.setPosition(liftPosition);
+                LIFT_POSITION -= INCREMENT;
+                droneLiftServo.setPosition(LIFT_POSITION);
             }
 
             telemetry.addData("Status", "Running");
-            telemetry.addData("Lift Position", "%.2f",liftPosition);
-            telemetry.addData("Launch Position", "%.2f", launchPosition);
+            telemetry.addData("Lift Position", "%.2f",LIFT_POSITION);
+            telemetry.addData("Launch Position", "%.2f", LAUNCH_POSITION);
 
             telemetry.update();
         }
