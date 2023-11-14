@@ -38,11 +38,11 @@ public class TeleOpM extends LinearOpMode {
             robotHardware.setTurtleMode(gamepad1.left_bumper);
             robotHardware.setBunnyMode(gamepad1.right_bumper);
 
-            if (currentGamepad.back && !previousGamepad.back) {
+            if (currentGamepad.options && !previousGamepad.options) {
                 robotHardware.toggleFieldCentric();
             }
 
-            if (currentGamepad.options && !previousGamepad.options) {
+            if (currentGamepad.back && !previousGamepad.back) {
                 robotHardware.resetYaw();
             }
 
