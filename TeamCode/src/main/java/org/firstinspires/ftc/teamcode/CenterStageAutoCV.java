@@ -167,6 +167,7 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         placePixelOnSpikeMark(location);
         placePixelOnBackdrop(location);
+        park();
 
         while(opModeIsActive()){}
     }
@@ -207,12 +208,17 @@ public class CenterStageAutoCV extends LinearOpMode {
         }
 
         while(opModeIsActive()) {
+            if (!heatSeek.isActive()) {
+                break;
+            }
             robotHardware.update();
             heatSeek.update();
             telemetry.update();
         }
+    }
 
-        // Make parkLeft do something
+    private void park() {
+        moveRight(parkLeft ? -1200 : 1200);
     }
 
     private void placePixelMiddle() {
