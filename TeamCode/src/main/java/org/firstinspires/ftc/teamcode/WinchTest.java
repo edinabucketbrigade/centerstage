@@ -4,22 +4,19 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
 @TeleOp
 public class WinchTest extends LinearOpMode {
     public static double WINCH_MOTOR_SPEED = 1;
+    public static double WINCH_SERVO_UP_POSITION = 0.5;
+    public static double WINCH_SERVO_DOWN_POSITION = 0;
     private DcMotor winchMotor;
     private Servo winchServo;
 
-
     @Override
     public void runOpMode() {
-        Gamepad previousGamepad = new Gamepad();
-        Gamepad currentGamepad = new Gamepad();
-
         winchMotor = hardwareMap.get(DcMotor.class, "winch_motor");
 
         winchServo = hardwareMap.get(Servo.class, "winch_servo");
@@ -34,32 +31,26 @@ public class WinchTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            previousGamepad.copy(currentGamepad);
-            currentGamepad.copy(gamepad1);
 
-            if (currentGamepad.y) {
-                winchServo.setPosition(1);
+            if (gamepad1.y) {
+                winchServo.setPosition(WINCH_SERVO_UP_POSITION);
             }
-            else if (currentGamepad.a) {
-                winchServo.setPosition(-1);
-            }
-            else {
-                winchServo.setPosition(0);
+            else if (gamepad1.a) {
+                winchServo.setPosition(WINCH_SERVO_DOWN_POSITION);
             }
 
-            if (currentGamepad.dpad_up) {
+            if (gamepad1.dpad_up) {
                 winchMotor.setPower(-WINCH_MOTOR_SPEED);
             }
-            else if (currentGamepad.dpad_down) {
+            else if (gamepad1.dpad_down) {
                 winchMotor.setPower(WINCH_MOTOR_SPEED);
             }
             else {
                 winchMotor.setPower(0);
             }
 
-
             telemetry.addData("Status", "Running");
-            telemetry.addData("Winch Power", "%.2f", winchMotor.getPower());
+            telemetry.addData("Winch Motor Power", "%.2f", winchMotor.getPower());
             telemetry.addData("Winch Servo Target", "%.2f", winchServo.getPosition());
             telemetry.update();
 
