@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 @TeleOp
 public class TeleOpM extends LinearOpMode {
 
+    private static final double TRIGGER_THRESHOLD = 0.5;
     private RobotHardwareA robotHardware;
     private HeatSeek heatSeek;
 
@@ -35,8 +36,13 @@ public class TeleOpM extends LinearOpMode {
             robotHardware.update();
             heatSeek.update();
 
-            robotHardware.setTurtleMode(gamepad1.left_bumper);
-            robotHardware.setBunnyMode(gamepad1.right_bumper);
+            if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
+                robotHardware.toggleTurtleMode();
+            }
+
+            if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                robotHardware.toggleBunnyMode();
+            }
 
             if (currentGamepad.options && !previousGamepad.options) {
                 robotHardware.toggleFieldCentric();
@@ -46,20 +52,39 @@ public class TeleOpM extends LinearOpMode {
                 robotHardware.resetYaw();
             }
 
-            if (currentGamepad.x && !previousGamepad.x) {
-                robotHardware.toggleLeftClaw();
-            }
+            if (gamepad1.left_trigger > TRIGGER_THRESHOLD) {
+                if (currentGamepad.x && !previousGamepad.x) {
+                    robotHardware.toggleLeftClaw();
+                }
 
-            if (currentGamepad.a && !previousGamepad.a) {
-                robotHardware.toggleWrist();
-            }
+                if (currentGamepad.a && !previousGamepad.a) {
+                    robotHardware.toggleWrist();
+                }
 
-            if (currentGamepad.b && !previousGamepad.b) {
-                robotHardware.toggleRightClaw();
-            }
+                if (currentGamepad.b && !previousGamepad.b) {
+                    robotHardware.toggleRightClaw();
+                }
 
-            if (currentGamepad.y && !previousGamepad.y){
-                robotHardware.toggleArm();
+                if (currentGamepad.y && !previousGamepad.y){
+                    robotHardware.toggleArm();
+                }
+            }
+            else if (gamepad1.right_trigger > TRIGGER_THRESHOLD) {
+                // Drone and winch stuff
+            }
+            else {
+                if (currentGamepad.a && !previousGamepad.a) {
+                    robotHardware.toggleLeftClaw();
+                    robotHardware.toggleRightClaw();
+                }
+
+                if (currentGamepad.x && !previousGamepad.x) {
+                    robotHardware.toggleLeftClaw();
+                }
+
+                if (currentGamepad.b && !previousGamepad.b) {
+                    robotHardware.toggleRightClaw();
+                }
             }
 
             if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
@@ -78,7 +103,7 @@ public class TeleOpM extends LinearOpMode {
                 heatSeek.cancel();
             }
 
-            if (currentGamepad.right_trigger > 0.5 && previousGamepad.right_trigger <= 0.5) {
+            if (currentGamepad.left_stick_button && !previousGamepad.left_stick_button) {
                 robotHardware.toggleReverse();
             }
 

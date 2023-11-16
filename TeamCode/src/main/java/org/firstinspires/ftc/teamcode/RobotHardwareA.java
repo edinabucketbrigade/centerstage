@@ -266,6 +266,25 @@ public class RobotHardwareA {
         }
     }
 
+    public void toggleTurtleMode() {
+        if (isTurtleMode) {
+            setTurtleMode(false);
+        }
+        else {
+            setTurtleMode(true);
+        }
+    }
+
+    public void toggleBunnyMode() {
+        if (isBunnyMode) {
+            setBunnyMode(false);
+        }
+        else {
+            setBunnyMode(true);
+        }
+    }
+
+
     public void setReverse() {
         isReverse = true;
     }
