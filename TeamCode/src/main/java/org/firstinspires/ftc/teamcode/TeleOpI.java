@@ -30,6 +30,7 @@ package org.firstinspires.ftc.teamcode;/*
 
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -51,6 +52,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @TeleOp
+@Disabled
 public class TeleOpI extends OpMode {
 
     /*

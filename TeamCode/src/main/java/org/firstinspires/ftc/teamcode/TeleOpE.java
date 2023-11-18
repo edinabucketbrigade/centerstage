@@ -1,5 +1,6 @@
     package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
     @TeleOp
+    @Disabled
     public class TeleOpE extends LinearOpMode {
     
         final double DESIRED_DISTANCE = 6.0; //  this is how close the camera should get to the target (inches)
