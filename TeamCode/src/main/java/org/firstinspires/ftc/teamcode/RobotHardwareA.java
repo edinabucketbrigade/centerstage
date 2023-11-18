@@ -348,6 +348,12 @@ public class RobotHardwareA {
         rightBackDrive.setPower(rightBackPower);
     }
 
+    public void stopDriveMotors() {
+        for(DcMotor driveMotor : driveMotors) {
+            driveMotor.setPower(0);
+        }
+    }
+
     private void initializeArm() {
         log("initialize arm");
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -581,7 +587,7 @@ public class RobotHardwareA {
 
     }
 
-    private void runUsingEncoder(double power) {
+    public void runUsingEncoder(double power) {
         for(DcMotor driveMotor : driveMotors) {
             driveMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             driveMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

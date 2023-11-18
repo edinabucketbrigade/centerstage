@@ -16,8 +16,8 @@ import org.openftc.easyopencv.OpenCvWebcam;
 @Autonomous(preselectTeleOp = "TeleOpM")
 public class CenterStageAutoCV extends LinearOpMode {
     /*
-    * If program has a build folder error try clearing the build
-    */
+     * If program has a build folder error try clearing the build
+     */
     public static int AWAY_FORWARD = 820;
     public static int TOWARD_FORWARD = 1310;
     public static int MIDDLE_FORWARD_POSITION = 1245;
@@ -27,12 +27,16 @@ public class CenterStageAutoCV extends LinearOpMode {
     public static int RIGHT_OFFSET_STRAFE = 640;
     public static int LEFT_OFFSET_STRAFE = 520;
     public static int MIDDLE_OFFSET_STRAFE = 200;
-    public static int FAR_DISTANCE_TO_BACKDROP = 3900;
+    public static int FAR_DISTANCE_TO_BACKDROP = 3000;
     public static int CLOSE_DISTANCE_TO_BACKDROP = 1300;
-    public static int MIDDLE_BACK_UP = 300;
-    public static int AWAY_RIGGING_BACKUP_STRAFE = 1200;
-    public static int CLOSE_RIGGING_BACKUP = 800;
-    public static int CLOSE_RIGGING_EXTRA_BACKUP = 1200;
+    public static int MIDDLE_BACK_UP = 1200;
+    public static int BACKUP = 650;
+    public static int EXTRA_BACKUP = 1200;
+    public static int EXTRA_EXTRA_BACKUP = 1500;
+    public static int EXTRA = 400;
+    public static int SAME_DIRECTION_PARK_DISTANCE = 800;
+    public static int DIFFERENT_DIRECTION_PARK_DISTANCE = 1600;
+    public static int MIDDLE_PARK_DISTANCE = 1200;
     private Boolean redAlliance = null;
     private Boolean startLeft = null;
     private Boolean parkLeft = null;
@@ -59,8 +63,7 @@ public class CenterStageAutoCV extends LinearOpMode {
                 if (currentGamepad.b && !previousGamepad.b) {
                     redAlliance = true;
                 }
-            }
-            else if (startLeft == null){
+            } else if (startLeft == null) {
                 telemetry.addData("Start", "X = left, B = right");
                 telemetry.update();
                 if (currentGamepad.x && !previousGamepad.x) {
@@ -69,8 +72,7 @@ public class CenterStageAutoCV extends LinearOpMode {
                 if (currentGamepad.b && !previousGamepad.b) {
                     startLeft = false;
                 }
-            }
-            else if (parkLeft == null) {
+            } else if (parkLeft == null) {
                 telemetry.addData("Park", "X = left, B = right");
                 telemetry.update();
                 if (currentGamepad.x && !previousGamepad.x) {
@@ -79,8 +81,7 @@ public class CenterStageAutoCV extends LinearOpMode {
                 if (currentGamepad.b && !previousGamepad.b) {
                     parkLeft = false;
                 }
-            }
-            else {
+            } else {
                 break;
             }
         }
@@ -103,11 +104,9 @@ public class CenterStageAutoCV extends LinearOpMode {
          *   * Lambda Expression *
          *   camera.openCameraDeviceAsync(() -> camera.startStreaming(320,240, OpenCvCameraRotation.UPRIGHT));
          */
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
-            public void onOpened()
-            {
+            public void onOpened() {
                 /*
                  * Tell the webcam to start streaming images to us! Note that you must make sure
                  * the resolution you specify is supported by the camera. If it is not, an exception
@@ -130,8 +129,7 @@ public class CenterStageAutoCV extends LinearOpMode {
             }
 
             @Override
-            public void onError(int errorCode)
-            {
+            public void onError(int errorCode) {
                 /*
                  * This will be called if the camera could not be opened
                  */
@@ -145,14 +143,14 @@ public class CenterStageAutoCV extends LinearOpMode {
         sleep(2000);
         robotHardware.raiseWrist();
 
-        while(opModeIsActive() && !startedStreaming) {
+        while (opModeIsActive() && !startedStreaming) {
             log("waiting for camera streaming to start");
             sleep(50);
         }
 
         CenterStageCVDetection.Location location = null;
 
-        while(opModeIsActive() && location == null) {
+        while (opModeIsActive() && location == null) {
             log("waiting for location detection");
             sleep(50);
             location = detector.getLocation();
@@ -169,10 +167,11 @@ public class CenterStageAutoCV extends LinearOpMode {
         robotHardware.resetYaw();
 
         placePixelOnSpikeMark(location);
-        //placePixelOnBackdrop(location);
-        //park();
+        placePixelOnBackdrop(location);
+        park(location);
 
-        while(opModeIsActive()){}
+        while (opModeIsActive()) {
+        }
     }
 
     private void placePixelOnSpikeMark(CenterStageCVDetection.Location location) {
@@ -190,84 +189,99 @@ public class CenterStageAutoCV extends LinearOpMode {
         robotHardware.openRightClaw();
     }
 
-    private void placePixelOnBackdrop (CenterStageCVDetection.Location location) throws InterruptedException {
+    private void placePixelOnBackdrop(CenterStageCVDetection.Location location) throws InterruptedException {
+        HeatSeek heatSeek = new HeatSeek(robotHardware);
+
         if (redAlliance) {
             if (startLeft) {
                 if (location == CenterStageCVDetection.Location.Left) {
                     robotHardware.raiseWrist();
-                    moveForward(CLOSE_RIGGING_BACKUP);
-                    moveRight(-FAR_DISTANCE_TO_BACKDROP);
-                    moveForward(-CLOSE_RIGGING_EXTRA_BACKUP);
+                    moveForward(BACKUP);
+                    robotHardware.turnToHeading(-90);
+                    moveForward(FAR_DISTANCE_TO_BACKDROP);
+                    moveRight(-EXTRA_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Middle) {
                     moveForward(MIDDLE_BACK_UP);
-                    moveRight(-FAR_DISTANCE_TO_BACKDROP);
+                    robotHardware.turnToHeading(-90);
+                    moveForward(FAR_DISTANCE_TO_BACKDROP);
+                    moveRight(-EXTRA_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
                     robotHardware.raiseWrist();
-                    moveRight(-AWAY_RIGGING_BACKUP_STRAFE);
+                    moveRight(-EXTRA_EXTRA_BACKUP);
+                    robotHardware.turnToHeading(-90);
                     moveForward(FAR_DISTANCE_TO_BACKDROP);
-                    moveRight(AWAY_RIGGING_BACKUP_STRAFE);
+                    moveRight(-EXTRA_BACKUP);
                 }
-            }
-            else {
+            } else {
                 if (location == CenterStageCVDetection.Location.Left) {
-
+                    robotHardware.raiseWrist();
+                    moveRight(BACKUP);
+                    moveForward(CLOSE_DISTANCE_TO_BACKDROP);
+                    moveRight(-EXTRA_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Middle) {
                     moveForward(MIDDLE_BACK_UP);
                     moveRight(-CLOSE_DISTANCE_TO_BACKDROP);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
-
+                    robotHardware.raiseWrist();
+                    moveRight(-CLOSE_DISTANCE_TO_BACKDROP);
+                    moveForward(-EXTRA);
                 }
             }
-            robotHardware.turnToHeading(-90);
-        }
-        else {
+        } else {
             if (startLeft) {
                 if (location == CenterStageCVDetection.Location.Left) {
-
+                    robotHardware.raiseWrist();
+                    moveRight(CLOSE_DISTANCE_TO_BACKDROP);
+                    moveForward(-EXTRA);
                 }
                 if (location == CenterStageCVDetection.Location.Middle) {
                     moveForward(MIDDLE_BACK_UP);
                     moveRight(CLOSE_DISTANCE_TO_BACKDROP);
-                    robotHardware.turnToHeading(90);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
-
+                    robotHardware.raiseWrist();
+                    moveRight(-BACKUP);
+                    moveForward(CLOSE_DISTANCE_TO_BACKDROP);
                 }
-            }
-            else {
+            } else {
                 if (location == CenterStageCVDetection.Location.Left) {
-
+                    robotHardware.raiseWrist();
+                    moveRight(BACKUP);
+                    moveForward(-FAR_DISTANCE_TO_BACKDROP);
+                    moveRight(-BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Middle) {
                     moveForward(MIDDLE_BACK_UP);
                     moveRight(FAR_DISTANCE_TO_BACKDROP);
-                    robotHardware.turnToHeading(90);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
-
+                    moveForward(BACKUP);
+                    moveRight(FAR_DISTANCE_TO_BACKDROP);
+                    moveForward(-EXTRA_BACKUP);
                 }
             }
+            robotHardware.turnToHeading(90);
         }
-        HeatSeek heatSeek = new HeatSeek(robotHardware);
 
-        if(location == CenterStageCVDetection.Location.Left) {
+        robotHardware.runUsingEncoder(0);
+
+        heatSeek.initialize();
+
+        if (location == CenterStageCVDetection.Location.Left) {
             heatSeek.startLeft();
-        }
-        else if(location == CenterStageCVDetection.Location.Middle) {
+        } else if (location == CenterStageCVDetection.Location.Middle) {
             heatSeek.startMiddle();
-        }
-        else if(location == CenterStageCVDetection.Location.Right) {
+        } else if (location == CenterStageCVDetection.Location.Right) {
             heatSeek.startRight();
-        }
-        else {
+        } else {
             throw new InterruptedException("Unrecognized location.");
         }
 
-        while(opModeIsActive()) {
+        while (opModeIsActive()) {
             if (!heatSeek.isActive()) {
                 break;
             }
@@ -277,8 +291,25 @@ public class CenterStageAutoCV extends LinearOpMode {
         }
     }
 
-    private void park() {
-        moveRight(parkLeft ? -1200 : 1200);
+    private void park(CenterStageCVDetection.Location location) {
+        if (location == CenterStageCVDetection.Location.Left && parkLeft == true) {
+            moveRight(-SAME_DIRECTION_PARK_DISTANCE);
+        }
+        else if (location == CenterStageCVDetection.Location.Right && parkLeft == false) {
+            moveRight(SAME_DIRECTION_PARK_DISTANCE);
+        }
+        else if (location == CenterStageCVDetection.Location.Left && parkLeft == false) {
+            moveRight(DIFFERENT_DIRECTION_PARK_DISTANCE);
+        }
+        else if (location == CenterStageCVDetection.Location.Right && parkLeft == true) {
+            moveRight(-DIFFERENT_DIRECTION_PARK_DISTANCE);
+        }
+        else if (location == CenterStageCVDetection.Location.Middle && parkLeft == false) {
+            moveRight(MIDDLE_PARK_DISTANCE);
+        }
+        else if (location == CenterStageCVDetection.Location.Middle && parkLeft == true) {
+            moveRight(-MIDDLE_PARK_DISTANCE);
+        }
     }
 
     private void placePixelMiddle() {

@@ -30,6 +30,8 @@ public class TeleOpM extends LinearOpMode {
 
         waitForStart();
 
+        heatSeek.initialize();
+
         robotHardware.resetYaw();
 
         while (opModeIsActive()) {
