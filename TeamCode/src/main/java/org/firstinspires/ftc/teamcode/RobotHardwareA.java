@@ -184,6 +184,7 @@ public class RobotHardwareA {
     }
 
     public void toggleLeftClaw() {
+        log("toggle left claw");
         if(leftClawIsOpen) {
             closeLeftClaw();
         }
@@ -215,6 +216,7 @@ public class RobotHardwareA {
     }
 
     public void toggleRightClaw() {
+        log("toggle right claw");
         if(rightClawIsOpen) {
             closeRightClaw();
         }
@@ -246,16 +248,19 @@ public class RobotHardwareA {
     }
 
     public void closeClaws() {
+        log("close claws");
         closeLeftClaw();
         closeRightClaw();
     }
 
     public void toggleClaws() {
+        log("toggle claws");
         toggleLeftClaw();
         toggleRightClaw();
     }
 
     public void toggleWrist() {
+        log("toggle wrist");
         if(isWristTargetUp) {
             lowerWrist();
         }
@@ -278,6 +283,7 @@ public class RobotHardwareA {
     }
 
     public void toggleReverse() {
+        log("toggle reverse");
         if (isReverse) {
             setForward();
         }
@@ -287,6 +293,7 @@ public class RobotHardwareA {
     }
 
     public void toggleTurtleMode() {
+        log("toggle turtle mode");
         if (isTurtleMode) {
             setTurtleMode(false);
         }
@@ -296,6 +303,7 @@ public class RobotHardwareA {
     }
 
     public void toggleBunnyMode() {
+        log("toggle bunny mode");
         if (isBunnyMode) {
             setBunnyMode(false);
         }
@@ -306,31 +314,14 @@ public class RobotHardwareA {
 
 
     public void setReverse() {
+        log("set reverse");
         isReverse = true;
     }
 
     public void setForward() {
+        log("set forward");
         isReverse = false;
     }
-
-    /*public void toLaunch(){
-        launcher.setPosition(0.8);
-        if (timer.milliseconds() == 1000){
-            launcher.setPosition(0.0);
-        }
-    }
-    public void toHang(){
-        hookMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        hookMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        runToPosition(500,-500,500,-500,0.5);
-        hookMotor.setTargetPosition(HOOK_TARGET);
-        runToPosition(-500,500,-500,500,0.5);
-        while(opMode.opModeIsActive() && (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() || leftBackDrive.isBusy() || rightBackDrive.isBusy())) {
-            update();
-            opMode.telemetry.update();
-        }
-        hookMotor.setTargetPosition(100);
-    }*/
 
     public void moveRobot(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
         leftFrontDrive.setPower(leftFrontPower);
@@ -340,11 +331,13 @@ public class RobotHardwareA {
     }
 
     private void initializeArm() {
+        log("initialize arm");
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void toggleArm() {
+        log("toggle arm");
         if(isArmTargetUp) {
             lowerArm();
         }
@@ -362,10 +355,11 @@ public class RobotHardwareA {
     }
 
     public void raiseArm() {
+        log("raise arm");
         if (!isArmReady) {
+            log("arm is not ready");
             return;
         }
-        log("raise arm");
         int armUpPosition = getArmUpPosition();
         armMotor.setTargetPosition(armUpPosition);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -373,10 +367,11 @@ public class RobotHardwareA {
     }
 
     public void lowerArm() {
+        log("lower arm");
         if (!isArmReady) {
+            log("arm is not ready");
             return;
         }
-        log("lower arm");
         armMotor.setTargetPosition(ARM_DOWN_POSITION);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setPower(ARM_LOWER_POWER);
@@ -433,6 +428,7 @@ public class RobotHardwareA {
         telemetry.addData("Wrist Servo Position", "%.2f", wristServo.getPosition());
         telemetry.addData("Field Centric", isFieldCentric);
         telemetry.addData("Turtle Mode", isTurtleMode);
+        telemetry.addData("Bunny Mode", isBunnyMode);
         telemetry.addData("Reverse", isReverse);
         telemetry.addData("Winch Motor Power", "%.2f", winchMotor.getPower());
         telemetry.addData("Winch Servo Target", "%.2f", winchServo.getPosition());
@@ -546,6 +542,7 @@ public class RobotHardwareA {
     }
 
     public void runToPosition(int frontRightPosition, int frontLeftPosition, int backRightPosition, int backLeftPosition, double power){
+        log("run to position " + frontRightPosition);
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -573,28 +570,27 @@ public class RobotHardwareA {
             opMode.telemetry.update();
         }
     }
-    public void setIsFieldCentric(boolean isFieldCentric){
-        this.isFieldCentric=isFieldCentric;
-    }
+
     public void toggleFieldCentric(){
+        log("toggle field centric");
         this.isFieldCentric=!isFieldCentric;
     }
 
     public boolean isArmRaised() {
         int armUpPosition = getArmUpPosition();
         int difference = Math.abs(armMotor.getCurrentPosition() - armUpPosition);
-
         return difference < ARM_POSITION_THRESHOLD;
     }
     public boolean isArmLowered() {
         int difference = Math.abs(armMotor.getCurrentPosition() - ARM_DOWN_POSITION);
-
         return difference < ARM_POSITION_THRESHOLD;
     }
     public void setTurtleMode(boolean isTurtleMode){
+        log("set turtle mode = " + isTurtleMode);
         this.isTurtleMode = isTurtleMode;
     }
     public void setBunnyMode(boolean isBunnyMode){
+        log("set bunny mode = " + isBunnyMode);
         this.isBunnyMode = isBunnyMode;
     }
 
@@ -613,6 +609,8 @@ public class RobotHardwareA {
     }
 
     public void turnToHeading(double heading) {
+
+        log("turn to heading " + heading);
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -671,10 +669,12 @@ public class RobotHardwareA {
         return orientation.getYaw(AngleUnit.DEGREES);
     }
     public void resetYaw() {
+        log("reset yaw");
         imu.resetYaw();
     }
 
     public void raiseWinchLift() {
+        log("raise winch lift");
         winchServo.setPosition(WINCH_SERVO_UP_POSITION);
         isWinchLiftTargetUp = true;
         raiseWrist();
@@ -682,11 +682,13 @@ public class RobotHardwareA {
     }
 
     public void lowerWinchLift() {
+        log("lower winch lift");
         winchServo.setPosition(WINCH_SERVO_DOWN_POSITION);
         isWinchLiftTargetUp = false;
     }
 
     public void toggleWinchLift() {
+        log("toggle winch lift");
         if (isWinchLiftTargetUp) {
             lowerWinchLift();
         }
@@ -696,15 +698,18 @@ public class RobotHardwareA {
     }
 
     public void raiseRobot() {
+        log("raise robot");
         lowerWinchLift();
         winchMotor.setPower(-WINCH_MOTOR_SPEED);
     }
 
     public void lowerRobot() {
+        log("lower robot");
         winchMotor.setPower(WINCH_MOTOR_SPEED);
     }
 
     public void stopLiftingRobot() {
+        //log("stop lifting robot");
         winchMotor.setPower(0);
     }
 }
