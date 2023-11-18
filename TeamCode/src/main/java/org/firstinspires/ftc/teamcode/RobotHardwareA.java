@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.support.v4.app.INotificationSideChannel;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -13,7 +14,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -66,7 +66,6 @@ public class RobotHardwareA {
     public static int ARM_DOWN_POSITION = 0;
     public static int HIGH_ARM_UP_POSITION = 1300;
     public static int LOW_ARM_UP_POSITION = 1500;
-    public static int HOOK_TARGET = 1000;
     public static double ARM_RAISE_POWER = 1;
     public static double ARM_LOWER_POWER = 0.9;
     public static double TURTLE_MULTIPLIER = 0.3;
@@ -83,7 +82,9 @@ public class RobotHardwareA {
     public static double WINCH_MOTOR_SPEED = 1;
     public static double WINCH_SERVO_UP_POSITION = 0.67;
     public static double WINCH_SERVO_DOWN_POSITION = 0;
-    private ElapsedTime timer = new ElapsedTime();
+    public static double DRONE_LAUNCH_POSITION = 0.8; // 0.6 - 1
+    public static double DRONE_LIFT_POSITION = 0.5; // 0.25 - 0.75
+    public static double DRONE_INCREMENT = 0.01;
     public LinearOpMode opMode;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -118,6 +119,8 @@ public class RobotHardwareA {
     public boolean isHighDrop;
     private DcMotor winchMotor;
     private Servo winchServo;
+    private Servo droneLaunchServo;
+    private Servo droneLiftServo;
 
     public RobotHardwareA (LinearOpMode opMode) {
         this.opMode = opMode;
@@ -155,6 +158,9 @@ public class RobotHardwareA {
         rightClawServo = hardwareMap.get(Servo.class, "right_claw_servo");
         winchServo = hardwareMap.get(Servo.class, "winch_servo");
 
+        droneLaunchServo = hardwareMap.get(Servo.class, "drone_launch_servo");
+        droneLiftServo = hardwareMap.get(Servo.class, "drone_lift_servo");
+
         touchSensor = hardwareMap.get(TouchSensor.class, "touch");
 
         armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
@@ -172,9 +178,11 @@ public class RobotHardwareA {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
         winchMotor.setDirection(DcMotor.Direction.FORWARD);
         winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        droneLaunchServo.setPosition(DRONE_LAUNCH_POSITION);
+        droneLiftServo.setPosition(DRONE_LIFT_POSITION);
 
         FtcDashboard.getInstance();
 
@@ -711,5 +719,47 @@ public class RobotHardwareA {
     public void stopLiftingRobot() {
         //log("stop lifting robot");
         winchMotor.setPower(0);
+    }
+
+    public void incrementDroneLaunchPosition() {
+        log("increment drone launch position");
+        double position = droneLaunchServo.getPosition() + DRONE_INCREMENT;
+        setDroneLaunchPosition(position);
+    }
+
+    public void decrementDroneLaunchPosition() {
+        log("decrement drone launch position");
+        double position = droneLaunchServo.getPosition() - DRONE_INCREMENT;
+        setDroneLaunchPosition(position);
+    }
+
+    public void setDroneLaunchPosition(double position) {
+        log("set drone launch position = " + position);
+        droneLaunchServo.setPosition(position);
+    }
+
+    public double getDroneLaunchPosition() {
+        return droneLaunchServo.getPosition();
+    }
+
+    public void incrementDroneLiftPosition() {
+        log("increment drone lift position");
+        double position = droneLiftServo.getPosition() + DRONE_INCREMENT;
+        setDroneLiftPosition(position);
+    }
+
+    public void decrementDroneLiftPosition() {
+        log("decrement drone launch position");
+        double position = droneLiftServo.getPosition() - DRONE_INCREMENT;
+        setDroneLiftPosition(position);
+    }
+
+    public void setDroneLiftPosition(double position) {
+        log("set drone lift position = " + position);
+        droneLiftServo.setPosition(position);
+    }
+
+    public double getDroneLiftPosition() {
+        return droneLiftServo.getPosition();
     }
 }
