@@ -79,12 +79,12 @@ public class RobotHardwareA {
     public static double TURN_GAIN = 0.03;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
     public static double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
     public static double WINCH_MOTOR_SPEED = 1;
-    public static double WINCH_SERVO_UP_POSITION = 0.67;
+    public static double WINCH_SERVO_UP_POSITION = 0.72;
     public static double WINCH_SERVO_DOWN_POSITION = 0;
     public static double INITIAL_DRONE_LAUNCH_POSITION = 0.68; // 0.6 - 1
-    public static double FINAL_DRONE_LAUNCH_POSITION = 0.78;
+    public static double FINAL_DRONE_LAUNCH_POSITION = 0.82;
     public static double INITIAL_DRONE_LIFT_POSITION = 0.25; // 0.25 - 0.75
-    public static double FINAL_DRONE_LIFT_POSITION = 0.5;
+    public static double FINAL_DRONE_LIFT_POSITION = 0.41;
     public static double DRONE_INCREMENT = 0.01;
     public LinearOpMode opMode;
     private DcMotor leftFrontDrive;
