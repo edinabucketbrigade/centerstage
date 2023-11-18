@@ -80,6 +80,9 @@ public class RobotHardwareA {
     public static double HEADING_THRESHOLD = 1.0;
     public static double TURN_GAIN = 0.03;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
     public static double MAX_AUTO_TURN = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
+    public static double WINCH_MOTOR_SPEED = 1;
+    public static double WINCH_SERVO_UP_POSITION = 0.67;
+    public static double WINCH_SERVO_DOWN_POSITION = 0;
     private ElapsedTime timer = new ElapsedTime();
     public LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -97,6 +100,7 @@ public class RobotHardwareA {
     private boolean leftClawIsOpen;
     private boolean rightClawIsOpen;
     private boolean isWristTargetUp;
+    private boolean isWinchLiftTargetUp;
     private boolean isArmTargetUp;
     private boolean isArmReady;
     private boolean isFieldCentric = false;
@@ -112,6 +116,8 @@ public class RobotHardwareA {
     private DigitalChannel redLightB;
     private boolean isReverse;
     public boolean isHighDrop;
+    private DcMotor winchMotor;
+    private Servo winchServo;
 
     public RobotHardwareA (LinearOpMode opMode) {
         this.opMode = opMode;
@@ -127,6 +133,8 @@ public class RobotHardwareA {
         redLightA = hardwareMap.get(DigitalChannel.class, "red_light_a");
         greenLightB = hardwareMap.get(DigitalChannel.class, "green_light_b");
         redLightB = hardwareMap.get(DigitalChannel.class, "red_light_b");
+
+        winchMotor = hardwareMap.get(DcMotor.class, "winch_motor");
 
         greenLightA.setMode(DigitalChannel.Mode.OUTPUT);
         redLightA.setMode(DigitalChannel.Mode.OUTPUT);
@@ -145,13 +153,11 @@ public class RobotHardwareA {
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
         leftClawServo = hardwareMap.get(Servo.class, "left_claw_servo");
         rightClawServo = hardwareMap.get(Servo.class, "right_claw_servo");
+        winchServo = hardwareMap.get(Servo.class, "winch_servo");
 
         touchSensor = hardwareMap.get(TouchSensor.class, "touch");
 
         armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
-
-        /*hookMotor = hardwareMap.get(DcMotor.class, "hook_motor");
-        launcher = hardwareMap.get(Servo.class,"launcher");*/
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -165,6 +171,10 @@ public class RobotHardwareA {
         armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        winchMotor.setDirection(DcMotor.Direction.FORWARD);
+        winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         FtcDashboard.getInstance();
 
@@ -233,6 +243,16 @@ public class RobotHardwareA {
             rightClawServo.setPosition(RIGHT_CLAW_CLOSED_POSITION);
         }
         rightClawIsOpen = false;
+    }
+
+    public void closeClaws() {
+        closeLeftClaw();
+        closeRightClaw();
+    }
+
+    public void toggleClaws() {
+        toggleLeftClaw();
+        toggleRightClaw();
     }
 
     public void toggleWrist() {
@@ -414,6 +434,8 @@ public class RobotHardwareA {
         telemetry.addData("Field Centric", isFieldCentric);
         telemetry.addData("Turtle Mode", isTurtleMode);
         telemetry.addData("Reverse", isReverse);
+        telemetry.addData("Winch Motor Power", "%.2f", winchMotor.getPower());
+        telemetry.addData("Winch Servo Target", "%.2f", winchServo.getPosition());
     }
 
     public void moveRobot() {
@@ -650,5 +672,39 @@ public class RobotHardwareA {
     }
     public void resetYaw() {
         imu.resetYaw();
+    }
+
+    public void raiseWinchLift() {
+        winchServo.setPosition(WINCH_SERVO_UP_POSITION);
+        isWinchLiftTargetUp = true;
+        raiseWrist();
+        closeClaws();
+    }
+
+    public void lowerWinchLift() {
+        winchServo.setPosition(WINCH_SERVO_DOWN_POSITION);
+        isWinchLiftTargetUp = false;
+    }
+
+    public void toggleWinchLift() {
+        if (isWinchLiftTargetUp) {
+            lowerWinchLift();
+        }
+        else {
+            raiseWinchLift();
+        }
+    }
+
+    public void raiseRobot() {
+        lowerWinchLift();
+        winchMotor.setPower(-WINCH_MOTOR_SPEED);
+    }
+
+    public void lowerRobot() {
+        winchMotor.setPower(WINCH_MOTOR_SPEED);
+    }
+
+    public void stopLiftingRobot() {
+        winchMotor.setPower(0);
     }
 }

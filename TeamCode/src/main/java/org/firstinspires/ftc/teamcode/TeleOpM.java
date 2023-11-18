@@ -52,6 +52,8 @@ public class TeleOpM extends LinearOpMode {
                 robotHardware.resetYaw();
             }
 
+            boolean liftingRobot = false;
+
             if (gamepad1.left_trigger > TRIGGER_THRESHOLD) {
                 if (currentGamepad.x && !previousGamepad.x) {
                     robotHardware.toggleLeftClaw();
@@ -70,12 +72,26 @@ public class TeleOpM extends LinearOpMode {
                 }
             }
             else if (gamepad1.right_trigger > TRIGGER_THRESHOLD) {
-                // Drone and winch stuff
+                if (currentGamepad.y) {
+                    liftingRobot = true;
+                    robotHardware.raiseRobot();
+                }
+                else if (currentGamepad.a) {
+                    liftingRobot = true;
+                    robotHardware.lowerRobot();
+                }
+
+                if (currentGamepad.x && !previousGamepad.x) {
+                    //launch drone
+                }
+
+                if (currentGamepad.b && !previousGamepad.b) {
+                    robotHardware.toggleWinchLift();
+                }
             }
             else {
                 if (currentGamepad.a && !previousGamepad.a) {
-                    robotHardware.toggleLeftClaw();
-                    robotHardware.toggleRightClaw();
+                    robotHardware.toggleClaws();
                 }
 
                 if (currentGamepad.x && !previousGamepad.x) {
@@ -85,6 +101,10 @@ public class TeleOpM extends LinearOpMode {
                 if (currentGamepad.b && !previousGamepad.b) {
                     robotHardware.toggleRightClaw();
                 }
+            }
+
+            if (!liftingRobot) {
+                robotHardware.stopLiftingRobot();
             }
 
             if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
