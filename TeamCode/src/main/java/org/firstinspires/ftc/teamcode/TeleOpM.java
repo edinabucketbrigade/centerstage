@@ -23,6 +23,9 @@ public class TeleOpM extends LinearOpMode {
 
         robotHardware.isHighDrop = true;
 
+        robotHardware.openClaws();
+        robotHardware.lowerWrist();
+
         telemetry.update();
 
         waitForStart();
