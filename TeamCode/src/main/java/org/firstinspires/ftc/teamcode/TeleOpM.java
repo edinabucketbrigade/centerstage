@@ -82,7 +82,7 @@ public class TeleOpM extends LinearOpMode {
                 }
 
                 if (currentGamepad.x && !previousGamepad.x) {
-                    //launch drone
+                    robotHardware.launchDrone();
                 }
 
                 if (currentGamepad.b && !previousGamepad.b) {

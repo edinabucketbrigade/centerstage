@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.support.v4.app.INotificationSideChannel;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -82,8 +81,9 @@ public class RobotHardwareA {
     public static double WINCH_MOTOR_SPEED = 1;
     public static double WINCH_SERVO_UP_POSITION = 0.67;
     public static double WINCH_SERVO_DOWN_POSITION = 0;
-    public static double DRONE_LAUNCH_POSITION = 0.8; // 0.6 - 1
-    public static double DRONE_LIFT_POSITION = 0.5; // 0.25 - 0.75
+    public static double INITIAL_DRONE_LAUNCH_POSITION = 0.68; // 0.6 - 1
+    public static double FINAL_DRONE_LAUNCH_POSITION = 0.78;
+    public static double INITIAL_DRONE_LIFT_POSITION = 0.5; // 0.25 - 0.75
     public static double DRONE_INCREMENT = 0.01;
     public LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -181,8 +181,8 @@ public class RobotHardwareA {
         winchMotor.setDirection(DcMotor.Direction.FORWARD);
         winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        droneLaunchServo.setPosition(DRONE_LAUNCH_POSITION);
-        droneLiftServo.setPosition(DRONE_LIFT_POSITION);
+        droneLaunchServo.setPosition(INITIAL_DRONE_LAUNCH_POSITION);
+        droneLiftServo.setPosition(INITIAL_DRONE_LIFT_POSITION);
 
         FtcDashboard.getInstance();
 
@@ -761,5 +761,9 @@ public class RobotHardwareA {
 
     public double getDroneLiftPosition() {
         return droneLiftServo.getPosition();
+    }
+
+    public void launchDrone() {
+        setDroneLaunchPosition(FINAL_DRONE_LAUNCH_POSITION);
     }
 }
