@@ -91,6 +91,7 @@ public class RobotHardwareA {
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
+    private DcMotor[] driveMotors;
     private IMU imu;
     private Encoder parallelEncoder;
     private Encoder perpendicularEncoder;
@@ -132,6 +133,8 @@ public class RobotHardwareA {
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+
+        driveMotors = new DcMotor[] {leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive};
 
         greenLightA = hardwareMap.get(DigitalChannel.class, "green_light_a");
         redLightA = hardwareMap.get(DigitalChannel.class, "red_light_a");
@@ -557,32 +560,39 @@ public class RobotHardwareA {
     }
 
     public void runToPosition(int frontRightPosition, int frontLeftPosition, int backRightPosition, int backLeftPosition, double power){
+
         log("run to position " + frontRightPosition);
-        leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        runUsingEncoder(0);
 
         rightFrontDrive.setTargetPosition(frontRightPosition);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFrontDrive.setPower(power);
         leftFrontDrive.setTargetPosition(frontLeftPosition);
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftFrontDrive.setPower(power);
         leftBackDrive.setTargetPosition(backLeftPosition);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftBackDrive.setPower(power);
         rightBackDrive.setTargetPosition(backRightPosition);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBackDrive.setPower(power);
+
+        runToPosition(power);
 
         while(opMode.opModeIsActive() && (leftFrontDrive.isBusy() || rightFrontDrive.isBusy() || leftBackDrive.isBusy() || rightBackDrive.isBusy())) {
             update();
             opMode.telemetry.update();
+        }
+
+        runUsingEncoder(0);
+
+    }
+
+    private void runUsingEncoder(double power) {
+        for(DcMotor driveMotor : driveMotors) {
+            driveMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            driveMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            driveMotor.setPower(power);
+        }
+    }
+
+    private void runToPosition(double power) {
+        for(DcMotor driveMotor : driveMotors) {
+            driveMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            driveMotor.setPower(power);
         }
     }
 
