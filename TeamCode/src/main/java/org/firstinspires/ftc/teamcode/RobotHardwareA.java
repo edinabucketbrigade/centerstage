@@ -55,7 +55,7 @@ public class RobotHardwareA {
     Webcam 1
     */
 
-    public static double LEFT_CLAW_OPEN_POSITION = 0.7;
+    public static double LEFT_CLAW_OPEN_POSITION = 0.5;
     public static double LEFT_CLAW_CLOSED_POSITION = 1;
     public static double RIGHT_CLAW_CLOSED_POSITION = 0.275;
     public static double RIGHT_CLAW_OPEN_POSITION = 0.6;
