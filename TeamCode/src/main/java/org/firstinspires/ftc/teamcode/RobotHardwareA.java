@@ -83,7 +83,8 @@ public class RobotHardwareA {
     public static double WINCH_SERVO_DOWN_POSITION = 0;
     public static double INITIAL_DRONE_LAUNCH_POSITION = 0.68; // 0.6 - 1
     public static double FINAL_DRONE_LAUNCH_POSITION = 0.78;
-    public static double INITIAL_DRONE_LIFT_POSITION = 0.5; // 0.25 - 0.75
+    public static double INITIAL_DRONE_LIFT_POSITION = 0.25; // 0.25 - 0.75
+    public static double FINAL_DRONE_LIFT_POSITION = 0.5;
     public static double DRONE_INCREMENT = 0.01;
     public LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -259,6 +260,12 @@ public class RobotHardwareA {
         log("close claws");
         closeLeftClaw();
         closeRightClaw();
+    }
+
+    public void openClaws() {
+        log("open claws");
+        openLeftClaw();
+        openRightClaw();
     }
 
     public void toggleClaws() {
@@ -764,6 +771,8 @@ public class RobotHardwareA {
     }
 
     public void launchDrone() {
+        setDroneLiftPosition(FINAL_DRONE_LIFT_POSITION);
+        opMode.sleep(2500);
         setDroneLaunchPosition(FINAL_DRONE_LAUNCH_POSITION);
     }
 }
