@@ -28,12 +28,11 @@ public class CenterStageAutoCV extends LinearOpMode {
     public static int LEFT_OFFSET_STRAFE = 520;
     public static int MIDDLE_OFFSET_STRAFE = 200;
     public static int FAR_DISTANCE_TO_BACKDROP = 3000;
-    public static int CLOSE_DISTANCE_TO_BACKDROP = 1300;
+    public static int CLOSE_DISTANCE_TO_BACKDROP = 850;
     public static int MIDDLE_BACK_UP = 1200;
     public static int BACKUP = 650;
     public static int EXTRA_BACKUP = 1200;
-    public static int EXTRA_EXTRA_BACKUP = 1500;
-    public static int EXTRA = 400;
+    public static int EXTRA_EXTRA_BACKUP = 1400;
     public static int SAME_DIRECTION_PARK_DISTANCE = 800;
     public static int DIFFERENT_DIRECTION_PARK_DISTANCE = 1600;
     public static int MIDDLE_PARK_DISTANCE = 1200;
@@ -216,52 +215,61 @@ public class CenterStageAutoCV extends LinearOpMode {
                 }
             } else {
                 if (location == CenterStageCVDetection.Location.Left) {
-                    robotHardware.raiseWrist();
-                    moveRight(BACKUP);
                     moveForward(CLOSE_DISTANCE_TO_BACKDROP);
-                    moveRight(-EXTRA_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Middle) {
                     moveForward(MIDDLE_BACK_UP);
-                    moveRight(-CLOSE_DISTANCE_TO_BACKDROP);
+                    robotHardware.turnToHeading(-90);
+                    moveForward(CLOSE_DISTANCE_TO_BACKDROP);
+                    moveRight(-EXTRA_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
                     robotHardware.raiseWrist();
-                    moveRight(-CLOSE_DISTANCE_TO_BACKDROP);
-                    moveForward(-EXTRA);
+                    moveForward(BACKUP);
+                    robotHardware.turnToHeading(-90);
+                    moveForward(CLOSE_DISTANCE_TO_BACKDROP);
+                    moveRight(-EXTRA_BACKUP);
                 }
             }
         } else {
             if (startLeft) {
                 if (location == CenterStageCVDetection.Location.Left) {
                     robotHardware.raiseWrist();
-                    moveRight(CLOSE_DISTANCE_TO_BACKDROP);
-                    moveForward(-EXTRA);
+                    moveForward(BACKUP);
+                    robotHardware.turnToHeading(90);
+                    moveForward(CLOSE_DISTANCE_TO_BACKDROP);
+                    moveRight(BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Middle) {
                     moveForward(MIDDLE_BACK_UP);
-                    moveRight(CLOSE_DISTANCE_TO_BACKDROP);
+                    robotHardware.turnToHeading(90);
+                    moveForward(CLOSE_DISTANCE_TO_BACKDROP);
+                    moveRight(EXTRA_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
-                    robotHardware.raiseWrist();
-                    moveRight(-BACKUP);
                     moveForward(CLOSE_DISTANCE_TO_BACKDROP);
                 }
             } else {
                 if (location == CenterStageCVDetection.Location.Left) {
                     robotHardware.raiseWrist();
+                    sleep(1000);
+                    moveRight(EXTRA_EXTRA_BACKUP);
+                    robotHardware.turnToHeading(90);
+                    moveForward(FAR_DISTANCE_TO_BACKDROP);
                     moveRight(BACKUP);
-                    moveForward(-FAR_DISTANCE_TO_BACKDROP);
-                    moveRight(-BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Middle) {
                     moveForward(MIDDLE_BACK_UP);
-                    moveRight(FAR_DISTANCE_TO_BACKDROP);
+                    robotHardware.turnToHeading(90);
+                    moveForward(FAR_DISTANCE_TO_BACKDROP);
+                    moveRight(BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
+                    robotHardware.raiseWrist();
                     moveForward(BACKUP);
-                    moveRight(FAR_DISTANCE_TO_BACKDROP);
-                    moveForward(-EXTRA_BACKUP);
+                    robotHardware.turnToHeading(90);
+                    moveForward(FAR_DISTANCE_TO_BACKDROP);
+                    moveRight(EXTRA_BACKUP);
                 }
             }
             robotHardware.turnToHeading(90);
