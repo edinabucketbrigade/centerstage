@@ -787,8 +787,11 @@ public class RobotHardwareA {
     }
 
     public void launchDrone() {
+        raiseWinchLift();
         setDroneLiftPosition(FINAL_DRONE_LIFT_POSITION);
         opMode.sleep(2500);
         setDroneLaunchPosition(FINAL_DRONE_LAUNCH_POSITION);
+        opMode.sleep(1000);
+        turnToHeading(getHeading() + 180);
     }
 }
