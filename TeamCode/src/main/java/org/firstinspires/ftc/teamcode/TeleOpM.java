@@ -128,9 +128,9 @@ public class TeleOpM extends LinearOpMode {
                 heatSeek.cancel();
             }
 
-            if (currentGamepad.left_stick_button && !previousGamepad.left_stick_button) {
+            /*if (currentGamepad.left_stick_button && !previousGamepad.left_stick_button) {
                 robotHardware.toggleReverse();
-            }
+            }*/
 
             telemetry.update();
 
