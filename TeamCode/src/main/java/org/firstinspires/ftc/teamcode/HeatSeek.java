@@ -35,8 +35,16 @@ public class HeatSeek {
         LOWERING
     }
 
-    public static double HIGH_DESIRED_DISTANCE = 6; // This is how close the camera should get to the target (inches)
+    // This is how close the camera should get to the target when placing high (in inches)
+    // - Edina: 6
+    // - Prior Lake: 4.25
+    public static double HIGH_DESIRED_DISTANCE = 6;
+    
+    // This is how close the camera should get to the target when placing low (in inches)
+    // - Edina: 9.5
+    // - Prior Lake: 8.5
     public static double LOW_DESIRED_DISTANCE = 9.5;
+
     public static double SPEED_GAIN = 0.04; // Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     public static double STRAFE_GAIN = 0.015; // Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     public static double MAX_AUTO_SPEED = 0.5; // Clip the approach speed to this max value (adjust for your robot)
