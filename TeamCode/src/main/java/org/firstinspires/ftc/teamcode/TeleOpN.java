@@ -6,6 +6,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp
 public class TeleOpN extends LinearOpMode {
 
+    private static final double THRESHOLD = 0.5;
+    private static final int MINIMUM_COLUMN = 1;
+    private static final int MAXIMUM_COLUMN = 6;
+    private static final int MINIMUM_ROW = 1;
+    private static final int MAXIMUM_ROW = 11;
     @Override
     public void runOpMode() {
         String[][] hexagons = {
@@ -31,6 +36,11 @@ public class TeleOpN extends LinearOpMode {
 
         waitForStart();
 
+        int leftColumn = MINIMUM_COLUMN;
+        int leftRow = MINIMUM_ROW;
+
+        boolean isLeftXNeutral = true;
+
         while (opModeIsActive()) {
             String graph = "  " + hexagons[0][0] + hexagons[1][0] + hexagons[2][0] + hexagons[3][0] + hexagons[4][0] + hexagons[5][0] + "\n" +
                     hexagons[0][1] + hexagons[1][1] + hexagons[2][1] + hexagons[3][1] + hexagons[4][1] + hexagons[5][1] + "\n" +
@@ -38,20 +48,25 @@ public class TeleOpN extends LinearOpMode {
                     hexagons[0][1] + hexagons[1][1] + hexagons[2][1] + hexagons[3][1] + hexagons[4][1] + hexagons[5][1] + "\n"
 
                     ;
-            int leftX = 0;
-            int leftY = 0;
+
             int rightX = 0;
             int rightY = 0;
-            if(gamepad1.left_stick_x > 0){
-                if(gamepad1.left_stick_x < 0){
-                    leftX += 1;
-                }
+            if(isLeftXNeutral && gamepad1.left_stick_x > THRESHOLD){
+                leftColumn = Math.min(leftColumn + 1, MAXIMUM_COLUMN);
+                isLeftXNeutral = false;
             }
-            if(gamepad1.left_stick_y > 0){
+            if(isLeftXNeutral && gamepad1.left_stick_x < -THRESHOLD){
+                leftColumn = Math.max(leftColumn - 1, MINIMUM_COLUMN);
+                isLeftXNeutral = false;
+            }
+            if(gamepad1.left_stick_x < THRESHOLD && gamepad1.left_stick_x > -THRESHOLD){
+                isLeftXNeutral = true;
+            }
+            /*if(gamepad1.left_stick_y > 0){
                 if(gamepad1.left_stick_y < 0){
-                    leftY += 1;
+                    leftRow += 1;
                 }
-            }
+            }*/
             /*if(gamepad1.right_stick_x > 0){
                 if(gamepad1.right_stick_x < 0){
                     rightX += 1;
@@ -62,14 +77,17 @@ public class TeleOpN extends LinearOpMode {
                     rightY += 1;
                 }
             }*/
-            if(gamepad1.left_stick_button){
-                leftX = 0;
-                leftY = 0;
-            }
+            /*if(gamepad1.left_stick_button){
+                leftColumn = MINIMUM_COLUMN;
+                leftRow = MINIMUM_ROW;
+            }*/
 
             telemetry.addData("", graph);
-            telemetry.addData("LeftX", leftX);
-            telemetry.addData("LeftY", leftY);
+            telemetry.addData("Left Column", leftColumn);
+            telemetry.addData("Left Row", leftRow);
+            telemetry.addData("Left Stick X", gamepad1.left_stick_x);
+            telemetry.addData("Left Stick Y", gamepad1.left_stick_y);
+            telemetry.addData("Left Stick X Neutral", isLeftXNeutral);
             //telemetry.addData("RightX", rightX);
             //telemetry.addData("RightY", rightY);
             telemetry.update();
