@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -12,17 +10,18 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import android.graphics.Color;
-import android.view.View;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Config
 @Autonomous
 public class PixelDetection extends LinearOpMode {
-    NormalizedColorSensor colorSensor;
-    RevBlinkinLedDriver blinkinLedDriver;
-    RevBlinkinLedDriver.BlinkinPattern blinkinPattern;
+    NormalizedColorSensor colorSensor1;
+    NormalizedColorSensor colorSensor2;
+    RevBlinkinLedDriver blinkinLedDriver1;
+    RevBlinkinLedDriver.BlinkinPattern blinkinPattern1;
+    RevBlinkinLedDriver blinkinLedDriver2;
+    RevBlinkinLedDriver.BlinkinPattern blinkinPattern2;
 
     public static float gain = 0.8f;
     public static double whiteValue = 0.5;
@@ -33,20 +32,27 @@ public class PixelDetection extends LinearOpMode {
     public static int purpleMin = 180;
     public static int purpleMax = 290;
 
-
-
     @Override
     public void runOpMode() throws InterruptedException {
 
-        final float[] hsvValues = new float[3];
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color_sensor");
-        if (colorSensor instanceof SwitchableLight) {
-            ((SwitchableLight)colorSensor).enableLight(true);
+        final float[] hsvValues1 = new float[3];
+        final float[] hsvValues2 = new float[3];
+        colorSensor1 = hardwareMap.get(NormalizedColorSensor.class, "color_sensor1");
+        colorSensor2 = hardwareMap.get(NormalizedColorSensor.class, "color_sensor2");
+        if (colorSensor1 instanceof SwitchableLight) {
+            ((SwitchableLight) colorSensor1).enableLight(true);
+        }
+        if (colorSensor2 instanceof SwitchableLight) {
+            ((SwitchableLight) colorSensor2).enableLight(true);
         }
 
-        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
-        blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.RED;
-        blinkinLedDriver.setPattern(blinkinPattern);
+        blinkinLedDriver1 = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin1");
+        blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.RED;
+        blinkinLedDriver1.setPattern(blinkinPattern1);
+
+        blinkinLedDriver2 = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin2");
+        blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.RED;
+        blinkinLedDriver2.setPattern(blinkinPattern2);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -54,42 +60,98 @@ public class PixelDetection extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            colorSensor.setGain(gain);
-            NormalizedRGBA colors = colorSensor.getNormalizedColors();
-            Color.colorToHSV(colors.toColor(), hsvValues);
+            NormalizedRGBA colors1 = colorSensor1.getNormalizedColors();
+            Color.colorToHSV(colors1.toColor(), hsvValues2);
             telemetry.addLine()
-                    .addData("Red", "%.3f", colors.red)
-                    .addData("Green", "%.3f", colors.green)
-                    .addData("Blue", "%.3f", colors.blue);
+                    .addData("Red", "%.3f", colors1.red)
+                    .addData("Green", "%.3f", colors1.green)
+                    .addData("Blue", "%.3f", colors1.blue);
             telemetry.addLine()
-                    .addData("Hue", "%.3f", hsvValues[0])
-                    .addData("Saturation", "%.3f", hsvValues[1])
-                    .addData("Value", "%.3f", hsvValues[2]);
-            telemetry.addData("Alpha", "%.3f", colors.alpha);
+                    .addData("Hue", "%.3f", hsvValues1[0])
+                    .addData("Saturation", "%.3f", hsvValues1[1])
+                    .addData("Value", "%.3f", hsvValues1[2]);
+            telemetry.addData("Alpha", "%.3f", colors1.alpha);
+            colorSensor2.setGain(gain);
+            NormalizedRGBA colors2 = colorSensor2.getNormalizedColors();
+            Color.colorToHSV(colors2.toColor(), hsvValues2);
+            telemetry.addLine()
+                    .addData("Red", "%.3f", colors2.red)
+                    .addData("Green", "%.3f", colors2.green)
+                    .addData("Blue", "%.3f", colors2.blue);
+            telemetry.addLine()
+                    .addData("Hue", "%.3f", hsvValues2[0])
+                    .addData("Saturation", "%.3f", hsvValues2[1])
+                    .addData("Value", "%.3f", hsvValues2[2]);
+            telemetry.addData("Alpha", "%.3f", colors2.alpha);
 
-            if (hsvValues[1] <= whiteValue)
-                //telemetry.addData("Color Detected Is: ", "White");
-                blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.WHITE;
-            else if (hsvValues[0] >= yellowMin && hsvValues[0] <= yellowMax)
-                //telemetry.addData("Color Detected Is: ", "Yellow");
-                blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
-            else if (hsvValues[0] >= greenMin && hsvValues[0] <= greenMax)
-                //telemetry.addData("Color Detected Is: ", "Green");
-                blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
-            else if (hsvValues[0] >= purpleMin && hsvValues[0] <= purpleMax)
-                //telemetry.addData("Color Detected Is: ", "Purple");
-                blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
-            else
-                //telemetry.addLine("No color in valid range.");
-                blinkinPattern = RevBlinkinLedDriver.BlinkinPattern.RED;
-
-
-            if (colorSensor instanceof DistanceSensor) {
-                telemetry.addData("Distance (cm)", "%.3f", ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM));
+            if (hsvValues1[1] <= whiteValue) {
+                blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.WHITE;
+                if (hsvValues2[1] <= whiteValue)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.WHITE;
+                else if (hsvValues2[0] >= yellowMin && hsvValues2[0] <= yellowMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                else if (hsvValues2[0] >= greenMin && hsvValues2[0] <= greenMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                else if (hsvValues2[0] >= purpleMin && hsvValues2[0] <= purpleMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
+                else
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.RED;
+            } else if (hsvValues2[0] >= yellowMin && hsvValues2[0] <= yellowMax) {
+                blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                if (hsvValues2[1] <= whiteValue)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.WHITE;
+                else if (hsvValues2[0] >= yellowMin && hsvValues2[0] <= yellowMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                else if (hsvValues2[0] >= greenMin && hsvValues2[0] <= greenMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                else if (hsvValues2[0] >= purpleMin && hsvValues2[0] <= purpleMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
+                else
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.RED;
+            }  else if (hsvValues2[0] >= greenMin && hsvValues2[0] <= greenMax) {
+                blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                if (hsvValues2[1] <= whiteValue)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.WHITE;
+                else if (hsvValues2[0] >= yellowMin && hsvValues2[0] <= yellowMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                else if (hsvValues2[0] >= greenMin && hsvValues2[0] <= greenMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                else if (hsvValues2[0] >= purpleMin && hsvValues2[0] <= purpleMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
+                else
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.RED;
+            } else if (hsvValues2[0] >= purpleMin && hsvValues2[0] <= purpleMax) {
+                blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.RED;
+                if (hsvValues2[1] <= whiteValue)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.WHITE;
+                else if (hsvValues2[0] >= yellowMin && hsvValues2[0] <= yellowMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                else if (hsvValues2[0] >= greenMin && hsvValues2[0] <= greenMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                else if (hsvValues2[0] >= purpleMin && hsvValues2[0] <= purpleMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
+                else
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.RED;
+            } else {
+                blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.RED;
+                if (hsvValues2[1] <= whiteValue)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.WHITE;
+                else if (hsvValues2[0] >= yellowMin && hsvValues2[0] <= yellowMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                else if (hsvValues2[0] >= greenMin && hsvValues2[0] <= greenMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                else if (hsvValues2[0] >= purpleMin && hsvValues2[0] <= purpleMax)
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
+                else
+                    blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.RED;
             }
 
-            blinkinLedDriver.setPattern(blinkinPattern);
-            telemetry.addData("Color Is", blinkinPattern);
+            if (colorSensor2 instanceof DistanceSensor) {
+                telemetry.addData("Distance (cm)", "%.3f", ((DistanceSensor) colorSensor2).getDistance(DistanceUnit.CM));
+            }
+
+            blinkinLedDriver2.setPattern(blinkinPattern2);
+            telemetry.addData("Color Is", blinkinPattern2);
 
             telemetry.addData("Status", "Running");
             telemetry.update();
