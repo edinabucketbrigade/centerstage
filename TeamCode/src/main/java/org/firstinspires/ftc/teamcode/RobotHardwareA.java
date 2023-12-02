@@ -184,6 +184,7 @@ public class RobotHardwareA {
 
         winchMotor.setDirection(DcMotor.Direction.FORWARD);
         winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        winchMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         droneLaunchServo.setPosition(INITIAL_DRONE_LAUNCH_POSITION);
         droneLiftServo.setPosition(INITIAL_DRONE_LIFT_POSITION);
