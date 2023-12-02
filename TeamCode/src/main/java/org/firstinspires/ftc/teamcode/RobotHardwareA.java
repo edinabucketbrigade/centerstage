@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -100,6 +101,7 @@ public class RobotHardwareA {
     private Servo leftClawServo;
     private Servo rightClawServo;
     private TouchSensor touchSensor;
+    private ColorSensor colorSensor;
     private boolean leftClawIsOpen;
     private boolean rightClawIsOpen;
     private boolean isWristTargetUp;
@@ -140,6 +142,8 @@ public class RobotHardwareA {
         redLightA = hardwareMap.get(DigitalChannel.class, "red_light_a");
         greenLightB = hardwareMap.get(DigitalChannel.class, "green_light_b");
         redLightB = hardwareMap.get(DigitalChannel.class, "red_light_b");
+
+        colorSensor = hardwareMap.colorSensor.get("color");
 
         winchMotor = hardwareMap.get(DcMotor.class, "winch_motor");
 
@@ -188,6 +192,12 @@ public class RobotHardwareA {
 
         droneLaunchServo.setPosition(INITIAL_DRONE_LAUNCH_POSITION);
         droneLiftServo.setPosition(INITIAL_DRONE_LIFT_POSITION);
+
+        colorSensor.red();
+        colorSensor.green();
+        colorSensor.blue();
+        colorSensor.alpha();
+        colorSensor.argb();
 
         FtcDashboard.getInstance();
 
