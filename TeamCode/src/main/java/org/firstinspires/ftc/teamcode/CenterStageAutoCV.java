@@ -31,11 +31,13 @@ public class CenterStageAutoCV extends LinearOpMode {
     public static int CLOSE_DISTANCE_TO_BACKDROP = 850;
     public static int MIDDLE_BACK_UP = 1200;
     public static int BACKUP = 650;
+    public static int SMALL_BACKUP = 200;
+    public static int SORTA_EXTRA_BACKUP = 750;
     public static int EXTRA_BACKUP = 1200;
     public static int EXTRA_EXTRA_BACKUP = 1400;
-    public static int SAME_DIRECTION_PARK_DISTANCE = 800;
-    public static int DIFFERENT_DIRECTION_PARK_DISTANCE = 1600;
-    public static int MIDDLE_PARK_DISTANCE = 1200;
+    public static int SAME_DIRECTION_PARK_DISTANCE = 1000;
+    public static int DIFFERENT_DIRECTION_PARK_DISTANCE = 1700;
+    public static int MIDDLE_PARK_DISTANCE = 1400;
     private Boolean redAlliance = null;
     private Boolean startLeft = null;
     private Boolean parkLeft = null;
@@ -207,50 +209,52 @@ public class CenterStageAutoCV extends LinearOpMode {
                     moveRight(-EXTRA_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
+                    moveForward(SMALL_BACKUP);
                     robotHardware.raiseWrist();
                     moveRight(-EXTRA_EXTRA_BACKUP);
                     robotHardware.turnToHeading(-90);
                     moveForward(FAR_DISTANCE_TO_BACKDROP);
-                    moveRight(-EXTRA_BACKUP);
+                    moveRight(-BACKUP);
                 }
             } else {
                 if (location == CenterStageCVDetection.Location.Left) {
                     moveForward(CLOSE_DISTANCE_TO_BACKDROP);
                 }
                 if (location == CenterStageCVDetection.Location.Middle) {
-                    moveForward(MIDDLE_BACK_UP);
+                    moveForward(SMALL_BACKUP);
                     robotHardware.turnToHeading(-90);
                     moveForward(CLOSE_DISTANCE_TO_BACKDROP);
-                    moveRight(-EXTRA_BACKUP);
+                    moveRight(-SMALL_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
                     robotHardware.raiseWrist();
-                    moveForward(BACKUP);
+                    moveForward(SMALL_BACKUP);
                     robotHardware.turnToHeading(-90);
                     moveForward(CLOSE_DISTANCE_TO_BACKDROP);
-                    moveRight(-EXTRA_BACKUP);
+                    moveRight(-SMALL_BACKUP);
                 }
             }
         } else {
             if (startLeft) {
                 if (location == CenterStageCVDetection.Location.Left) {
                     robotHardware.raiseWrist();
-                    moveForward(BACKUP);
+                    moveForward(SMALL_BACKUP);
                     robotHardware.turnToHeading(90);
                     moveForward(CLOSE_DISTANCE_TO_BACKDROP);
-                    moveRight(BACKUP);
+                    moveRight(SMALL_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Middle) {
-                    moveForward(MIDDLE_BACK_UP);
+                    moveForward(SMALL_BACKUP);
                     robotHardware.turnToHeading(90);
                     moveForward(CLOSE_DISTANCE_TO_BACKDROP);
-                    moveRight(EXTRA_BACKUP);
+                    moveRight(SMALL_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
                     moveForward(CLOSE_DISTANCE_TO_BACKDROP);
                 }
             } else {
                 if (location == CenterStageCVDetection.Location.Left) {
+                    moveForward(SMALL_BACKUP);
                     robotHardware.raiseWrist();
                     sleep(1000);
                     moveRight(EXTRA_EXTRA_BACKUP);
@@ -262,11 +266,11 @@ public class CenterStageAutoCV extends LinearOpMode {
                     moveForward(MIDDLE_BACK_UP);
                     robotHardware.turnToHeading(90);
                     moveForward(FAR_DISTANCE_TO_BACKDROP);
-                    moveRight(BACKUP);
+                    moveRight(EXTRA_BACKUP);
                 }
                 if (location == CenterStageCVDetection.Location.Right) {
                     robotHardware.raiseWrist();
-                    moveForward(BACKUP);
+                    moveForward(SORTA_EXTRA_BACKUP);
                     robotHardware.turnToHeading(90);
                     moveForward(FAR_DISTANCE_TO_BACKDROP);
                     moveRight(EXTRA_BACKUP);
@@ -300,22 +304,22 @@ public class CenterStageAutoCV extends LinearOpMode {
     }
 
     private void park(CenterStageCVDetection.Location location) {
-        if (location == CenterStageCVDetection.Location.Left && parkLeft == true) {
+        if (location == CenterStageCVDetection.Location.Left && parkLeft) {
             moveRight(-SAME_DIRECTION_PARK_DISTANCE);
         }
-        else if (location == CenterStageCVDetection.Location.Right && parkLeft == false) {
+        else if (location == CenterStageCVDetection.Location.Right && !parkLeft) {
             moveRight(SAME_DIRECTION_PARK_DISTANCE);
         }
-        else if (location == CenterStageCVDetection.Location.Left && parkLeft == false) {
+        else if (location == CenterStageCVDetection.Location.Left && !parkLeft) {
             moveRight(DIFFERENT_DIRECTION_PARK_DISTANCE);
         }
-        else if (location == CenterStageCVDetection.Location.Right && parkLeft == true) {
+        else if (location == CenterStageCVDetection.Location.Right && parkLeft) {
             moveRight(-DIFFERENT_DIRECTION_PARK_DISTANCE);
         }
-        else if (location == CenterStageCVDetection.Location.Middle && parkLeft == false) {
+        else if (location == CenterStageCVDetection.Location.Middle && !parkLeft) {
             moveRight(MIDDLE_PARK_DISTANCE);
         }
-        else if (location == CenterStageCVDetection.Location.Middle && parkLeft == true) {
+        else if (location == CenterStageCVDetection.Location.Middle && parkLeft) {
             moveRight(-MIDDLE_PARK_DISTANCE);
         }
     }

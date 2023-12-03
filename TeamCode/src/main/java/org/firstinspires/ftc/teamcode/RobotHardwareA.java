@@ -62,7 +62,7 @@ public class RobotHardwareA {
     public static double RIGHT_CLAW_OPEN_POSITION = 0.6;
     public static double WRIST_DOWN_POSITION = 0.08;
     public static double HIGH_WRIST_UP_POSITION = 0.8;
-    public static double LOW_WRIST_UP_POSITION = 0.7;
+    public static double LOW_WRIST_UP_POSITION = 0.66;
     public static int ARM_DOWN_POSITION = 0;
     public static int HIGH_ARM_UP_POSITION = 1300;
     public static int LOW_ARM_UP_POSITION = 1500;
@@ -101,7 +101,7 @@ public class RobotHardwareA {
     private Servo leftClawServo;
     private Servo rightClawServo;
     private TouchSensor touchSensor;
-    private ColorSensor colorSensor;
+    //private ColorSensor colorSensor;
     private boolean leftClawIsOpen;
     private boolean rightClawIsOpen;
     private boolean isWristTargetUp;
@@ -143,7 +143,7 @@ public class RobotHardwareA {
         greenLightB = hardwareMap.get(DigitalChannel.class, "green_light_b");
         redLightB = hardwareMap.get(DigitalChannel.class, "red_light_b");
 
-        colorSensor = hardwareMap.colorSensor.get("color");
+        //colorSensor = hardwareMap.colorSensor.get("color");
 
         winchMotor = hardwareMap.get(DcMotor.class, "winch_motor");
 
@@ -193,11 +193,11 @@ public class RobotHardwareA {
         droneLaunchServo.setPosition(INITIAL_DRONE_LAUNCH_POSITION);
         droneLiftServo.setPosition(INITIAL_DRONE_LIFT_POSITION);
 
-        colorSensor.red();
+        /*colorSensor.red();
         colorSensor.green();
         colorSensor.blue();
         colorSensor.alpha();
-        colorSensor.argb();
+        colorSensor.argb();*/
 
         FtcDashboard.getInstance();
 
