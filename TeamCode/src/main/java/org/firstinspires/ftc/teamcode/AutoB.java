@@ -39,7 +39,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @Autonomous(preselectTeleOp = "TeleOpB")
-@Disabled
+//@Disabled
 public class AutoB extends LinearOpMode
 {
     OpenCvWebcam webcam;
