@@ -35,15 +35,15 @@ import java.util.List;
  *
  */
 public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
-    public static double TICKS_PER_REV = 8192;
-    public static double WHEEL_RADIUS = 0.6889764; // in
+    public static double TICKS_PER_REV = 2000; // Per https://www.gobilda.com/odometry-pod-43mm-width-48mm-wheel/ gobilda has 2000 ticks per revolution, per https://www.revrobotics.com/rev-11-1271/ rev has 8192
+    public static double WHEEL_RADIUS = 0.945; // Per https://www.gobilda.com/odometry-pod-43mm-width-48mm-wheel/ gobilda is 0.945
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double PARALLEL_X = 3.5; // X is the up and down direction
-    public static double PARALLEL_Y = 0; // Y is the strafe direction
+    public static double PARALLEL_X = 7; // X is the up and down direction
+    public static double PARALLEL_Y = 0.5; // Y is the strafe direction
 
     public static double PERPENDICULAR_X = 0;
-    public static double PERPENDICULAR_Y = 5;
+    public static double PERPENDICULAR_Y = 6;
 
     public static double X_MULTIPLIER = 1; // Multiplier in the X direction
     public static double Y_MULTIPLIER = 1; // Multiplier in the Y direction
@@ -102,8 +102,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         //  compensation method
 
         return Arrays.asList(
-                encoderTicksToInches(parallelEncoder.getCorrectedVelocity()) * X_MULTIPLIER,
-                encoderTicksToInches(perpendicularEncoder.getCorrectedVelocity()) * Y_MULTIPLIER
+                encoderTicksToInches(parallelEncoder.getRawVelocity()) * X_MULTIPLIER,
+                encoderTicksToInches(perpendicularEncoder.getRawVelocity()) * Y_MULTIPLIER
         );
     }
 }
