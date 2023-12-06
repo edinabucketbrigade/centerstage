@@ -151,7 +151,9 @@ public class PixelDetection extends LinearOpMode {
             }
 
             blinkinLedDriver2.setPattern(blinkinPattern2);
-            telemetry.addData("Color Is", blinkinPattern2);
+            telemetry.addData("Right Color Is", blinkinPattern2);
+            blinkinLedDriver1.setPattern(blinkinPattern1);
+            telemetry.addData("Left Color Is", blinkinPattern1);
 
             telemetry.addData("Status", "Running");
             telemetry.update();
