@@ -38,7 +38,7 @@ public class HeatSeek {
     // This is how close the camera should get to the target when placing high (in inches)
     // - Edina: 6
     // - Prior Lake: 4.25
-    public static double HIGH_DESIRED_DISTANCE = 6;
+    public static double HIGH_DESIRED_DISTANCE = 5;
     
     // This is how close the camera should get to the target when placing low (in inches)
     // - Edina: 9.5

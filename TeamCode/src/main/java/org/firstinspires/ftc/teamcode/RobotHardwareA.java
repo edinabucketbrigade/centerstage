@@ -110,7 +110,7 @@ public class RobotHardwareA {
     private boolean isArmReady;
     private boolean isFieldCentric = false;
     private boolean isTurtleMode;
-    private boolean isBunnyMode;
+    private boolean isBunnyMode = true;
     private double headingError = 0;
     private double  targetHeading = 0;
     /*private DcMotor hookMotor;
