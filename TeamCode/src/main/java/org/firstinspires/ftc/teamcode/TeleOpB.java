@@ -31,7 +31,7 @@ public class TeleOpB extends LinearOpMode {
 
         // Wheel reversing (test for correct directions)
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         //lift.setDirection(DcMotor.Direction.REVERSE);
@@ -83,12 +83,11 @@ public class TeleOpB extends LinearOpMode {
             // Once the correct motors move in the correct direction re-comment this code.
 
             /*
-            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad reverse
+            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
             leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad reverse
-            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad reverse
-             */
-
+            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
+            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
+            */
 
 
             // Send calculated power to wheels
