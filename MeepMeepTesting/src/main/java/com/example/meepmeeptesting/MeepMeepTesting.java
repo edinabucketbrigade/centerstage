@@ -30,7 +30,7 @@ enum Route {
 
 public class MeepMeepTesting {
 
-    public static final Route ROUTE = Route.PARK_LEFT;
+    public static final Route ROUTE = Route.RED_LEFT_DIRECT;
     public static final double DELAY = 0.5;
     public static final double MAXVEL = 60;
     public static final double MAXACCEL = 60;
