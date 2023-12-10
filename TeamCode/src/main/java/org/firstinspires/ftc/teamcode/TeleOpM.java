@@ -93,6 +93,7 @@ public class TeleOpM extends LinearOpMode {
                 if (currentGamepad.b && !previousGamepad.b) {
                     robotHardware.toggleWinchLift();
                 }
+
             }
             else {
                 if (currentGamepad.a && !previousGamepad.a) {
@@ -128,9 +129,9 @@ public class TeleOpM extends LinearOpMode {
                 heatSeek.cancel();
             }
 
-            /*if (currentGamepad.left_stick_button && !previousGamepad.left_stick_button) {
-                robotHardware.toggleReverse();
-            }*/
+            if (currentGamepad.left_stick_button && !previousGamepad.left_stick_button) {
+                robotHardware.lowerWinchLift();
+            }
 
             telemetry.update();
 
