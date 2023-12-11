@@ -215,6 +215,7 @@ public class HeatSeek {
     }
 
     private void handleDropping() {
+        robotHardware.opMode.sleep(500);
         robotHardware.openLeftClaw();
         robotHardware.openRightClaw();
         if (timer.milliseconds() > 1000) {

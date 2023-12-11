@@ -6,7 +6,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -56,12 +55,14 @@ public class RobotHardwareA {
     Webcam 1
     */
 
-    public static double LEFT_CLAW_OPEN_POSITION = 0.65;
+    public static double LEFT_CLAW_OPEN_WIDE_POSITION = 0.65;
+    public static double LEFT_CLAW_OPEN_NARROW_POSITION = 0.8;
     public static double LEFT_CLAW_CLOSED_POSITION = 1;
     public static double RIGHT_CLAW_CLOSED_POSITION = 0.275;
-    public static double RIGHT_CLAW_OPEN_POSITION = 0.6;
+    public static double RIGHT_CLAW_OPEN_WIDE_POSITION = 0.6;
+    public static double RIGHT_CLAW_OPEN_NARROW_POSITION = 0.45;
     public static double WRIST_DOWN_POSITION = 0.08;
-    public static double HIGH_WRIST_UP_POSITION = 0.8;
+    public static double HIGH_WRIST_UP_POSITION = 0.75;
     public static double LOW_WRIST_UP_POSITION = 0.66;
     public static int ARM_DOWN_POSITION = 0;
     public static int HIGH_ARM_UP_POSITION = 1300;
@@ -219,10 +220,10 @@ public class RobotHardwareA {
     public void openLeftClaw() {
         log("open left claw");
         if (isReverse) {
-            rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
+            rightClawServo.setPosition(isArmTargetUp ? RIGHT_CLAW_OPEN_NARROW_POSITION : RIGHT_CLAW_OPEN_WIDE_POSITION);
         }
         else {
-            leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
+            leftClawServo.setPosition(isArmTargetUp ? LEFT_CLAW_OPEN_NARROW_POSITION : LEFT_CLAW_OPEN_WIDE_POSITION);
         }
         leftClawIsOpen = true;
     }
@@ -251,10 +252,10 @@ public class RobotHardwareA {
     public void openRightClaw() {
         log("open right claw");
         if (isReverse) {
-            leftClawServo.setPosition(LEFT_CLAW_OPEN_POSITION);
+            leftClawServo.setPosition(isArmTargetUp ? LEFT_CLAW_OPEN_NARROW_POSITION : LEFT_CLAW_OPEN_WIDE_POSITION);
         }
         else {
-            rightClawServo.setPosition(RIGHT_CLAW_OPEN_POSITION);
+            rightClawServo.setPosition(isArmTargetUp ? RIGHT_CLAW_OPEN_NARROW_POSITION : RIGHT_CLAW_OPEN_WIDE_POSITION);
         }
         rightClawIsOpen = true;
     }
@@ -411,6 +412,7 @@ public class RobotHardwareA {
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setPower(ARM_LOWER_POWER);
         isArmTargetUp = false;
+        openClaws();
     }
 
     public void update() {
@@ -614,8 +616,8 @@ public class RobotHardwareA {
     }
 
     public void toggleFieldCentric(){
-        log("toggle field centric");
-        this.isFieldCentric=!isFieldCentric;
+        /*log("toggle field centric");
+        this.isFieldCentric=!isFieldCentric;*/
     }
 
     public boolean isArmRaised() {
