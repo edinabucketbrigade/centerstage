@@ -7,12 +7,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
-
-@Config
-@Autonomous
 public class CameraPixelColor extends OpenCvPipeline {
     public static int MINIMUM_WHITE_VALUES = 0;
     public static int MINIMUM_YELLOW_VALUES = 0;
@@ -30,6 +28,14 @@ public class CameraPixelColor extends OpenCvPipeline {
     public static int MAXIMUM_YELLOW_HUE = 0;
     public static int MAXIMUM_GREEN_HUE = 0;
     public static int MAXIMUM_PURPLE_HUE = 0;
+
+    public static Rect LEFT_ROI = new Rect(30,160, 150,120);
+    public static Rect RIGHT_ROI = new Rect(435,165, 150,120);
+    public enum Location{
+        Left,
+        Right,
+    }
+    private Location location;
 
     Telemetry telemetry;
     Mat mat = new Mat();
@@ -52,6 +58,26 @@ public class CameraPixelColor extends OpenCvPipeline {
         Core.inRange(mat, MINIMUM_GREEN, MAXIMUM_GREEN, mat);
         Core.inRange(mat, MINIMUM_PURPLE, MAXIMUM_PURPLE, mat);
 
+        Mat left = mat.submat(LEFT_ROI);
+        Mat right = mat.submat(RIGHT_ROI);
+
+        double leftValue = Core.sumElems(left).val[0];
+        double rightValue = Core.sumElems(right).val[0];
+
+        telemetry.addData("Left Raw Value", leftValue);
+        telemetry.addData("Right Raw Value", rightValue);
+
+        left.release();
+        right.release();
+
+        if (rightValue >= leftValue){
+            location = Location.Right;
+        } else {
+            location = Location.Left;
+        }
+
         return mat;
     }
+    public CameraPixelColor.Location getLocation(){return location;}
+
 }
