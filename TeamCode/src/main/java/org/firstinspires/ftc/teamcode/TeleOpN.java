@@ -125,6 +125,19 @@ public class TeleOpN extends LinearOpMode {
             } else if (leftColumn == 6){
                 telemetry.addData("Left Column", "⬡⬡⬡⬡⬡⬢");
             }
+            if (rightColumn == 1){
+                telemetry.addData("Right Column", "⬢⬡⬡⬡⬡⬡");
+            } else if (rightColumn == 2){
+                telemetry.addData("Right Column", "⬡⬢⬡⬡⬡⬡");
+            } else if (rightColumn == 3){
+                telemetry.addData("Right Column", "⬡⬡⬢⬡⬡⬡");
+            } else if (rightColumn == 4){
+                telemetry.addData("Right Column", "⬡⬡⬡⬢⬡⬡");
+            } else if (rightColumn == 5){
+                telemetry.addData("Right Column", "⬡⬡⬡⬡⬢⬡");
+            } else if (rightColumn == 6){
+                telemetry.addData("Right Column", "⬡⬡⬡⬡⬡⬢");
+            }
             telemetry.update();
         }
 
