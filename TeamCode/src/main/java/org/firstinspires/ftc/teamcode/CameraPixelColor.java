@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
@@ -11,12 +9,13 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
+@Config
 public class CameraPixelColor extends OpenCvPipeline {
     public static int MINIMUM_WHITE_VALUES = 0;
     public static int MINIMUM_YELLOW_VALUES = 0;
     public static int MINIMUM_GREEN_VALUES = 0;
     public static int MINIMUM_PURPLE_VALUES = 0;
-    public static int MAXIMUM_WHITE_VALUES = 0;
+    public static int MAXIMUM_WHITE_VALUES = 160;
     public static int MAXIMUM_YELLOW_VALUES = 0;
     public static int MAXIMUM_GREEN_VALUES = 0;
     public static int MAXIMUM_PURPLE_VALUES = 0;
@@ -24,7 +23,7 @@ public class CameraPixelColor extends OpenCvPipeline {
     public static int MINIMUM_YELLOW_HUE = 0;
     public static int MINIMUM_GREEN_HUE = 0;
     public static int MINIMUM_PURPLE_HUE = 0;
-    public static int MAXIMUM_WHITE_HUE = 0;
+    public static int MAXIMUM_WHITE_HUE = 20;
     public static int MAXIMUM_YELLOW_HUE = 0;
     public static int MAXIMUM_GREEN_HUE = 0;
     public static int MAXIMUM_PURPLE_HUE = 0;
@@ -39,6 +38,9 @@ public class CameraPixelColor extends OpenCvPipeline {
 
     Telemetry telemetry;
     Mat mat = new Mat();
+    public CameraPixelColor(Telemetry telemetry){
+        this.telemetry = telemetry;
+    }
     @Override
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
