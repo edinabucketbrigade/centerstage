@@ -112,6 +112,19 @@ public class TeleOpN extends LinearOpMode {
             telemetry.addData("Right Stick Y", gamepad1.right_stick_y);
             telemetry.addData("Right Stick X Neutral", isRightXNeutral);
             telemetry.addData("Right Stick Y Neutral", isRightYNeutral);
+            if (leftColumn == 1){
+                telemetry.addData("Left Column", "⬢⬡⬡⬡⬡⬡");
+            } else if (leftColumn == 2){
+                telemetry.addData("Left Column", "⬡⬢⬡⬡⬡⬡");
+            } else if (leftColumn == 3){
+                telemetry.addData("Left Column", "⬡⬡⬢⬡⬡⬡");
+            } else if (leftColumn == 4){
+                telemetry.addData("Left Column", "⬡⬡⬡⬢⬡⬡");
+            } else if (leftColumn == 5){
+                telemetry.addData("Left Column", "⬡⬡⬡⬡⬢⬡");
+            } else if (leftColumn == 6){
+                telemetry.addData("Left Column", "⬡⬡⬡⬡⬡⬢");
+            }
             telemetry.update();
         }
 
