@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp
@@ -38,19 +37,20 @@ public class TeleOpN extends LinearOpMode {
 
         int leftColumn = MINIMUM_COLUMN;
         int leftRow = MINIMUM_ROW;
+        int rightColumn = MINIMUM_COLUMN;
+        int rightRow = MINIMUM_ROW;
 
         boolean isLeftXNeutral = true;
+        boolean isRightXNeutral = true;
+        boolean isLeftYNeutral = true;
+        boolean isRightYNeutral = true;
 
         while (opModeIsActive()) {
             String graph = "  " + hexagons[0][0] + hexagons[1][0] + hexagons[2][0] + hexagons[3][0] + hexagons[4][0] + hexagons[5][0] + "\n" +
                     hexagons[0][1] + hexagons[1][1] + hexagons[2][1] + hexagons[3][1] + hexagons[4][1] + hexagons[5][1] + "\n" +
                     "  " + hexagons[0][2] + hexagons[1][2] + hexagons[2][2] + hexagons[3][2] + hexagons[4][2] + hexagons[5][2] + "\n" +
-                    hexagons[0][1] + hexagons[1][1] + hexagons[2][1] + hexagons[3][1] + hexagons[4][1] + hexagons[5][1] + "\n"
+                    hexagons[0][1] + hexagons[1][1] + hexagons[2][1] + hexagons[3][1] + hexagons[4][1] + hexagons[5][1] + "\n";
 
-                    ;
-
-            int rightX = 0;
-            int rightY = 0;
             if(isLeftXNeutral && gamepad1.left_stick_x > THRESHOLD){
                 leftColumn = Math.min(leftColumn + 1, MAXIMUM_COLUMN);
                 isLeftXNeutral = false;
@@ -62,34 +62,69 @@ public class TeleOpN extends LinearOpMode {
             if(gamepad1.left_stick_x < THRESHOLD && gamepad1.left_stick_x > -THRESHOLD){
                 isLeftXNeutral = true;
             }
-            /*if(gamepad1.left_stick_y > 0){
-                if(gamepad1.left_stick_y < 0){
-                    leftRow += 1;
-                }
-            }*/
-            /*if(gamepad1.right_stick_x > 0){
-                if(gamepad1.right_stick_x < 0){
-                    rightX += 1;
-                }
+            if(isLeftYNeutral && gamepad1.left_stick_y > THRESHOLD){
+                leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
+                isLeftYNeutral = false;
             }
-            if(gamepad1.right_stick_y > 0){
-                if(gamepad1.right_stick_y < 0){
-                    rightY += 1;
-                }
-            }*/
-            /*if(gamepad1.left_stick_button){
-                leftColumn = MINIMUM_COLUMN;
-                leftRow = MINIMUM_ROW;
-            }*/
+            if(isLeftYNeutral && gamepad1.left_stick_y < -THRESHOLD){
+                leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
+                isLeftYNeutral = false;
+            }
+            if(gamepad1.left_stick_y < THRESHOLD && gamepad1.left_stick_y > -THRESHOLD){
+                isLeftYNeutral = true;
+            }
+
+
+
+            if(isRightXNeutral && gamepad1.right_stick_x > THRESHOLD){
+                rightColumn = Math.min(rightColumn + 1, MAXIMUM_COLUMN);
+                isRightXNeutral = false;
+            }
+            if(isRightXNeutral && gamepad1.right_stick_x < -THRESHOLD){
+                rightColumn = Math.max(rightColumn - 1, MINIMUM_COLUMN);
+                isRightXNeutral = false;
+            }
+            if(gamepad1.right_stick_x < THRESHOLD && gamepad1.right_stick_x > -THRESHOLD){
+                isRightXNeutral = true;
+            }
+            if(isRightYNeutral && gamepad1.right_stick_y > THRESHOLD){
+                rightRow = Math.max(rightRow - 1, MINIMUM_ROW);
+                isRightYNeutral = false;
+            }
+            if(isRightYNeutral && gamepad1.right_stick_y < -THRESHOLD){
+                rightRow = Math.min(rightRow + 1, MAXIMUM_ROW);
+                isRightYNeutral = false;
+            }
+            if(gamepad1.right_stick_y < THRESHOLD && gamepad1.right_stick_y > -THRESHOLD){
+                isRightYNeutral = true;
+            }
 
             telemetry.addData("", graph);
             telemetry.addData("Left Column", leftColumn);
             telemetry.addData("Left Row", leftRow);
+            telemetry.addData("Right Column", rightColumn);
+            telemetry.addData("Right Row", rightRow);
             telemetry.addData("Left Stick X", gamepad1.left_stick_x);
             telemetry.addData("Left Stick Y", gamepad1.left_stick_y);
             telemetry.addData("Left Stick X Neutral", isLeftXNeutral);
-            //telemetry.addData("RightX", rightX);
-            //telemetry.addData("RightY", rightY);
+            telemetry.addData("Left Stick Y Neutral", isLeftYNeutral);
+            telemetry.addData("Right Stick X", gamepad1.right_stick_x);
+            telemetry.addData("Right Stick Y", gamepad1.right_stick_y);
+            telemetry.addData("Right Stick X Neutral", isRightXNeutral);
+            telemetry.addData("Right Stick Y Neutral", isRightYNeutral);
+            if (leftColumn == 1){
+                telemetry.addData("Left Column", "⬢⬡⬡⬡⬡⬡");
+            } else if (leftColumn == 2){
+                telemetry.addData("Left Column", "⬡⬢⬡⬡⬡⬡");
+            } else if (leftColumn == 3){
+                telemetry.addData("Left Column", "⬡⬡⬢⬡⬡⬡");
+            } else if (leftColumn == 4){
+                telemetry.addData("Left Column", "⬡⬡⬡⬢⬡⬡");
+            } else if (leftColumn == 5){
+                telemetry.addData("Left Column", "⬡⬡⬡⬡⬢⬡");
+            } else if (leftColumn == 6){
+                telemetry.addData("Left Column", "⬡⬡⬡⬡⬡⬢");
+            }
             telemetry.update();
         }
 
