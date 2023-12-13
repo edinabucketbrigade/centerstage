@@ -38,8 +38,13 @@ public class TeleOpN extends LinearOpMode {
 
         int leftColumn = MINIMUM_COLUMN;
         int leftRow = MINIMUM_ROW;
+        int rightColumn = MINIMUM_COLUMN;
+        int rightRow = MINIMUM_ROW;
 
         boolean isLeftXNeutral = true;
+        boolean isRightXNeutral = true;
+        boolean isLeftYNeutral = true;
+        boolean isRightYNeutral = true;
 
         while (opModeIsActive()) {
             String graph = "  " + hexagons[0][0] + hexagons[1][0] + hexagons[2][0] + hexagons[3][0] + hexagons[4][0] + hexagons[5][0] + "\n" +
@@ -61,6 +66,42 @@ public class TeleOpN extends LinearOpMode {
             }
             if(gamepad1.left_stick_x < THRESHOLD && gamepad1.left_stick_x > -THRESHOLD){
                 isLeftXNeutral = true;
+            }
+            if(isLeftYNeutral && gamepad1.left_stick_y > THRESHOLD){
+                leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
+                isLeftYNeutral = false;
+            }
+            if(isLeftYNeutral && gamepad1.left_stick_y < -THRESHOLD){
+                leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
+                isLeftYNeutral = false;
+            }
+            if(gamepad1.left_stick_y < THRESHOLD && gamepad1.left_stick_y > -THRESHOLD){
+                isLeftYNeutral = true;
+            }
+
+
+
+            if(isRightXNeutral && gamepad1.right_stick_x > THRESHOLD){
+                rightColumn = Math.min(rightColumn + 1, MAXIMUM_COLUMN);
+                isRightXNeutral = false;
+            }
+            if(isRightXNeutral && gamepad1.right_stick_x < -THRESHOLD){
+                rightColumn = Math.max(rightColumn - 1, MINIMUM_COLUMN);
+                isRightXNeutral = false;
+            }
+            if(gamepad1.right_stick_x < THRESHOLD && gamepad1.right_stick_x > -THRESHOLD){
+                isRightXNeutral = true;
+            }
+            if(isRightYNeutral && gamepad1.right_stick_y > THRESHOLD){
+                rightRow = Math.min(rightRow + 1, MAXIMUM_ROW);
+                isRightYNeutral = false;
+            }
+            if(isRightYNeutral && gamepad1.right_stick_y < -THRESHOLD){
+                rightRow = Math.max(rightRow - 1, MINIMUM_ROW);
+                isRightYNeutral = false;
+            }
+            if(gamepad1.right_stick_y < THRESHOLD && gamepad1.right_stick_y > -THRESHOLD){
+                isRightYNeutral = true;
             }
             /*if(gamepad1.left_stick_y > 0){
                 if(gamepad1.left_stick_y < 0){
