@@ -27,7 +27,7 @@ public class PixelDetection extends LinearOpMode {
     public static double whiteValue = 0.5;
     public static int yellowMin = 20;
     public static int yellowMax = 80;
-    public static int greenMin = 100;
+    public static int greenMin = 110;
     public static int greenMax = 130;
     public static int purpleMin = 180;
     public static int purpleMax = 290;
