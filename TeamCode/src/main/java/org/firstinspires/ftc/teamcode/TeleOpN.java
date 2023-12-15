@@ -41,13 +41,8 @@ public class TeleOpN extends LinearOpMode {
         int rightRow = MINIMUM_ROW;
 
         boolean isLeftXNeutral = true;
-<<<<<<< Updated upstream
         boolean isRightXNeutral = true;
         boolean isLeftYNeutral = true;
-=======
-        boolean isLeftYNeutral = true;
-        boolean isRightXNeutral = true;
->>>>>>> Stashed changes
         boolean isRightYNeutral = true;
 
         while (opModeIsActive()) {
@@ -67,34 +62,17 @@ public class TeleOpN extends LinearOpMode {
             if(gamepad1.left_stick_x < THRESHOLD && gamepad1.left_stick_x > -THRESHOLD){
                 isLeftXNeutral = true;
             }
-<<<<<<< Updated upstream
             if(isLeftYNeutral && gamepad1.left_stick_y > THRESHOLD){
                 leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
                 isLeftYNeutral = false;
             }
             if(isLeftYNeutral && gamepad1.left_stick_y < -THRESHOLD){
                 leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
-=======
-
-            if(isLeftYNeutral && gamepad1.left_stick_y > THRESHOLD){
-                leftRow = Math.min(leftRow - 1, MAXIMUM_ROW);
-                isLeftYNeutral = false;
-            }
-            if(isLeftYNeutral && gamepad1.left_stick_y < -THRESHOLD){
-                leftRow = Math.max(leftRow + 1, MINIMUM_ROW);
->>>>>>> Stashed changes
                 isLeftYNeutral = false;
             }
             if(gamepad1.left_stick_y < THRESHOLD && gamepad1.left_stick_y > -THRESHOLD){
                 isLeftYNeutral = true;
             }
-
-
-
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
             if(isRightXNeutral && gamepad1.right_stick_x > THRESHOLD){
                 rightColumn = Math.min(rightColumn + 1, MAXIMUM_COLUMN);
                 isRightXNeutral = false;
@@ -106,44 +84,16 @@ public class TeleOpN extends LinearOpMode {
             if(gamepad1.right_stick_x < THRESHOLD && gamepad1.right_stick_x > -THRESHOLD){
                 isRightXNeutral = true;
             }
-<<<<<<< Updated upstream
             if(isRightYNeutral && gamepad1.right_stick_y > THRESHOLD){
                 rightRow = Math.max(rightRow - 1, MINIMUM_ROW);
                 isRightYNeutral = false;
             }
             if(isRightYNeutral && gamepad1.right_stick_y < -THRESHOLD){
                 rightRow = Math.min(rightRow + 1, MAXIMUM_ROW);
-=======
-
-            if(isRightYNeutral && gamepad1.right_stick_y > THRESHOLD){
-                rightRow = Math.min(rightRow - 1, MAXIMUM_ROW);
-                isRightYNeutral = false;
-            }
-            if(isRightYNeutral && gamepad1.right_stick_y < -THRESHOLD){
-                rightRow = Math.max(rightRow + 1, MINIMUM_ROW);
->>>>>>> Stashed changes
                 isRightYNeutral = false;
             }
             if(gamepad1.right_stick_y < THRESHOLD && gamepad1.right_stick_y > -THRESHOLD){
                 isRightYNeutral = true;
-<<<<<<< Updated upstream
-=======
-            }
-
-
-
-
-
-            /*if(gamepad1.left_stick_y > 0){
-                if(gamepad1.left_stick_y < 0){
-                    leftRow += 1;
-                }
-            }*/
-            /*if(gamepad1.right_stick_x > 0){
-                if(gamepad1.right_stick_x < 0){
-                    rightX += 1;
-                }
->>>>>>> Stashed changes
             }
 
             telemetry.addData("", graph);
@@ -154,7 +104,6 @@ public class TeleOpN extends LinearOpMode {
             telemetry.addData("Left Stick X", gamepad1.left_stick_x);
             telemetry.addData("Left Stick Y", gamepad1.left_stick_y);
             telemetry.addData("Left Stick X Neutral", isLeftXNeutral);
-<<<<<<< Updated upstream
             telemetry.addData("Left Stick Y Neutral", isLeftYNeutral);
             telemetry.addData("Right Stick X", gamepad1.right_stick_x);
             telemetry.addData("Right Stick Y", gamepad1.right_stick_y);
@@ -186,15 +135,6 @@ public class TeleOpN extends LinearOpMode {
             } else if (rightColumn == 6){
                 telemetry.addData("Right Column", "⬡⬡⬡⬡⬡⬢");
             }
-=======
-            telemetry.addData("Right Column", rightColumn);
-            telemetry.addData("Right Row", rightRow);
-            telemetry.addData("Right Stick X", gamepad1.right_stick_x);
-            telemetry.addData("Right Stick Y", gamepad1.right_stick_y);
-            telemetry.addData("Right Stick X Neutral", isRightXNeutral);
-            //telemetry.addData("RightX", rightX);
-            //telemetry.addData("RightY", rightY);
->>>>>>> Stashed changes
             telemetry.update();
         }
 
