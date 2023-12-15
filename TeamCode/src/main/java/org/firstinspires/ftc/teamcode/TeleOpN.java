@@ -109,24 +109,24 @@ public class TeleOpN extends LinearOpMode {
             telemetry.addData("Right Stick Y", gamepad1.right_stick_y);
             telemetry.addData("Right Stick X Neutral", isRightXNeutral);
             telemetry.addData("Right Stick Y Neutral", isRightYNeutral);
-            String leftColumnString = "";
-            String leftRowString = "";
+            String leftRow1String = "";
+            String leftRow2String = "";
             for(int i = MINIMUM_COLUMN; i <= MAXIMUM_COLUMN; i++){
-                if (i == leftColumn){
-                    leftColumnString += "⬢";
+                if (i == leftColumn && leftRow == 1){
+                    leftRow1String += "⬢";
                 } else {
-                    leftColumnString += "⬡";
+                    leftRow1String += "⬡";
                 }
             }
-            for(int i = MINIMUM_ROW; i <= MAXIMUM_ROW; i++){
-                if (i == leftRow){
-                    leftRowString += "⬢";
+            for(int i = MINIMUM_COLUMN; i <= MAXIMUM_COLUMN; i++){
+                if (i == leftColumn && leftRow == 2){
+                    leftRow2String += "⬢";
                 } else {
-                    leftRowString += "⬡";
+                    leftRow2String += "⬡";
                 }
             }
-            telemetry.addData("Left Column", leftColumnString);
-            telemetry.addData("Left Row", leftRowString);
+            telemetry.addData("Left Row 2", leftRow2String);
+            telemetry.addData("Left Row 1", leftRow1String);
             /*if (leftColumn == 1){
                 telemetry.addData("Left Column", "⬢⬡⬡⬡⬡⬡");
             } else if (leftColumn == 2){
