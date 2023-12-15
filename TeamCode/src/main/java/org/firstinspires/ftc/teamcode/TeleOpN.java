@@ -73,9 +73,6 @@ public class TeleOpN extends LinearOpMode {
             if(gamepad1.left_stick_y < THRESHOLD && gamepad1.left_stick_y > -THRESHOLD){
                 isLeftYNeutral = true;
             }
-
-
-
             if(isRightXNeutral && gamepad1.right_stick_x > THRESHOLD){
                 rightColumn = Math.min(rightColumn + 1, MAXIMUM_COLUMN);
                 isRightXNeutral = false;
@@ -112,7 +109,25 @@ public class TeleOpN extends LinearOpMode {
             telemetry.addData("Right Stick Y", gamepad1.right_stick_y);
             telemetry.addData("Right Stick X Neutral", isRightXNeutral);
             telemetry.addData("Right Stick Y Neutral", isRightYNeutral);
-            if (leftColumn == 1){
+            String leftRow1String = "";
+            String leftRow2String = "";
+            for(int i = MINIMUM_COLUMN; i <= MAXIMUM_COLUMN; i++){
+                if (i == leftColumn && leftRow == 1){
+                    leftRow1String += "⬢";
+                } else {
+                    leftRow1String += "⬡";
+                }
+            }
+            for(int i = MINIMUM_COLUMN; i <= MAXIMUM_COLUMN; i++){
+                if (i == leftColumn && leftRow == 2){
+                    leftRow2String += "⬢";
+                } else {
+                    leftRow2String += "⬡";
+                }
+            }
+            telemetry.addData("Left Row 2", leftRow2String);
+            telemetry.addData("Left Row 1", leftRow1String);
+            /*if (leftColumn == 1){
                 telemetry.addData("Left Column", "⬢⬡⬡⬡⬡⬡");
             } else if (leftColumn == 2){
                 telemetry.addData("Left Column", "⬡⬢⬡⬡⬡⬡");
@@ -125,6 +140,19 @@ public class TeleOpN extends LinearOpMode {
             } else if (leftColumn == 6){
                 telemetry.addData("Left Column", "⬡⬡⬡⬡⬡⬢");
             }
+            if (rightColumn == 1){
+                telemetry.addData("Right Column", "⬢⬡⬡⬡⬡⬡");
+            } else if (rightColumn == 2){
+                telemetry.addData("Right Column", "⬡⬢⬡⬡⬡⬡");
+            } else if (rightColumn == 3){
+                telemetry.addData("Right Column", "⬡⬡⬢⬡⬡⬡");
+            } else if (rightColumn == 4){
+                telemetry.addData("Right Column", "⬡⬡⬡⬢⬡⬡");
+            } else if (rightColumn == 5){
+                telemetry.addData("Right Column", "⬡⬡⬡⬡⬢⬡");
+            } else if (rightColumn == 6){
+                telemetry.addData("Right Column", "⬡⬡⬡⬡⬡⬢");
+            }*/
             telemetry.update();
         }
 
