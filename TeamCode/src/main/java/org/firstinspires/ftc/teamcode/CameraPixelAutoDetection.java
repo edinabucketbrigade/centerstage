@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -31,16 +32,16 @@ public class CameraPixelAutoDetection extends LinearOpMode {
         camera.setPipeline(detector);
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
         if (currentGamepad.x && !previousGamepad.x){
-            Core.inRange(detector.mat,detector.MINIMUM_WHITE,detector.MAXIMUM_WHITE,detector.mat);
+            Core.inRange(detector.mat,detector.MINIMUM_PURPLE,detector.MAXIMUM_PURPLE,detector.mat);
         }
         if (currentGamepad.a && !previousGamepad.a){
-            Core.inRange(detector.mat,detector.MINIMUM_WHITE,detector.MAXIMUM_WHITE,detector.mat);
+            Core.inRange(detector.mat,detector.MINIMUM_GREEN,detector.MAXIMUM_GREEN,detector.mat);
         }
         if (currentGamepad.b && !previousGamepad.b){
             Core.inRange(detector.mat,detector.MINIMUM_WHITE,detector.MAXIMUM_WHITE,detector.mat);
         }
         if (currentGamepad.y && !previousGamepad.y){
-            Core.inRange(detector.mat,detector.MINIMUM_WHITE,detector.MAXIMUM_WHITE,detector.mat);
+            Core.inRange(detector.mat,detector.MINIMUM_YELLOW,detector.MAXIMUM_YELLOW,detector.mat);
         }
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -55,24 +56,20 @@ public class CameraPixelAutoDetection extends LinearOpMode {
                 log("Error"+errorCode);
             }
         });
-        log("1");
+        FtcDashboard.getInstance().startCameraStream(camera, 0);
         while (opModeIsActive() && !startedStreaming) {
             log("waiting for camera streaming to start");
             sleep(50);
         }
         CameraPixelColor.Location location = null;
-        log("2");
         while (opModeIsActive() && location == null) {
             log("waiting for location detection");
             sleep(50);
             location = detector.getLocation();
         }
-        log("3");
         waitForStart();
-        log("4");
 
         location = detector.getLocation();
-        log("5");
 
         while(opModeIsActive()) {
             detector.telemetry.update();
