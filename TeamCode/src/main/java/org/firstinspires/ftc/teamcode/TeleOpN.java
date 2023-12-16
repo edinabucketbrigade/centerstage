@@ -64,6 +64,7 @@ public class TeleOpN extends LinearOpMode {
             }
             if(isLeftYNeutral && gamepad1.left_stick_y > THRESHOLD){
                 leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
+
                 isLeftYNeutral = false;
             }
             if(isLeftYNeutral && gamepad1.left_stick_y < -THRESHOLD){
@@ -73,9 +74,6 @@ public class TeleOpN extends LinearOpMode {
             if(gamepad1.left_stick_y < THRESHOLD && gamepad1.left_stick_y > -THRESHOLD){
                 isLeftYNeutral = true;
             }
-
-
-
             if(isRightXNeutral && gamepad1.right_stick_x > THRESHOLD){
                 rightColumn = Math.min(rightColumn + 1, MAXIMUM_COLUMN);
                 isRightXNeutral = false;
@@ -112,6 +110,54 @@ public class TeleOpN extends LinearOpMode {
             telemetry.addData("Right Stick Y", gamepad1.right_stick_y);
             telemetry.addData("Right Stick X Neutral", isRightXNeutral);
             telemetry.addData("Right Stick Y Neutral", isRightYNeutral);
+            String output = "\n";
+            for(int row = MAXIMUM_ROW; row >= MINIMUM_ROW; row--) {
+                for (int column = MINIMUM_COLUMN; column <= MAXIMUM_COLUMN; column++) {
+                    if (column == leftColumn && leftRow == row) {
+                        output += "Ⓛ";
+                    } else if (column == rightColumn && rightRow == row){
+                        output += "Ⓡ";
+                    } else{
+                        output += "⬡";
+
+                    }
+                }
+                output += "\n";
+            }
+            /*for(int row = MINIMUM_ROW; row <= MAXIMUM_ROW; row++){
+                if (row == leftColumn && leftRow == 2){
+                    leftRow2String += "⬢";
+                } else {
+                    leftRow2String += "⬡";
+                }
+            }*/
+            telemetry.addData("output", output);
+            /*if (leftColumn == 1){
+                telemetry.addData("Left Column", "⬢⬡⬡⬡⬡⬡");
+            } else if (leftColumn == 2){
+                telemetry.addData("Left Column", "⬡⬢⬡⬡⬡⬡");
+            } else if (leftColumn == 3){
+                telemetry.addData("Left Column", "⬡⬡⬢⬡⬡⬡");
+            } else if (leftColumn == 4){
+                telemetry.addData("Left Column", "⬡⬡⬡⬢⬡⬡");
+            } else if (leftColumn == 5){
+                telemetry.addData("Left Column", "⬡⬡⬡⬡⬢⬡");
+            } else if (leftColumn == 6){
+                telemetry.addData("Left Column", "⬡⬡⬡⬡⬡⬢");
+            }
+            if (rightColumn == 1){
+                telemetry.addData("Right Column", "⬢⬡⬡⬡⬡⬡");
+            } else if (rightColumn == 2){
+                telemetry.addData("Right Column", "⬡⬢⬡⬡⬡⬡");
+            } else if (rightColumn == 3){
+                telemetry.addData("Right Column", "⬡⬡⬢⬡⬡⬡");
+            } else if (rightColumn == 4){
+                telemetry.addData("Right Column", "⬡⬡⬡⬢⬡⬡");
+            } else if (rightColumn == 5){
+                telemetry.addData("Right Column", "⬡⬡⬡⬡⬢⬡");
+            } else if (rightColumn == 6){
+                telemetry.addData("Right Column", "⬡⬡⬡⬡⬡⬢");
+            }*/
             telemetry.update();
         }
 
