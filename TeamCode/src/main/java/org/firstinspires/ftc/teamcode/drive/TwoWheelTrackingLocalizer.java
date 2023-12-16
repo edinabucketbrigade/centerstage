@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.drive;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -34,6 +35,7 @@ import java.util.List;
  *    \--------------/
  *
  */
+@Config
 public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     public static double TICKS_PER_REV = 2000; // Per https://www.gobilda.com/odometry-pod-43mm-width-48mm-wheel/ gobilda has 2000 ticks per revolution, per https://www.revrobotics.com/rev-11-1271/ rev has 8192
     public static double WHEEL_RADIUS = 0.945; // Per https://www.gobilda.com/odometry-pod-43mm-width-48mm-wheel/ gobilda is 0.945

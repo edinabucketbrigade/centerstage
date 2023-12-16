@@ -27,7 +27,7 @@ public class DriveConstants {
     public static final double MAX_RPM = 312;
 
     public static final RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
-    public static final RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+    public static final RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR = RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
     /*
      * Set RUN_USING_ENCODER to true to enable built-in hub velocity control using drive encoders.
@@ -60,8 +60,8 @@ public class DriveConstants {
      * empirically tuned.
      */
     public static double kV = 0.0175; // Default = 1.0 / rpmToVelocity(MAX_RPM)
-    public static double kA = 0.005; // Default = 0
-    public static double kStatic = 0; // Default = 0
+    public static double kA = 0.003; // Default = 0
+    public static double kStatic = 0.01; // Default = 0
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -91,10 +91,10 @@ public class DriveConstants {
      * You are free to raise this on your own if you would like. It is best determined through experimentation.
      
      */
-    public static double MAX_VEL = 52.48291908330528;
-    public static double MAX_ACCEL = 52.48291908330528;
-    public static double MAX_ANG_VEL = Math.toRadians(214.78926857142858); // V3 strafer chassis = 184.02607784577722
-    public static double MAX_ANG_ACCEL = Math.toRadians(214.78926857142858); // V3 strafer chassis = 184.02607784577722
+    public static double MAX_VEL = 50;
+    public static double MAX_ACCEL = 50;
+    public static double MAX_ANG_VEL = Math.toRadians(214.78926857142858); // V3 strafer chassis = 184.02607784577722, previous code = 214.78926857142858
+    public static double MAX_ANG_ACCEL = Math.toRadians(214.78926857142858); // V3 strafer chassis = 184.02607784577722, previous code = 214.78926857142858
 
 
     public static double encoderTicksToInches(double ticks) {
