@@ -7,29 +7,12 @@ public class TeleOpN extends LinearOpMode {
 
     private static final double THRESHOLD = 0.5;
     private static final int MINIMUM_COLUMN = 1;
-    private static final int MAXIMUM_COLUMN = 6;
+    private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
+    private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     private static final int MINIMUM_ROW = 1;
     private static final int MAXIMUM_ROW = 11;
     @Override
     public void runOpMode() {
-        String[][] hexagons = {
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡", "⬡"},
-                {"⬡", "⬡", "⬡", "⬡", "⬡", "⬡"}
-        };
-        int selectedX = 0;
-        int selectedY = 0;
-        //hexagons[1][2] Outputs 7
-
         telemetry.addData("", "Initialized");
         telemetry.update();
 
@@ -46,13 +29,9 @@ public class TeleOpN extends LinearOpMode {
         boolean isRightYNeutral = true;
 
         while (opModeIsActive()) {
-            String graph = "  " + hexagons[0][0] + hexagons[1][0] + hexagons[2][0] + hexagons[3][0] + hexagons[4][0] + hexagons[5][0] + "\n" +
-                    hexagons[0][1] + hexagons[1][1] + hexagons[2][1] + hexagons[3][1] + hexagons[4][1] + hexagons[5][1] + "\n" +
-                    "  " + hexagons[0][2] + hexagons[1][2] + hexagons[2][2] + hexagons[3][2] + hexagons[4][2] + hexagons[5][2] + "\n" +
-                    hexagons[0][1] + hexagons[1][1] + hexagons[2][1] + hexagons[3][1] + hexagons[4][1] + hexagons[5][1] + "\n";
-
             if(isLeftXNeutral && gamepad1.left_stick_x > THRESHOLD){
-                leftColumn = Math.min(leftColumn + 1, MAXIMUM_COLUMN);
+                int maximumColumn = getMaximumColumn(leftRow);
+                leftColumn = Math.min(leftColumn + 1, maximumColumn);
                 isLeftXNeutral = false;
             }
             if(isLeftXNeutral && gamepad1.left_stick_x < -THRESHOLD){
@@ -75,7 +54,8 @@ public class TeleOpN extends LinearOpMode {
                 isLeftYNeutral = true;
             }
             if(isRightXNeutral && gamepad1.right_stick_x > THRESHOLD){
-                rightColumn = Math.min(rightColumn + 1, MAXIMUM_COLUMN);
+                int maximumColumn = getMaximumColumn(rightRow);
+                rightColumn = Math.min(rightColumn + 1, maximumColumn);
                 isRightXNeutral = false;
             }
             if(isRightXNeutral && gamepad1.right_stick_x < -THRESHOLD){
@@ -97,7 +77,6 @@ public class TeleOpN extends LinearOpMode {
                 isRightYNeutral = true;
             }
 
-            telemetry.addData("", graph);
             telemetry.addData("Left Column", leftColumn);
             telemetry.addData("Left Row", leftRow);
             telemetry.addData("Right Column", rightColumn);
@@ -112,14 +91,14 @@ public class TeleOpN extends LinearOpMode {
             telemetry.addData("Right Stick Y Neutral", isRightYNeutral);
             String output = "\n";
             for(int row = MAXIMUM_ROW; row >= MINIMUM_ROW; row--) {
-                for (int column = MINIMUM_COLUMN; column <= MAXIMUM_COLUMN; column++) {
+                int maximumColumn = getMaximumColumn(row);
+                for (int column = MINIMUM_COLUMN; column <= maximumColumn; column++) {
                     if (column == leftColumn && leftRow == row) {
                         output += "Ⓛ";
                     } else if (column == rightColumn && rightRow == row){
                         output += "Ⓡ";
                     } else{
                         output += "⬡";
-
                     }
                 }
                 output += "\n";
@@ -162,5 +141,11 @@ public class TeleOpN extends LinearOpMode {
         }
 
     }
-
+    public int getMaximumColumn(int row){
+        if (row%2 == 0){
+            return MAXIMUM_COLUMN_EVEN_ROW;
+        } else {
+            return MAXIMUM_COLUMN_ODD_ROW;
+        }
+    }
 }
