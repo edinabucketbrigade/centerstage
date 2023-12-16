@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -32,16 +30,16 @@ public class CameraPixelAutoDetection extends LinearOpMode {
         camera.setPipeline(detector);
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
         if (currentGamepad.x && !previousGamepad.x){
-            Core.inRange(detector.mat,detector.MINIMUM_PURPLE,detector.MAXIMUM_PURPLE,detector.mat);
+            Core.inRange(detector.matWhite,detector.MINIMUM_PURPLE,detector.MAXIMUM_PURPLE,detector.matWhite);
         }
         if (currentGamepad.a && !previousGamepad.a){
-            Core.inRange(detector.mat,detector.MINIMUM_GREEN,detector.MAXIMUM_GREEN,detector.mat);
+            Core.inRange(detector.matWhite,detector.MINIMUM_GREEN,detector.MAXIMUM_GREEN,detector.matWhite);
         }
         if (currentGamepad.b && !previousGamepad.b){
-            Core.inRange(detector.mat,detector.MINIMUM_WHITE,detector.MAXIMUM_WHITE,detector.mat);
+            Core.inRange(detector.matWhite,detector.MINIMUM_WHITE,detector.MAXIMUM_WHITE,detector.matWhite);
         }
         if (currentGamepad.y && !previousGamepad.y){
-            Core.inRange(detector.mat,detector.MINIMUM_YELLOW,detector.MAXIMUM_YELLOW,detector.mat);
+            Core.inRange(detector.matWhite,detector.MINIMUM_YELLOW,detector.MAXIMUM_YELLOW,detector.matWhite);
         }
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -72,8 +70,8 @@ public class CameraPixelAutoDetection extends LinearOpMode {
         location = detector.getLocation();
 
         while(opModeIsActive()) {
-            detector.telemetry.update();
-            telemetry.update();
+//            detector.telemetry.update();
+//            telemetry.update();
         }
 
         camera.stopStreaming();
