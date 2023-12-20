@@ -33,8 +33,8 @@ public class CameraPixelColor extends OpenCvPipeline {
     public static int MAXIMUM_GREEN_HUE = 90;
     public static int MAXIMUM_PURPLE_HUE = 140;
 
-    public static Rect LEFT_ROI = new Rect(30,160, 150,120);
-    public static Rect RIGHT_ROI = new Rect(435,165, 150,120);
+    public static Rect LEFT_ROI = new Rect(50,50, 200,250);
+    public static Rect RIGHT_ROI = new Rect(300,50, 200,250);
     public enum Location{
         Left,
         Right,
