@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
@@ -35,11 +33,16 @@ public class CameraPixelColor extends OpenCvPipeline {
 
     public static Rect LEFT_ROI = new Rect(50,50, 200,250);
     public static Rect RIGHT_ROI = new Rect(300,50, 200,250);
-    public enum Location{
-        Left,
-        Right,
+    public enum Pixel{
+        White,
+        Yellow,
+        Green,
+        Purple,
+        None
     }
-    private Location location;
+
+    public Pixel leftPixel = Pixel.None;
+    public Pixel rightPixel = Pixel.None;
 
     Telemetry telemetry;
     Mat matWhite = new Mat();
@@ -55,10 +58,6 @@ public class CameraPixelColor extends OpenCvPipeline {
     public Scalar MAXIMUM_GREEN;
     public Scalar MINIMUM_PURPLE;
     public Scalar MAXIMUM_PURPLE;
-    RevBlinkinLedDriver blinkinLedDriver1;
-    RevBlinkinLedDriver blinkinLedDriver2;
-    RevBlinkinLedDriver.BlinkinPattern blinkinPattern1;
-    RevBlinkinLedDriver.BlinkinPattern blinkinPattern2;
     public CameraPixelColor(Telemetry telemetry){
         this.telemetry = telemetry;
     }
@@ -73,14 +72,6 @@ public class CameraPixelColor extends OpenCvPipeline {
         MAXIMUM_GREEN = new Scalar(MAXIMUM_GREEN_HUE, MAXIMUM_GREEN_VALUES, MAXIMUM_GREEN_VALUES);
         MINIMUM_PURPLE = new Scalar(MINIMUM_PURPLE_HUE, MINIMUM_PURPLE_VALUES, MINIMUM_PURPLE_VALUES);
         MAXIMUM_PURPLE = new Scalar(MAXIMUM_PURPLE_HUE, MAXIMUM_PURPLE_VALUES, MAXIMUM_PURPLE_VALUES);
-
-        blinkinLedDriver1 = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin1");
-        blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.RED;
-        blinkinLedDriver1.setPattern(blinkinPattern1);
-
-        blinkinLedDriver2 = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin2");
-        blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.RED;
-        blinkinLedDriver2.setPattern(blinkinPattern2);
 
         Imgproc.cvtColor(input, matWhite, Imgproc.COLOR_RGB2HSV);
         Core.inRange(matWhite, MINIMUM_WHITE, MAXIMUM_WHITE, matWhite);
@@ -123,30 +114,26 @@ public class CameraPixelColor extends OpenCvPipeline {
         telemetry.addData("Left Green Raw Value", leftValueGreen);
         telemetry.addData("Right Green Raw Value", rightValueGreen);
         telemetry.addData("Left Purple Raw Value", leftValuePurple);
-        telemetry.addData("Right Purple Raw Value", leftValuePurple);
+        telemetry.addData("Right Purple Raw Value", rightValuePurple);
         telemetry.addData("Left Yellow Raw Value", leftValueYellow);
         telemetry.addData("Right Yellow Raw Value", rightValueYellow);
 
-        if (leftValueWhite > leftValueYellow && leftValueWhite > leftValueGreen && leftValueWhite > leftValuePurple)
-            blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.WHITE;
-        else if(leftValueYellow > leftValueWhite && leftValueYellow > leftValueGreen && leftValueYellow > leftValuePurple)
-            blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
-        else if(leftValueGreen > leftValueWhite && leftValueGreen > leftValueYellow && leftValueGreen > leftValuePurple)
-            blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.GREEN;
-        else if(leftValuePurple > leftValueWhite && leftValuePurple > leftValueYellow && leftValuePurple > leftValueGreen)
-            blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
-        else
-            blinkinPattern1 = RevBlinkinLedDriver.BlinkinPattern.RED;
-        if (rightValueWhite > rightValueYellow && rightValueWhite > rightValueGreen && rightValueWhite > rightValuePurple)
-            blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.WHITE;
-        else if(rightValueYellow > rightValueWhite && rightValueYellow > rightValueGreen && rightValueYellow > rightValuePurple)
-            blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
-        else if(rightValueGreen > rightValueWhite && rightValueGreen > rightValueYellow && rightValueGreen > rightValuePurple)
-            blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.GREEN;
-        else if(rightValuePurple > rightValueWhite && rightValuePurple > rightValueYellow && rightValuePurple > rightValueGreen)
-            blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
-        else
-            blinkinPattern2 = RevBlinkinLedDriver.BlinkinPattern.RED;
+        if (leftValueWhite > leftValueYellow && leftValueWhite > leftValueGreen && leftValueWhite > leftValuePurple) {
+            telemetry.addData("Left Pixel is: ", "WHITE");
+            leftPixel = Pixel.White;
+        } else if (leftValueYellow > leftValueWhite && leftValueYellow > leftValueGreen && leftValueYellow > leftValuePurple){
+            telemetry.addData("Left Pixel is: ", "YELLOW");
+            leftPixel = Pixel.Yellow;
+        }else if(leftValueGreen > leftValueWhite && leftValueGreen > leftValueYellow && leftValueGreen > leftValuePurple) {
+            telemetry.addData("Left Pixel is: ", "GREEN");
+            leftPixel = Pixel.Green;
+        }else if(leftValuePurple > leftValueWhite && leftValuePurple > leftValueYellow && leftValuePurple > leftValueGreen) {
+            telemetry.addData("Left Pixel is: ", "PURPLE");
+            leftPixel = Pixel.Purple;
+        }else{
+            telemetry.addData("Left Pixel is: ", "Not Found");
+            leftPixel = Pixel.None;
+        }
 
         //Imgproc.cvtColor(mat, mat, Imgproc.COLOR_GRAY2RGB);
         Scalar pixelColor = new Scalar(255,255,255);
@@ -160,14 +147,12 @@ public class CameraPixelColor extends OpenCvPipeline {
         Imgproc.rectangle(matYellow, LEFT_ROI, pixelColor);
         Imgproc.rectangle(matYellow, RIGHT_ROI, pixelColor);
 
-        blinkinLedDriver2.setPattern(blinkinPattern2);
-        telemetry.addData("Right Color Is", blinkinPattern2);
-        blinkinLedDriver1.setPattern(blinkinPattern1);
-        telemetry.addData("Left Color Is", blinkinPattern1);
-
         telemetry.update();
         return matWhite;
     }
-    public CameraPixelColor.Location getLocation(){return location;}
+    public CameraPixelColor.Pixel getLeftPixel(){return leftPixel;}
+    public CameraPixelColor.Pixel getRightPixel(){return rightPixel;}
+
+
 
 }
