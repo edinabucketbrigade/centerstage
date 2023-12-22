@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp
 public class TeleOpO extends LinearOpMode {
@@ -16,8 +15,6 @@ public class TeleOpO extends LinearOpMode {
 
         beamBreak = hardwareMap.get(DigitalChannel.class, "beam_break");
 
-        beamBreak.setMode(DigitalChannel.Mode.INPUT);
-
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -25,9 +22,15 @@ public class TeleOpO extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            boolean beamBroken = !beamBreak.getState(); //May show status as true if beam is broken
-            telemetry.addData("Beam Break Status", beamBroken);
-
+            boolean isItOpen = beamBreak.getState();
+            String switchState;
+            if (isItOpen) {
+                switchState = "Open";
+            } else {
+                switchState = "Closed";
+            }
+            telemetry.addData("time", "elapsed time: " + Double.toString(this.time));
+            telemetry.addData("state", ":  " + switchState);
             telemetry.addData("Status", "Running");
             telemetry.update();
 
