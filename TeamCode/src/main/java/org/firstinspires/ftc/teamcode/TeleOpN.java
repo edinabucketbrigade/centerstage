@@ -76,6 +76,12 @@ public class TeleOpN extends LinearOpMode {
             if(gamepad1.right_stick_y < THRESHOLD && gamepad1.right_stick_y > -THRESHOLD){
                 isRightYNeutral = true;
             }
+            if (!isEven(leftRow) && leftColumn == MAXIMUM_COLUMN_EVEN_ROW){
+                leftColumn = MAXIMUM_COLUMN_ODD_ROW;
+            }
+            if (!isEven(rightRow) && rightColumn == MAXIMUM_COLUMN_EVEN_ROW){
+                rightColumn = MAXIMUM_COLUMN_ODD_ROW;
+            }
 
             telemetry.addData("Left Column", leftColumn);
             telemetry.addData("Left Row", leftRow);
