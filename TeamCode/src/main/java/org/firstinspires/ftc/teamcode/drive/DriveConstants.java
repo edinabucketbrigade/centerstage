@@ -23,8 +23,8 @@ public class DriveConstants {
     /*
      * These are motor constants that should be listed online for your motors.
      */
-    public static final double TICKS_PER_REV = 537.7;
-    public static final double MAX_RPM = 312;
+    public static final double TICKS_PER_REV = 537.7; // RM: See encoder resolution at https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
+    public static final double MAX_RPM = 312; // RM: See RPM at https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
 
     public static final RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
     public static final RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR = RevHubOrientationOnRobot.UsbFacingDirection.UP;
@@ -37,9 +37,9 @@ public class DriveConstants {
      * If using the built-in motor velocity PID, update MOTOR_VELO_PID with the tuned coefficients
      * from DriveVelocityPIDTuner.
      */
-    public static final boolean RUN_USING_ENCODER = false;
+    public static final boolean RUN_USING_ENCODER = false; // RM: We are using feedforward, so this should be false
     public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(0, 0, 0,
-      getMotorVelocityF(MAX_RPM / 60 * TICKS_PER_REV));
+      getMotorVelocityF(MAX_RPM / 60 * TICKS_PER_REV)); // RM: We are using feedforward, so ignore this
 
     /*
      * These are physical constants that can be determined from your robot (including the track
@@ -49,9 +49,9 @@ public class DriveConstants {
      * angular distances although most angular parameters are wrapped in Math.toRadians() for
      * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
      */
-    public static double WHEEL_RADIUS = 1.8898; // in
-    public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 13.5;// in
+    public static double WHEEL_RADIUS = 1.8898; // RM: See https://www.gobilda.com/strafer-chassis-kit-v4/; wheels are 96 mm diameter, 48 mm radius, which is 1.8898 inches
+    public static double GEAR_RATIO = 1; // RM: We have no gears or belts, so it is 1
+    public static double TRACK_WIDTH = 13.5; // RM: This is the distance from the center of one drive wheel to the center of its parallel wheel in inches
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -59,8 +59,8 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.0175; // Default = 1.0 / rpmToVelocity(MAX_RPM)
-    public static double kA = 0.003; // Default = 0
+    public static double kV = 0.018; // Default = 1.0 / rpmToVelocity(MAX_RPM)
+    public static double kA = 0.002; // Default = 0
     public static double kStatic = 0.01; // Default = 0
 
     /*
