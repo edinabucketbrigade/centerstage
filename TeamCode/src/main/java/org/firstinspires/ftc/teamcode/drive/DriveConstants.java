@@ -51,7 +51,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.8898; // RM: See https://www.gobilda.com/strafer-chassis-kit-v4/; wheels are 96 mm diameter, 48 mm radius, which is 1.8898 inches
     public static double GEAR_RATIO = 1; // RM: We have no gears or belts, so it is 1
-    public static double TRACK_WIDTH = 13.5; // RM: This is the distance from the center of one drive wheel to the center of its parallel wheel in inches
+    public static double TRACK_WIDTH = 14; // RM: This is the distance from the center of one drive wheel to the center of its parallel wheel in inches
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
