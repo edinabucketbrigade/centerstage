@@ -27,12 +27,12 @@ import java.util.List;
  */
 @Config
 public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer {
-    public static double TICKS_PER_REV = 0;
-    public static double WHEEL_RADIUS = 2; // in
+    public static double TICKS_PER_REV = 2000; // Per https://www.gobilda.com/odometry-pod-43mm-width-48mm-wheel/ gobilda has 2000 ticks per revolution, per https://www.revrobotics.com/rev-11-1271/ rev has 8192
+    public static double WHEEL_RADIUS = 0.945; // Per https://www.gobilda.com/odometry-pod-43mm-width-48mm-wheel/ gobilda odometry wheel diameter is 48 mm, so the radius is 24 mm or 0.945 inches
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 10; // in; distance between the left and right wheels
-    public static double FORWARD_OFFSET = 4; // in; offset of the lateral wheel
+    public static double LATERAL_DISTANCE = 13.25; // in; distance between the left and right wheels
+    public static double FORWARD_OFFSET = -6.25; // in; offset of the lateral wheel
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 
@@ -48,11 +48,14 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
         lastEncPositions = lastTrackingEncPositions;
         lastEncVels = lastTrackingEncVels;
 
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftEncoder"));
-        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightEncoder"));
-        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontEncoder"));
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "left_encoder")); // A
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "right_encoder")); // B
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "front_encoder")); // C
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
+        leftEncoder.setDirection(Encoder.Direction.FORWARD);
+        rightEncoder.setDirection(Encoder.Direction.FORWARD);
+        frontEncoder.setDirection(Encoder.Direction.FORWARD);
     }
 
     public static double encoderTicksToInches(double ticks) {

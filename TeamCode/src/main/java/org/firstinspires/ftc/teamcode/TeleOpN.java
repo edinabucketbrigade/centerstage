@@ -76,6 +76,12 @@ public class TeleOpN extends LinearOpMode {
             if(gamepad1.right_stick_y < THRESHOLD && gamepad1.right_stick_y > -THRESHOLD){
                 isRightYNeutral = true;
             }
+            if (!isEven(leftRow) && leftColumn == MAXIMUM_COLUMN_EVEN_ROW){
+                leftColumn = MAXIMUM_COLUMN_ODD_ROW;
+            }
+            if (!isEven(rightRow) && rightColumn == MAXIMUM_COLUMN_EVEN_ROW){
+                rightColumn = MAXIMUM_COLUMN_ODD_ROW;
+            }
 
             telemetry.addData("Left Column", leftColumn);
             telemetry.addData("Left Row", leftRow);
@@ -91,6 +97,9 @@ public class TeleOpN extends LinearOpMode {
             telemetry.addData("Right Stick Y Neutral", isRightYNeutral);
             String output = "\n";
             for(int row = MAXIMUM_ROW; row >= MINIMUM_ROW; row--) {
+                if (!isEven(row)){
+                    output += "  ";
+                }
                 int maximumColumn = getMaximumColumn(row);
                 for (int column = MINIMUM_COLUMN; column <= maximumColumn; column++) {
                     if (column == leftColumn && leftRow == row) {
@@ -98,7 +107,7 @@ public class TeleOpN extends LinearOpMode {
                     } else if (column == rightColumn && rightRow == row){
                         output += "Ⓡ";
                     } else{
-                        output += "⬡";
+                        output += "〇";
                     }
                 }
                 output += "\n";
@@ -142,10 +151,17 @@ public class TeleOpN extends LinearOpMode {
 
     }
     public int getMaximumColumn(int row){
-        if (row%2 == 0){
+        if (isEven(row)){
             return MAXIMUM_COLUMN_EVEN_ROW;
         } else {
             return MAXIMUM_COLUMN_ODD_ROW;
+        }
+    }
+    public boolean isEven(int value){
+        if (value%2 == 0){
+            return true;
+        } else {
+            return false;
         }
     }
 }
