@@ -36,46 +36,21 @@ public class AutoF extends LinearOpMode {
     @Override
     public void runOpMode() {
 /*
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-
-        Trajectory myTrajectory = drive.trajectoryBuilder(new Pose2d(61, -36, Math.toRadians(180)))
-                .lineTo(new Vector2d(35, -36))
-                //.lineToLinearHeading(new Pose2d(35, 36, Math.toRadians(180)))
-                .splineTo(new Vector2d(35, 36), Math.toRadians(90))
-                .build();
-
-        TrajectorySequence trajectorySequence = drive.trajectorySequenceBuilder(new Pose2d(61, -36, Math.toRadians(180)))
-                .back(26)
-                .turn(Math.toRadians(90))
-                .forward(72)
-                .build();
-
         waitForStart();
 
         if(isStopRequested()) return;
-
-        drive.followTrajectorySequence(trajectorySequence);
 
         while (opModeIsActive()) {
             telemetry.addData("Status", "Running");
             telemetry.update();
         }
 
-        Pose2d poseEstimate = drive.getPoseEstimate();
-        telemetry.addData("finalX", poseEstimate.getX());
-        telemetry.addData("finalY", poseEstimate.getY());
-        telemetry.addData("finalHeading", poseEstimate.getHeading());
-        telemetry.update();
-
         while (!isStopRequested() && opModeIsActive()) ;
         */
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        Pose2d startPose = new Pose2d(-24, -24, 0);
+        Pose2d startPose = new Pose2d(-61, -36, Math.toRadians(0));
 
         drive.setPoseEstimate(startPose);
 
@@ -84,17 +59,11 @@ public class AutoF extends LinearOpMode {
         if (isStopRequested()) return;
 
         //while (!isStopRequested()) {
-            TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                    .back(26)
-                    .turn(Math.toRadians(-90))
-                    .back(72)
-                    /*.forward(DISTANCE)
-                    .turn(Math.toRadians(90))
-                    .forward(DISTANCE)
-                    .turn(Math.toRadians(90))
-                    .forward(DISTANCE)
-                    .turn(Math.toRadians(90))*/
-                    .build();
+        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+                .forward(26)
+                .splineTo(new Vector2d(-10,0),Math.toRadians(90))
+                .splineTo(new Vector2d(-38,40), Math.toRadians(90))
+                .build();
             drive.followTrajectorySequence(trajSeq);
         //}
 
