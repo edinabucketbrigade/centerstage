@@ -50,7 +50,7 @@ public class AutoF extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        Pose2d startPose = new Pose2d(-61, -36, Math.toRadians(0));
+        Pose2d startPose = new Pose2d(61, -36, Math.toRadians(0));
 
         drive.setPoseEstimate(startPose);
 
@@ -60,9 +60,23 @@ public class AutoF extends LinearOpMode {
 
         //while (!isStopRequested()) {
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .forward(26)
-                .splineTo(new Vector2d(-10,0),Math.toRadians(90))
-                .splineTo(new Vector2d(-38,40), Math.toRadians(90))
+                .back(32)
+                .setReversed(true)
+                .splineTo(new Vector2d(8,0),Math.toRadians(90))
+                .splineTo(new Vector2d(36,40), Math.toRadians(90))
+                // Heat seek
+                .setReversed(false)
+                .splineTo(new Vector2d(8,0),Math.toRadians(-90))
+                .splineTo(new Vector2d(9.5,-58), Math.toRadians(-90))
+                .setReversed(true)
+                .splineTo(new Vector2d(8,0),Math.toRadians(90))
+                .splineTo(new Vector2d(36,40),Math.toRadians(90))
+                .setReversed(false)
+                .splineTo(new Vector2d(8,0),Math.toRadians(-90))
+                .splineTo(new Vector2d(9.5,-58), Math.toRadians(-90))
+                .setReversed(true)
+                .splineTo(new Vector2d(8,0),Math.toRadians(90))
+                .splineTo(new Vector2d(36,40),Math.toRadians(90))
                 .build();
             drive.followTrajectorySequence(trajSeq);
         //}
