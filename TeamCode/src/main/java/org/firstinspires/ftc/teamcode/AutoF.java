@@ -50,16 +50,23 @@ public class AutoF extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        Pose2d startPose = new Pose2d(61, -36, Math.toRadians(0));
-
-        drive.setPoseEstimate(startPose);
-
         waitForStart();
 
         if (isStopRequested()) return;
 
         //while (!isStopRequested()) {
-        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+
+        TrajectorySequence sequence = getRedRightTrajectorySequence(drive);
+        drive.followTrajectorySequence(sequence);
+        //}
+
+    }
+
+    private TrajectorySequence getRedLeftTrajectorySequence(SampleMecanumDrive drive) {
+        Pose2d startPose = new Pose2d(61, -36, Math.toRadians(0));
+        drive.setPoseEstimate(startPose);
+
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(32)
                 .setReversed(true)
                 .splineTo(new Vector2d(8,0),Math.toRadians(90))
@@ -78,9 +85,18 @@ public class AutoF extends LinearOpMode {
                 .splineTo(new Vector2d(8,0),Math.toRadians(90))
                 .splineTo(new Vector2d(36,40),Math.toRadians(90))
                 .build();
-            drive.followTrajectorySequence(trajSeq);
-        //}
+        return sequence;
+    }
 
+    private TrajectorySequence getRedRightTrajectorySequence(SampleMecanumDrive drive) {
+        Pose2d startPose = new Pose2d(61, 12, Math.toRadians(0));
+        drive.setPoseEstimate(startPose);
+
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .back(26)
+                .lineToLinearHeading(new Pose2d(36, 40, Math.toRadians(-90)))
+                .build();
+        return sequence;
     }
 
 }
