@@ -23,14 +23,16 @@ public class TeleOpQ extends LinearOpMode {
 
     private Servo elbowServo;
     private Servo wristServo;
-    private Servo handServo;
+    private Servo handServo1;
+    private Servo handServo2;
 
     @Override
     public void runOpMode() {
 
         elbowServo = hardwareMap.get(Servo.class, "elbow_servo");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
-        handServo = hardwareMap.get(Servo.class, "hand_servo");
+        handServo1 = hardwareMap.get(Servo.class, "hand1_servo");
+        handServo2 = hardwareMap.get(Servo.class, "hand2_servo");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -50,10 +52,12 @@ public class TeleOpQ extends LinearOpMode {
 
             }
             if(gamepad1.x){
-                handServo.setPosition(MINIMUM_HAND_POSITION);
+                handServo1.setPosition(MINIMUM_HAND_POSITION);
+                handServo2.setPosition(MINIMUM_HAND_POSITION);
             }
             if(gamepad1.b){
-                handServo.setPosition(MAXIMUM_HAND_POSITION);
+                handServo1.setPosition(MAXIMUM_HAND_POSITION);
+                handServo2.setPosition(MAXIMUM_HAND_POSITION);
             }
         }
 
