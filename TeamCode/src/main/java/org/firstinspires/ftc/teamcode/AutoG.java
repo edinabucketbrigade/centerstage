@@ -72,9 +72,15 @@ public class AutoG extends LinearOpMode {
         telemetry.addData("ftcPose", "x %.2f, y %.2f, z %.2f ", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z);
         telemetry.addData("ftcPose2", "bearing %.2f, yaw %.2f, pitch %.2f, elevation %.2f, range %.2f, roll %.2f", detection.ftcPose.bearing, detection.ftcPose.yaw, detection.ftcPose.pitch, detection.ftcPose.elevation, detection.ftcPose.range, detection.ftcPose.roll);
 
-        double cameraX = detection.ftcPose.x - detection.metadata.fieldPosition.get(1);
-        double cameraY = detection.metadata.fieldPosition.get(0) + detection.ftcPose.y;
+        /*double cameraX = detection.ftcPose.x - detection.metadata.fieldPosition.get(1);
+        double cameraY = detection.metadata.fieldPosition.get(0) + detection.ftcPose.y;*/
         double cameraHeading = detection.metadata.fieldOrientation.z - detection.ftcPose.yaw - 90;
+
+        double cameraRange = detection.ftcPose.range;
+        double cameraYaw = detection.ftcPose.yaw;
+
+        double cameraX = detection.metadata.fieldPosition.get(1) + cameraRange * Math.cos(Math.toRadians(cameraYaw));
+        double cameraY = detection.metadata.fieldPosition.get(0) + cameraRange * Math.sin(Math.toRadians(cameraYaw));
 
         double robotX = cameraX-CAMERA_OFFSET_X;
         double robotY = cameraY-CAMERA_OFFSET_Y;
@@ -97,7 +103,7 @@ public class AutoG extends LinearOpMode {
                 .splineTo(new Vector2d(10, -58), Math.toRadians(-90))
                 .build();
 
-        drive.followTrajectorySequence(sequence);
+        //drive.followTrajectorySequence(sequence);
 
         while (opModeIsActive()) {}
     }
