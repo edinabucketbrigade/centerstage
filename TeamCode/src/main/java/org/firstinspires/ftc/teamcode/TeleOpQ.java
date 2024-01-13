@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,6 +14,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp
+@Config
 public class TeleOpQ extends LinearOpMode {
 
     public static double ELBOW_PICK_UP = 0.05;
@@ -28,6 +31,7 @@ public class TeleOpQ extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        FtcDashboard.getInstance();
 
         elbowServo = hardwareMap.get(Servo.class, "elbow_servo");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
@@ -45,6 +49,7 @@ public class TeleOpQ extends LinearOpMode {
             if(gamepad1.a){
                 elbowServo.setPosition(ELBOW_PICK_UP);
                 wristServo.setPosition(WRIST_PICK_UP);
+
             }
             if(gamepad1.y){
                 elbowServo.setPosition(ELBOW_BACKDROP);
