@@ -21,13 +21,15 @@ public class TeleOpQ extends LinearOpMode {
     public static double ELBOW_BACKDROP = 0.67;
     public static double WRIST_PICK_UP = 0.75;
     public static double WRIST_BACKDROP = 0.2;
-    public static double MINIMUM_HAND_POSITION = 0.5;
-    public static double MAXIMUM_HAND_POSITION = 0;
+    public static double RIGHT_MAXIMUM_HAND_POSITION = 0.25;
+    public static double RIGHT_MINIMUM_HAND_POSITION = 0.38;
+    public static double LEFT_MAXIMUM_HAND_POSITION = 0.35;
+    public static double LEFT_MINIMUM_HAND_POSITION = 0.46;
 
     private Servo elbowServo;
     private Servo wristServo;
-    private Servo handServo1;
-    private Servo handServo2;
+    private Servo leftHandServo;
+    private Servo rightHandServo2;
 
     @Override
     public void runOpMode() {
@@ -35,8 +37,8 @@ public class TeleOpQ extends LinearOpMode {
 
         elbowServo = hardwareMap.get(Servo.class, "elbow_servo");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
-        handServo1 = hardwareMap.get(Servo.class, "hand1_servo");
-        handServo2 = hardwareMap.get(Servo.class, "hand2_servo");
+        leftHandServo = hardwareMap.get(Servo.class, "left_hand_servo");
+        rightHandServo2 = hardwareMap.get(Servo.class, "right_hand_servo");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -57,12 +59,12 @@ public class TeleOpQ extends LinearOpMode {
 
             }
             if(gamepad1.x){
-                handServo1.setPosition(MINIMUM_HAND_POSITION);
-                handServo2.setPosition(MINIMUM_HAND_POSITION);
+                leftHandServo.setPosition(LEFT_MINIMUM_HAND_POSITION);
+                rightHandServo2.setPosition(RIGHT_MINIMUM_HAND_POSITION);
             }
             if(gamepad1.b){
-                handServo1.setPosition(MAXIMUM_HAND_POSITION);
-                handServo2.setPosition(MAXIMUM_HAND_POSITION);
+               leftHandServo.setPosition(LEFT_MAXIMUM_HAND_POSITION);
+                rightHandServo2.setPosition(RIGHT_MAXIMUM_HAND_POSITION);
             }
         }
 
