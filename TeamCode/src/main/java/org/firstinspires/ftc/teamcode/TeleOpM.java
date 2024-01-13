@@ -15,8 +15,8 @@ public class TeleOpM extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Gamepad previousGamepad = new Gamepad();
         Gamepad currentGamepad = new Gamepad();
+        Gamepad previousGamepad = new Gamepad();
 
         robotHardware = new RobotHardwareA(this);
         heatSeek = new HeatSeek(robotHardware);
