@@ -74,13 +74,12 @@ public class AutoG extends LinearOpMode {
 
         /*double cameraX = detection.ftcPose.x - detection.metadata.fieldPosition.get(1);
         double cameraY = detection.metadata.fieldPosition.get(0) + detection.ftcPose.y;*/
-        double cameraHeading = detection.metadata.fieldOrientation.z - detection.ftcPose.yaw - 90;
-
+        double cameraYaw = detection.ftcPose.yaw - 90;
+        double cameraHeading = detection.metadata.fieldOrientation.z - cameraYaw;
         double cameraRange = detection.ftcPose.range;
-        double cameraYaw = detection.ftcPose.yaw;
 
         double cameraX = detection.metadata.fieldPosition.get(1) + cameraRange * Math.cos(Math.toRadians(cameraYaw));
-        double cameraY = detection.metadata.fieldPosition.get(0) + cameraRange * Math.sin(Math.toRadians(cameraYaw));
+        double cameraY = detection.metadata.fieldPosition.get(0) - cameraRange * Math.sin(Math.toRadians(cameraYaw));
 
         double robotX = cameraX-CAMERA_OFFSET_X;
         double robotY = cameraY-CAMERA_OFFSET_Y;
@@ -96,14 +95,15 @@ public class AutoG extends LinearOpMode {
 
         telemetry.update();
 
-        Pose2d startPose = new Pose2d(robotX, robotY, Math.toRadians(robotHeading));
+        //Pose2d startPose = new Pose2d(robotX, robotY, Math.toRadians(robotHeading));
+        Pose2d startPose = new Pose2d(robotX, robotY, Math.toRadians(cameraHeading));
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .splineTo(new Vector2d(10, -58), Math.toRadians(-90))
                 .build();
 
-        //drive.followTrajectorySequence(sequence);
+        drive.followTrajectorySequence(sequence);
 
         while (opModeIsActive()) {}
     }
