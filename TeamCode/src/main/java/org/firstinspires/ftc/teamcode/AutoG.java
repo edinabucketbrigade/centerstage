@@ -53,7 +53,7 @@ public class AutoG extends LinearOpMode {
                 .addProcessor(aprilTag)
                 .build();
 
-//        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         waitForStart();
 
@@ -91,13 +91,13 @@ public class AutoG extends LinearOpMode {
         telemetry.update();
 
         Pose2d startPose = new Pose2d(robotX, robotY, Math.toRadians(robotHeading));
-//        drive.setPoseEstimate(startPose);
+        drive.setPoseEstimate(startPose);
 
-//        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-//                .splineTo(new Vector2d(10, -58), Math.toRadians(-90))
-//                .build();
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .splineTo(new Vector2d(10, -58), Math.toRadians(-90))
+                .build();
 
-//        drive.followTrajectorySequence(sequence);
+        drive.followTrajectorySequence(sequence);
 
         while (opModeIsActive()) {}
     }
