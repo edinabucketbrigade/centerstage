@@ -31,6 +31,15 @@ enum Route {
 @Autonomous(preselectTeleOp = "TeleOpA")
 //@Disabled
 public class AutoF extends LinearOpMode {
+    public static final double RED_MIDDLE_X = 8;
+    public static final double RED_MIDDLE_Y = 0;
+    public static final double RED_BACKDROP_X = 36;
+    public static final double RED_BACKDROP_Y = 40;
+    public static final double RED_PIXELS_X = 10;
+    public static final double RED_PIXELS_Y = -58;
+
+
+
     public static final Route ROUTE = Route.RED_LEFT_DIRECT;
     public static final double DELAY = 0.5;
     @Override
@@ -50,23 +59,65 @@ public class AutoF extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        Pose2d startPose = new Pose2d(-61, -36, Math.toRadians(0));
-
-        drive.setPoseEstimate(startPose);
-
         waitForStart();
 
         if (isStopRequested()) return;
 
         //while (!isStopRequested()) {
-        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .forward(26)
-                .splineTo(new Vector2d(-10,0),Math.toRadians(90))
-                .splineTo(new Vector2d(-38,40), Math.toRadians(90))
-                .build();
-            drive.followTrajectorySequence(trajSeq);
+
+        TrajectorySequence sequence = getRedRightTrajectorySequence(drive);
+        drive.followTrajectorySequence(sequence);
         //}
 
+    }
+
+    private TrajectorySequence getRedLeftTrajectorySequence(SampleMecanumDrive drive) {
+        Pose2d startPose = new Pose2d(61, -36, Math.toRadians(0));
+        drive.setPoseEstimate(startPose);
+
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .back(32)
+                .setReversed(true)
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(90))
+                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y), Math.toRadians(90))
+                // Heat seek
+                .setReversed(false)
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(-90))
+                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(-90))
+                .setReversed(true)
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(90))
+                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(90))
+                .setReversed(false)
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(-90))
+                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(-90))
+                .setReversed(true)
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(90))
+                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(90))
+                .build();
+        return sequence;
+    }
+
+    private TrajectorySequence getRedRightTrajectorySequence(SampleMecanumDrive drive) {
+        Pose2d startPose = new Pose2d(61, 12, Math.toRadians(0));
+        drive.setPoseEstimate(startPose);
+
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .back(26)
+                .lineToLinearHeading(new Pose2d(RED_BACKDROP_X, RED_BACKDROP_X, Math.toRadians(-90)))
+                .setReversed(false)
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(-90))
+                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(-90))
+                .setReversed(true)
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(90))
+                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(90))
+                .setReversed(false)
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(-90))
+                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(-90))
+                .setReversed(true)
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(90))
+                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(90))
+                .build();
+        return sequence;
     }
 
 }
