@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Size;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -16,9 +18,20 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+
 @Autonomous(preselectTeleOp = "TeleOpA")
+@Config
 //@Disabled
 public class AutoG extends LinearOpMode {
+    public static double CAMERA_OFFSET_X = 0;
+    public static double CAMERA_OFFSET_Y = -7;
+    public static double CAMERA_OFFSET_HEADING = 180;
+
     private VisionPortal visionPortal; // Used to manage the video source.
     private AprilTagProcessor aprilTag; // Used for managing the AprilTag detection process.
     private HeatSeek.TargetMode targetMode = HeatSeek.TargetMode.NONE;
@@ -27,6 +40,7 @@ public class AutoG extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        FtcDashboard.getInstance();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -38,6 +52,8 @@ public class AutoG extends LinearOpMode {
                 .setCameraResolution(new Size(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT))
                 .addProcessor(aprilTag)
                 .build();
+
+//        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         waitForStart();
 
@@ -56,15 +72,32 @@ public class AutoG extends LinearOpMode {
         telemetry.addData("ftcPose", "x %.2f, y %.2f, z %.2f ", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z);
         telemetry.addData("ftcPose2", "bearing %.2f, yaw %.2f, pitch %.2f, elevation %.2f, range %.2f, roll %.2f", detection.ftcPose.bearing, detection.ftcPose.yaw, detection.ftcPose.pitch, detection.ftcPose.elevation, detection.ftcPose.range, detection.ftcPose.roll);
 
-        double x = detection.ftcPose.x - detection.metadata.fieldPosition.get(1);
-        double y = detection.metadata.fieldPosition.get(0) + detection.ftcPose.y;
-        double heading = detection.metadata.fieldOrientation.z - detection.ftcPose.yaw;
+        double cameraX = detection.ftcPose.x - detection.metadata.fieldPosition.get(1);
+        double cameraY = detection.metadata.fieldPosition.get(0) + detection.ftcPose.y;
+        double cameraHeading = detection.metadata.fieldOrientation.z - detection.ftcPose.yaw - 90;
 
-        telemetry.addData("x", x);
-        telemetry.addData("y", y);
-        telemetry.addData("heading", heading);
+        double robotX = cameraX-CAMERA_OFFSET_X;
+        double robotY = cameraY-CAMERA_OFFSET_Y;
+        double robotHeading = cameraHeading - CAMERA_OFFSET_HEADING;
+
+        telemetry.addData("camera x", cameraX);
+        telemetry.addData("camera y", cameraY);
+        telemetry.addData("camera heading", cameraHeading);
+
+        telemetry.addData("robot x", robotX);
+        telemetry.addData("robot y", robotY);
+        telemetry.addData("robot heading", robotHeading);
 
         telemetry.update();
+
+        Pose2d startPose = new Pose2d(robotX, robotY, Math.toRadians(robotHeading));
+//        drive.setPoseEstimate(startPose);
+
+//        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+//                .splineTo(new Vector2d(10, -58), Math.toRadians(-90))
+//                .build();
+
+//        drive.followTrajectorySequence(sequence);
 
         while (opModeIsActive()) {}
     }
