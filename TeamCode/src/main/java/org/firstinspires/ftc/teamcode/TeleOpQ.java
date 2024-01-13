@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -30,10 +31,14 @@ public class TeleOpQ extends LinearOpMode {
     private Servo wristServo;
     private Servo leftHandServo;
     private Servo rightHandServo2;
+    private boolean isHandOpen = false;
 
     @Override
     public void runOpMode() {
         FtcDashboard.getInstance();
+
+        Gamepad currentGamepad = new Gamepad();
+        Gamepad previousGamepad = new Gamepad();
 
         elbowServo = hardwareMap.get(Servo.class, "elbow_servo");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
@@ -46,6 +51,9 @@ public class TeleOpQ extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            previousGamepad.copy(currentGamepad);
+            currentGamepad.copy(gamepad1);
+
             telemetry.addData("Status", "Running");
             telemetry.update();
             if(gamepad1.a){
@@ -58,13 +66,15 @@ public class TeleOpQ extends LinearOpMode {
                 wristServo.setPosition(WRIST_BACKDROP);
 
             }
-            if(gamepad1.x){
-                leftHandServo.setPosition(LEFT_MINIMUM_HAND_POSITION);
-                rightHandServo2.setPosition(RIGHT_MINIMUM_HAND_POSITION);
-            }
-            if(gamepad1.b){
-               leftHandServo.setPosition(LEFT_MAXIMUM_HAND_POSITION);
-                rightHandServo2.setPosition(RIGHT_MAXIMUM_HAND_POSITION);
+            if(currentGamepad.x && !previousGamepad.x){
+                if (isHandOpen){
+                    leftHandServo.setPosition(LEFT_MINIMUM_HAND_POSITION);
+                    rightHandServo2.setPosition(RIGHT_MINIMUM_HAND_POSITION);
+                } else {
+                    leftHandServo.setPosition(LEFT_MAXIMUM_HAND_POSITION);
+                    rightHandServo2.setPosition(RIGHT_MAXIMUM_HAND_POSITION);
+                }
+                isHandOpen = !isHandOpen;
             }
         }
 
