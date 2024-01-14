@@ -11,8 +11,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagMetadata;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
@@ -61,9 +64,7 @@ public class AutoG extends LinearOpMode {
 
         while (opModeIsActive() && detection == null) {
             detection = getDetection();
-
             telemetry.addData("Status", "Running");
-
             telemetry.update();
         }
 
@@ -72,31 +73,67 @@ public class AutoG extends LinearOpMode {
         telemetry.addData("ftcPose", "x %.2f, y %.2f, z %.2f ", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z);
         telemetry.addData("ftcPose2", "bearing %.2f, yaw %.2f, pitch %.2f, elevation %.2f, range %.2f, roll %.2f", detection.ftcPose.bearing, detection.ftcPose.yaw, detection.ftcPose.pitch, detection.ftcPose.elevation, detection.ftcPose.range, detection.ftcPose.roll);
 
-        /*double cameraX = detection.ftcPose.x - detection.metadata.fieldPosition.get(1);
-        double cameraY = detection.metadata.fieldPosition.get(0) + detection.ftcPose.y;*/
+        AprilTagMetadata tagMetadata = detection.metadata;
+        VectorF inputTagPoint = tagMetadata.fieldPosition;
+        double tagX = inputTagPoint.get(1);
+        double tagY = inputTagPoint.get(0);
+        Vector2d outputTagPoint = new Vector2d(tagX, tagY);
+
+        AprilTagPoseFtc tagPose = detection.ftcPose;
+        double poseX = tagPose.x;
+        double poseY = tagPose.y;
+        double poseYaw = tagPose.yaw;
+
+        Vector2d cameraPoint = outputTagPoint;
+        cameraPoint = offset(cameraPoint, poseX, poseYaw);
+        cameraPoint = offset(cameraPoint, poseY, poseYaw - 90);
+
+        //Vector2d cameraPointA = offset(cameraPoint, poseY, poseYaw - 90);
+        //Vector2d cameraPointB = offset(cameraPoint, poseY, -poseYaw - 90);
+        //Vector2d cameraPointC = offset(cameraPoint, poseY, poseYaw + 90);
+        //Vector2d cameraPointD = offset(cameraPoint, poseY, -poseYaw + 90);
+
+        double cameraX = cameraPoint.getX();
+        double cameraY = cameraPoint.getY();
+        double cameraHeading = -poseYaw - 90;
+
+        telemetry.addData("camera", "x %.2f, y %.2f, heading %.2f ", cameraX, cameraY, cameraHeading);
+
+        //Vector2d cameraPointA = offset(outputTagPoint, poseX, poseYaw);
+        //Vector2d cameraPointC = offset(outputTagPoint, poseY, poseYaw - 90);
+
+        //telemetry.addData("cameraPointA", cameraPointA.getX() + "," + cameraPointA.getY());
+        //telemetry.addData("cameraPointB", cameraPointB.getX() + "," + cameraPointB.getY());
+        //telemetry.addData("cameraPointC", cameraPointC.getX() + "," + cameraPointC.getY());
+        //telemetry.addData("cameraPointD", cameraPointD.getX() + "," + cameraPointD.getY());
+
+        //double cameraX = cameraPoint.getX();
+        //double cameraY = cameraPoint.getX();
+
+        /*
         double cameraYaw = detection.ftcPose.yaw - 90;
-        double cameraHeading = detection.metadata.fieldOrientation.z - cameraYaw;
         double cameraRange = detection.ftcPose.range;
 
         double cameraX = detection.metadata.fieldPosition.get(1) + cameraRange * Math.cos(Math.toRadians(cameraYaw));
         double cameraY = detection.metadata.fieldPosition.get(0) - cameraRange * Math.sin(Math.toRadians(cameraYaw));
 
-        double robotX = cameraX-CAMERA_OFFSET_X;
-        double robotY = cameraY-CAMERA_OFFSET_Y;
+        double cameraHeading = -detection.ftcPose.yaw - 90;
+
+        double robotX = cameraX - CAMERA_OFFSET_X;
+        double robotY = cameraY - CAMERA_OFFSET_Y;
         double robotHeading = cameraHeading - CAMERA_OFFSET_HEADING;
+        */
+        //telemetry.addData("camera x", cameraX);
+        //telemetry.addData("camera y", cameraY);
+        //telemetry.addData("camera heading", cameraHeading);
 
-        telemetry.addData("camera x", cameraX);
-        telemetry.addData("camera y", cameraY);
-        telemetry.addData("camera heading", cameraHeading);
-
-        telemetry.addData("robot x", robotX);
-        telemetry.addData("robot y", robotY);
-        telemetry.addData("robot heading", robotHeading);
+        //telemetry.addData("robot x", robotX);
+        //telemetry.addData("robot y", robotY);
+        //telemetry.addData("robot heading", robotHeading);
 
         telemetry.update();
-
-        //Pose2d startPose = new Pose2d(robotX, robotY, Math.toRadians(robotHeading));
-        Pose2d startPose = new Pose2d(robotX, robotY, Math.toRadians(cameraHeading));
+        /*
+        Pose2d startPose = new Pose2d(robotX, robotY, Math.toRadians(robotHeading));
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
@@ -104,11 +141,19 @@ public class AutoG extends LinearOpMode {
                 .build();
 
         drive.followTrajectorySequence(sequence);
-
+        */
         while (opModeIsActive()) {}
     }
 
-
+    private static Vector2d offset(Vector2d inputPoint, double distance, double degrees) {
+        double inputX = inputPoint.getX();
+        double inputY = inputPoint.getY();
+        double radians = Math.toRadians(degrees);
+        double outputX = inputX + distance * Math.cos(radians);
+        double outputY = inputY - distance * Math.sin(radians);
+        Vector2d outputPoint = new Vector2d(outputX, outputY);
+        return outputPoint;
+    }
 
     public void update() throws InterruptedException {
         if (!initialized) {
@@ -147,7 +192,7 @@ public class AutoG extends LinearOpMode {
         if (detection.metadata == null) {
             return false;
         }
-        boolean isMatch = detection.id == 10 || detection.id == 7;
+        boolean isMatch = detection.id == 9;
 
         return isMatch;
     }
