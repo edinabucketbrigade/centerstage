@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagMetadata;
@@ -31,15 +32,10 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Config
 //@Disabled
 public class AutoG extends LinearOpMode {
-    public static double CAMERA_OFFSET_X = 0;
-    public static double CAMERA_OFFSET_Y = -7;
-    public static double CAMERA_OFFSET_HEADING = 180;
-
     private VisionPortal visionPortal; // Used to manage the video source.
     private AprilTagProcessor aprilTag; // Used for managing the AprilTag detection process.
     private HeatSeek.TargetMode targetMode = HeatSeek.TargetMode.NONE;
     private boolean initialized;
-
 
     @Override
     public void runOpMode() {
@@ -68,68 +64,39 @@ public class AutoG extends LinearOpMode {
             telemetry.update();
         }
 
-        telemetry.addData("Field Position", detection.metadata.fieldPosition);
-        telemetry.addData("Field Orientation", detection.metadata.fieldOrientation);
-        telemetry.addData("ftcPose", "x %.2f, y %.2f, z %.2f ", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z);
-        telemetry.addData("ftcPose2", "bearing %.2f, yaw %.2f, pitch %.2f, elevation %.2f, range %.2f, roll %.2f", detection.ftcPose.bearing, detection.ftcPose.yaw, detection.ftcPose.pitch, detection.ftcPose.elevation, detection.ftcPose.range, detection.ftcPose.roll);
-
         AprilTagMetadata tagMetadata = detection.metadata;
-        VectorF inputTagPoint = tagMetadata.fieldPosition;
-        double tagX = inputTagPoint.get(1);
-        double tagY = inputTagPoint.get(0);
-        Vector2d outputTagPoint = new Vector2d(tagX, tagY);
-
+        VectorF fieldPosition = tagMetadata.fieldPosition;
+        Quaternion fieldOrientation = tagMetadata.fieldOrientation;
         AprilTagPoseFtc tagPose = detection.ftcPose;
+
+        telemetry.addData("Field Position", fieldPosition);
+        telemetry.addData("Field Orientation", fieldOrientation);
+        telemetry.addData("Tag Pose", "x %.2f, y %.2f, z %.2f, bearing %.2f, yaw %.2f, pitch %.2f, elevation %.2f, range %.2f, roll %.2f", tagPose.x, tagPose.y, tagPose.z, tagPose.bearing, tagPose.yaw, tagPose.pitch, tagPose.elevation, tagPose.range, tagPose.roll);
+
+        double tagX = fieldPosition.get(1);
+        double tagY = fieldPosition.get(0);
+        Vector2d tagPoint = new Vector2d(tagX, tagY);
+
         double poseX = tagPose.x;
         double poseY = tagPose.y;
         double poseYaw = tagPose.yaw;
 
-        Vector2d cameraPoint = outputTagPoint;
-        cameraPoint = offset(cameraPoint, poseX, poseYaw);
+        Vector2d cameraPoint = offset(tagPoint, poseX, poseYaw);
         cameraPoint = offset(cameraPoint, poseY, poseYaw - 90);
-
-        //Vector2d cameraPointA = offset(cameraPoint, poseY, poseYaw - 90);
-        //Vector2d cameraPointB = offset(cameraPoint, poseY, -poseYaw - 90);
-        //Vector2d cameraPointC = offset(cameraPoint, poseY, poseYaw + 90);
-        //Vector2d cameraPointD = offset(cameraPoint, poseY, -poseYaw + 90);
 
         double cameraX = cameraPoint.getX();
         double cameraY = cameraPoint.getY();
         double cameraHeading = -poseYaw - 90;
 
-        telemetry.addData("camera", "x %.2f, y %.2f, heading %.2f ", cameraX, cameraY, cameraHeading);
+        telemetry.addData("camera", "x %.2f, y %.2f, heading %.2f", cameraX, cameraY, cameraHeading);
 
-        //Vector2d cameraPointA = offset(outputTagPoint, poseX, poseYaw);
-        //Vector2d cameraPointC = offset(outputTagPoint, poseY, poseYaw - 90);
+        Vector2d robotPoint = offset(cameraPoint, -7, -poseYaw - 90);
+        
+        double robotX = robotPoint.getX();
+        double robotY = robotPoint.getY();
+        double robotHeading = cameraHeading + 180;
 
-        //telemetry.addData("cameraPointA", cameraPointA.getX() + "," + cameraPointA.getY());
-        //telemetry.addData("cameraPointB", cameraPointB.getX() + "," + cameraPointB.getY());
-        //telemetry.addData("cameraPointC", cameraPointC.getX() + "," + cameraPointC.getY());
-        //telemetry.addData("cameraPointD", cameraPointD.getX() + "," + cameraPointD.getY());
-
-        //double cameraX = cameraPoint.getX();
-        //double cameraY = cameraPoint.getX();
-
-        /*
-        double cameraYaw = detection.ftcPose.yaw - 90;
-        double cameraRange = detection.ftcPose.range;
-
-        double cameraX = detection.metadata.fieldPosition.get(1) + cameraRange * Math.cos(Math.toRadians(cameraYaw));
-        double cameraY = detection.metadata.fieldPosition.get(0) - cameraRange * Math.sin(Math.toRadians(cameraYaw));
-
-        double cameraHeading = -detection.ftcPose.yaw - 90;
-
-        double robotX = cameraX - CAMERA_OFFSET_X;
-        double robotY = cameraY - CAMERA_OFFSET_Y;
-        double robotHeading = cameraHeading - CAMERA_OFFSET_HEADING;
-        */
-        //telemetry.addData("camera x", cameraX);
-        //telemetry.addData("camera y", cameraY);
-        //telemetry.addData("camera heading", cameraHeading);
-
-        //telemetry.addData("robot x", robotX);
-        //telemetry.addData("robot y", robotY);
-        //telemetry.addData("robot heading", robotHeading);
+        telemetry.addData("robot", "x %.2f, y %.2f, heading %.2f", robotX, robotY, robotHeading);
 
         telemetry.update();
         /*
