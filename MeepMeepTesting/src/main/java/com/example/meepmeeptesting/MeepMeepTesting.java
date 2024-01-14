@@ -86,15 +86,15 @@ public class MeepMeepTesting {
                 throw new Exception("unrecognized route");
         }
 
-
+        /*
         Image img = null;
         try {
             img = ImageIO.read(new File("field-2023-official.png"));
         } catch (IOException e) {
         }
-
-        meepMeep.setBackground(img)
-                //meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
+        */
+        //meepMeep.setBackground(img)
+        meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
                 .setDarkMode(false)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(myBot)
