@@ -59,18 +59,36 @@ public class AutoG extends LinearOpMode {
         AprilTagDetection detection = null;
 
         while (opModeIsActive() && detection == null) {
-            detection = getDetection();
-            telemetry.addData("Status", "Running");
+
+            telemetry.addData("Status", "Looking for AprilTag");
             telemetry.update();
+
+            detection = getDetection();
+
+            if (detection == null) {
+                telemetry.update();
+                continue;
+            }
+
+            AprilTagPoseFtc tagPose = detection.ftcPose;
+
+            double tagPitch = tagPose.pitch;
+
+            if(tagPitch > 10) {
+                detection = null;
+            }
         }
 
+        AprilTagPoseFtc tagPose = detection.ftcPose;
         AprilTagMetadata tagMetadata = detection.metadata;
         VectorF fieldPosition = tagMetadata.fieldPosition;
         Quaternion fieldOrientation = tagMetadata.fieldOrientation;
-        AprilTagPoseFtc tagPose = detection.ftcPose;
 
-        telemetry.addData("Field Position", fieldPosition);
-        telemetry.addData("Field Orientation", fieldOrientation);
+        int tagId = detection.id;
+
+        telemetry.addData("Tag ID", tagId);
+        telemetry.addData("Tag Position", fieldPosition);
+        telemetry.addData("Tag Orientation", fieldOrientation);
         telemetry.addData("Tag Pose", "x %.2f, y %.2f, z %.2f, bearing %.2f, yaw %.2f, pitch %.2f, elevation %.2f, range %.2f, roll %.2f", tagPose.x, tagPose.y, tagPose.z, tagPose.bearing, tagPose.yaw, tagPose.pitch, tagPose.elevation, tagPose.range, tagPose.roll);
 
         double tagX = fieldPosition.get(1);
@@ -79,6 +97,8 @@ public class AutoG extends LinearOpMode {
 
         double poseX = tagPose.x;
         double poseY = tagPose.y;
+        //double poseYaw = poseX < 0 ? Math.abs(tagPose.yaw) : tagPose.yaw;
+        //double poseYaw = Math.abs(tagPose.yaw);
         double poseYaw = tagPose.yaw;
 
         Vector2d cameraPoint = offset(tagPoint, poseX, poseYaw);
@@ -90,7 +110,17 @@ public class AutoG extends LinearOpMode {
 
         telemetry.addData("camera", "x %.2f, y %.2f, heading %.2f", cameraX, cameraY, cameraHeading);
 
-        Vector2d robotPoint = offset(cameraPoint, 7, -poseYaw - 90);
+        Vector2d robotPoint = offset(cameraPoint, 7, poseYaw - 90);
+
+        //Vector2d robotPointA = offset(cameraPoint, 7, -poseYaw - 90);
+        //Vector2d robotPointB = offset(cameraPoint, 7, -poseYaw + 90);
+        //Vector2d robotPointC = offset(cameraPoint, 7, poseYaw - 90);
+        //Vector2d robotPointD = offset(cameraPoint, 7, poseYaw + 90);
+
+        //telemetry.addData("robotPointA", "x %.2f, y %.2f", robotPointA.getX(), robotPointA.getY());
+        //telemetry.addData("robotPointB", "x %.2f, y %.2f", robotPointB.getX(), robotPointB.getY());
+        //telemetry.addData("robotPointC", "x %.2f, y %.2f", robotPointC.getX(), robotPointC.getY());
+        //telemetry.addData("robotPointD", "x %.2f, y %.2f", robotPointD.getX(), robotPointD.getY());
 
         double robotX = robotPoint.getX();
         double robotY = robotPoint.getY();
@@ -105,7 +135,7 @@ public class AutoG extends LinearOpMode {
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 //.splineTo(new Vector2d(36, -58), Math.toRadians(-90))
-                .lineToLinearHeading(new Pose2d(36, -60, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(36, -58, Math.toRadians(90)))
                 .build();
 
         drive.followTrajectorySequence(sequence);
