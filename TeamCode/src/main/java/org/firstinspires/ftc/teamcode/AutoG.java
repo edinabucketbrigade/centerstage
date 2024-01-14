@@ -90,8 +90,8 @@ public class AutoG extends LinearOpMode {
 
         telemetry.addData("camera", "x %.2f, y %.2f, heading %.2f", cameraX, cameraY, cameraHeading);
 
-        Vector2d robotPoint = offset(cameraPoint, -7, -poseYaw - 90);
-        
+        Vector2d robotPoint = offset(cameraPoint, 7, -poseYaw - 90);
+
         double robotX = robotPoint.getX();
         double robotY = robotPoint.getY();
         double robotHeading = cameraHeading + 180;
@@ -99,16 +99,17 @@ public class AutoG extends LinearOpMode {
         telemetry.addData("robot", "x %.2f, y %.2f, heading %.2f", robotX, robotY, robotHeading);
 
         telemetry.update();
-        /*
+
         Pose2d startPose = new Pose2d(robotX, robotY, Math.toRadians(robotHeading));
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .splineTo(new Vector2d(10, -58), Math.toRadians(-90))
+                //.splineTo(new Vector2d(36, -58), Math.toRadians(-90))
+                .lineToLinearHeading(new Pose2d(36, -60, Math.toRadians(90)))
                 .build();
 
         drive.followTrajectorySequence(sequence);
-        */
+
         while (opModeIsActive()) {}
     }
 
