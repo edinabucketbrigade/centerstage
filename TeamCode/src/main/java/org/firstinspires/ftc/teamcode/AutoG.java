@@ -4,12 +4,18 @@ import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MinAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagMetadata;
@@ -39,6 +45,12 @@ public class AutoG extends LinearOpMode {
 
     // Maximum pitch for valid AprilTag detection
     private static final double MAXIMUM_PITCH = 10;
+
+    // Maximum velocity
+    private static final double MAXIMUM_VELOCITY = DriveConstants.MAX_VEL;
+
+    // Maximum acceleration
+    private static final double MAXIMUM_ACCELERATION = DriveConstants.MAX_ACCEL;
 
     // Used to detect april tags
     private AprilTagProcessor aprilTagProcessor;
@@ -82,8 +94,15 @@ public class AutoG extends LinearOpMode {
         // Construct a target pose.
         Pose2d targetPose = new Pose2d(-58, -35, Math.toRadians(0));
 
+        // Construct a velocity constraint.
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY, DriveConstants.TRACK_WIDTH);
+
+        // Construct an acceleration constraint.
+        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
+
         // Construct a trajectory sequence.
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .setConstraints(velocityConstraint, accelerationConstraint)
                 .lineToLinearHeading(targetPose)
                 .build();
 
