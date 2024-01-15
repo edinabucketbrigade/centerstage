@@ -28,6 +28,12 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Config
 public class AutoG extends LinearOpMode {
 
+    // Tag identifiers
+    private static final int RED_ALLIANCE_LARGE_WALL_TAG_ID = 7;
+    private static final int RED_ALLIANCE_SMALL_WALL_TAG_ID = 8;
+    private static final int BLUE_ALLIANCE_SMALL_WALL_TAG_ID = 9;
+    private static final int BLUE_ALLIANCE_LARGE_WALL_TAG_ID = 10;
+
     // Y offset between the camera's front the the robot's center
     private static final double CAMERA_Y_OFFSET = 7;
 
@@ -74,7 +80,7 @@ public class AutoG extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         // Construct a target pose.
-        Pose2d targetPose = new Pose2d(-58, 35, Math.toRadians(0));
+        Pose2d targetPose = new Pose2d(-58, -35, Math.toRadians(0));
 
         // Construct a trajectory sequence.
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
@@ -169,8 +175,15 @@ public class AutoG extends LinearOpMode {
 
         }
 
+        // Get the tag identifier.
+        int tagId = detection.id;
+
         // Determine whether the detection is a match.
-        boolean isMatch = detection.id == 9 || detection.id == 10;
+        boolean isMatch =
+                tagId == RED_ALLIANCE_LARGE_WALL_TAG_ID ||
+                tagId == RED_ALLIANCE_SMALL_WALL_TAG_ID ||
+                tagId == BLUE_ALLIANCE_SMALL_WALL_TAG_ID ||
+                tagId == BLUE_ALLIANCE_LARGE_WALL_TAG_ID;
 
         // Return the result.
         return isMatch;
