@@ -102,24 +102,24 @@ public class AutoF extends LinearOpMode {
     }
 
     private TrajectorySequence getRedRightTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(RED_RIGHT_START_X, RED_RIGHT_START_Y, Math.toRadians(0));
+        Pose2d startPose = new Pose2d(RED_RIGHT_START_X, RED_RIGHT_START_Y, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(26)
-                .lineToLinearHeading(new Pose2d(RED_BACKDROP_X, RED_BACKDROP_X, Math.toRadians(-90)))
+                .lineToLinearHeading(new Pose2d(RED_BACKDROP_X, RED_BACKDROP_Y, Math.toRadians(180)))
                 .setReversed(false)
-                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(-90))
-                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(-90))
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(180))
+                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(180))
                 .setReversed(true)
-                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(90))
-                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(90))
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(0))
+                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(0))
                 .setReversed(false)
-                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(-90))
-                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(-90))
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(180))
+                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(180))
                 .setReversed(true)
-                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(90))
-                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(90))
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(0))
+                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(0))
                 .build();
         return sequence;
     }
