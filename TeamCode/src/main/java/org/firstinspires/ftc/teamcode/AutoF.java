@@ -31,12 +31,16 @@ enum Route {
 @Autonomous(preselectTeleOp = "TeleOpA")
 //@Disabled
 public class AutoF extends LinearOpMode {
-    public static final double RED_MIDDLE_X = 8;
-    public static final double RED_MIDDLE_Y = 0;
-    public static final double RED_BACKDROP_X = 36;
-    public static final double RED_BACKDROP_Y = 40;
-    public static final double RED_PIXELS_X = 10;
-    public static final double RED_PIXELS_Y = -58;
+    public static final double RED_MIDDLE_X = 0;
+    public static final double RED_MIDDLE_Y = -8;
+    public static final double RED_BACKDROP_X = 40;
+    public static final double RED_BACKDROP_Y = -36;
+    public static final double RED_PIXELS_X = -58;
+    public static final double RED_PIXELS_Y = -10;
+    public static final double RED_LEFT_START_X = -36;
+    public static final double RED_LEFT_START_Y = -61;
+    public static final double RED_RIGHT_START_X = 12;
+    public static final double RED_RIGHT_START_Y = -61;
 
 
 
@@ -72,33 +76,33 @@ public class AutoF extends LinearOpMode {
     }
 
     private TrajectorySequence getRedLeftTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(61, -36, Math.toRadians(0));
+        Pose2d startPose = new Pose2d(RED_LEFT_START_X, RED_LEFT_START_Y, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(32)
                 .setReversed(true)
-                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(90))
-                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y), Math.toRadians(90))
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(0))
+                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y), Math.toRadians(0))
                 // Heat seek
                 .setReversed(false)
-                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(-90))
-                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(-90))
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(180))
+                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(180))
                 .setReversed(true)
-                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(90))
-                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(90))
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(0))
+                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(0))
                 .setReversed(false)
-                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(-90))
-                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(-90))
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(180))
+                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(180))
                 .setReversed(true)
-                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(90))
-                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(90))
+                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y),Math.toRadians(0))
+                .splineTo(new Vector2d(RED_BACKDROP_X,RED_BACKDROP_Y),Math.toRadians(0))
                 .build();
         return sequence;
     }
 
     private TrajectorySequence getRedRightTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(61, 12, Math.toRadians(0));
+        Pose2d startPose = new Pose2d(RED_RIGHT_START_X, RED_RIGHT_START_Y, Math.toRadians(0));
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
