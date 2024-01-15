@@ -5,7 +5,6 @@ import android.util.Size;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.MinAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
@@ -35,10 +34,16 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 public class AutoG extends LinearOpMode {
 
     // Tag identifiers
-    private static final int RED_ALLIANCE_LARGE_WALL_TAG_ID = 7;
-    private static final int RED_ALLIANCE_SMALL_WALL_TAG_ID = 8;
-    private static final int BLUE_ALLIANCE_SMALL_WALL_TAG_ID = 9;
-    private static final int BLUE_ALLIANCE_LARGE_WALL_TAG_ID = 10;
+    private static final int TAG_ID_BLUE_ALLIANCE_BACKDROP_LEFT = 1;
+    private static final int TAG_ID_BLUE_ALLIANCE_BACKDROP_MIDDLE = 2;
+    private static final int TAG_ID_BLUE_ALLIANCE_BACKDROP_RIGHT = 3;
+    private static final int TAG_ID_RED_ALLIANCE_BACKDROP_LEFT = 4;
+    private static final int TAG_ID_RED_ALLIANCE_BACKDROP_MIDDLE = 5;
+    private static final int TAG_ID_RED_ALLIANCE_BACKDROP_RIGHT = 6;
+    private static final int TAG_ID_RED_ALLIANCE_WALL_LARGE = 7;
+    private static final int TAG_ID_RED_ALLIANCE_WALL_SMALL = 8;
+    private static final int TAG_ID_BLUE_ALLIANCE_WALL_SMALL = 9;
+    private static final int TAG_ID_BLUE_ALLIANCE_WALL_LARGE = 10;
 
     // Y offset between the camera's front the the robot's center
     private static final double CAMERA_Y_OFFSET = 7;
@@ -92,7 +97,10 @@ public class AutoG extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         // Construct a target pose.
-        Pose2d targetPose = new Pose2d(-58, -35, Math.toRadians(0));
+        Pose2d targetPose = new Pose2d(-58, 35, Math.toRadians(0)); // blue wall small
+        //Pose2d targetPose = new Pose2d(-58, -35, Math.toRadians(0)); // red wall small
+        //Pose2d targetPose = new Pose2d(50, 35, Math.toRadians(180)); // blue backdrop middle
+        //Pose2d targetPose = new Pose2d(50, -35, Math.toRadians(180)); // red backdrop middle
 
         // Construct a velocity constraint.
         TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY, DriveConstants.TRACK_WIDTH);
@@ -198,11 +206,7 @@ public class AutoG extends LinearOpMode {
         int tagId = detection.id;
 
         // Determine whether the detection is a match.
-        boolean isMatch =
-                tagId == RED_ALLIANCE_LARGE_WALL_TAG_ID ||
-                tagId == RED_ALLIANCE_SMALL_WALL_TAG_ID ||
-                tagId == BLUE_ALLIANCE_SMALL_WALL_TAG_ID ||
-                tagId == BLUE_ALLIANCE_LARGE_WALL_TAG_ID;
+        boolean isMatch = isBackdropTag(tagId) || isWallTag(tagId);
 
         // Return the result.
         return isMatch;
@@ -263,19 +267,22 @@ public class AutoG extends LinearOpMode {
         // Get the pose's yaw.
         double poseYaw = tagPose.yaw;
 
+        // Determine whether this is a wall tag.
+        boolean isWallTag = isWallTag(tagId);
+
         // Get the camera's location by offsetting from the tag's location.
-        Vector2d cameraPoint = offset(tagPoint, poseY, poseYaw);
-        cameraPoint = offset(cameraPoint, poseX, 90 + poseYaw);
+        Vector2d cameraPoint = offset(tagPoint, isWallTag ? poseY : -poseY, poseYaw);
+        cameraPoint = offset(cameraPoint, isWallTag ? poseX : -poseX, 90 + poseYaw);
 
         // Get the camera's coordinates.
         double cameraX = cameraPoint.getX();
         double cameraY = cameraPoint.getY();
 
         // Get the camera's heading.
-        double cameraHeading = -poseYaw + 180;
+        double cameraHeading = isWallTag ? -poseYaw + 180 : -poseYaw;
 
         // Get the robot's center location by offsetting from the camera's location.
-        Vector2d robotPoint = offset(cameraPoint, CAMERA_Y_OFFSET, poseYaw);
+        Vector2d robotPoint = offset(cameraPoint, isWallTag ? CAMERA_Y_OFFSET : -CAMERA_Y_OFFSET, poseYaw);
 
         // Get the robot's coordinates.
         double robotX = robotPoint.getX();
@@ -306,6 +313,38 @@ public class AutoG extends LinearOpMode {
 
         // Wait for the user to press stop.
         while (opModeIsActive()) {}
+
+    }
+
+    // Determines whether this is a backdrop tag.
+    private boolean isBackdropTag(int tagId) {
+
+        // Determine whether this is a backdrop tag.
+        boolean isBackdropTag =
+                tagId == TAG_ID_BLUE_ALLIANCE_BACKDROP_LEFT ||
+                tagId == TAG_ID_BLUE_ALLIANCE_BACKDROP_MIDDLE ||
+                tagId == TAG_ID_BLUE_ALLIANCE_BACKDROP_RIGHT ||
+                tagId == TAG_ID_RED_ALLIANCE_BACKDROP_LEFT ||
+                tagId == TAG_ID_RED_ALLIANCE_BACKDROP_MIDDLE ||
+                tagId == TAG_ID_RED_ALLIANCE_BACKDROP_RIGHT;
+
+        // Return the result.
+        return isBackdropTag;
+
+    }
+
+    // Determines whether this is a wall tag.
+    private boolean isWallTag(int tagId) {
+
+        // Determine whether this is a wall tag.
+        boolean isWallTag =
+                tagId == TAG_ID_RED_ALLIANCE_WALL_LARGE ||
+                tagId == TAG_ID_RED_ALLIANCE_WALL_SMALL ||
+                tagId == TAG_ID_BLUE_ALLIANCE_WALL_SMALL ||
+                tagId == TAG_ID_BLUE_ALLIANCE_WALL_LARGE;
+
+        // Return the result.
+        return isWallTag;
 
     }
 
