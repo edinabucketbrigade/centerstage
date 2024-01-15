@@ -91,51 +91,45 @@ public class AutoG extends LinearOpMode {
         telemetry.addData("Tag Orientation", fieldOrientation);
         telemetry.addData("Tag Pose", "x %.2f, y %.2f, z %.2f, bearing %.2f, yaw %.2f, pitch %.2f, elevation %.2f, range %.2f, roll %.2f", tagPose.x, tagPose.y, tagPose.z, tagPose.bearing, tagPose.yaw, tagPose.pitch, tagPose.elevation, tagPose.range, tagPose.roll);
 
-        double tagX = fieldPosition.get(1);
-        double tagY = fieldPosition.get(0);
+        double tagX = fieldPosition.get(0);
+        double tagY = fieldPosition.get(1);
         Vector2d tagPoint = new Vector2d(tagX, tagY);
 
         double poseX = tagPose.x;
         double poseY = tagPose.y;
-        //double poseYaw = poseX < 0 ? Math.abs(tagPose.yaw) : tagPose.yaw;
-        //double poseYaw = Math.abs(tagPose.yaw);
         double poseYaw = tagPose.yaw;
 
-        Vector2d cameraPoint = offset(tagPoint, poseX, poseYaw);
-        cameraPoint = offset(cameraPoint, poseY, poseYaw - 90);
+        Vector2d cameraPoint = offset(tagPoint, poseY, poseYaw);
+        cameraPoint = offset(cameraPoint, poseX, 90 + poseYaw);
 
         double cameraX = cameraPoint.getX();
         double cameraY = cameraPoint.getY();
-        double cameraHeading = -poseYaw - 90;
+        double cameraHeading = -poseYaw;
 
         telemetry.addData("camera", "x %.2f, y %.2f, heading %.2f", cameraX, cameraY, cameraHeading);
 
-        Vector2d robotPoint = offset(cameraPoint, 7, poseYaw - 90);
-
-        //Vector2d robotPointA = offset(cameraPoint, 7, -poseYaw - 90);
-        //Vector2d robotPointB = offset(cameraPoint, 7, -poseYaw + 90);
-        //Vector2d robotPointC = offset(cameraPoint, 7, poseYaw - 90);
-        //Vector2d robotPointD = offset(cameraPoint, 7, poseYaw + 90);
-
-        //telemetry.addData("robotPointA", "x %.2f, y %.2f", robotPointA.getX(), robotPointA.getY());
-        //telemetry.addData("robotPointB", "x %.2f, y %.2f", robotPointB.getX(), robotPointB.getY());
-        //telemetry.addData("robotPointC", "x %.2f, y %.2f", robotPointC.getX(), robotPointC.getY());
-        //telemetry.addData("robotPointD", "x %.2f, y %.2f", robotPointD.getX(), robotPointD.getY());
+        Vector2d robotPoint = offset(cameraPoint, 7, poseYaw);
 
         double robotX = robotPoint.getX();
         double robotY = robotPoint.getY();
-        double robotHeading = cameraHeading + 180;
+        double robotHeading = cameraHeading;
 
         telemetry.addData("robot", "x %.2f, y %.2f, heading %.2f", robotX, robotY, robotHeading);
 
         telemetry.update();
 
         Pose2d startPose = new Pose2d(robotX, robotY, Math.toRadians(robotHeading));
+
         drive.setPoseEstimate(startPose);
 
+        double targetX = -58;
+        double targetY = 35;
+        Pose2d targetPose = new Pose2d(targetX, targetY, Math.toRadians(0));
+
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                //.splineTo(new Vector2d(36, -58), Math.toRadians(-90))
-                .lineToLinearHeading(new Pose2d(36, -58, Math.toRadians(90)))
+                //.splineTo(targetPose)
+                .lineToLinearHeading(targetPose)
+                //.lineTo(new Vector2d(targetX, targetY))
                 .build();
 
         drive.followTrajectorySequence(sequence);
@@ -190,7 +184,7 @@ public class AutoG extends LinearOpMode {
         if (detection.metadata == null) {
             return false;
         }
-        boolean isMatch = detection.id == 9;
+        boolean isMatch = detection.id == 9 || detection.id == 10;
 
         return isMatch;
     }
