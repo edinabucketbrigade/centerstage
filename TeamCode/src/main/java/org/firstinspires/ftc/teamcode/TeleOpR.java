@@ -19,7 +19,11 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 @Config
 @TeleOp
 public class TeleOpR extends LinearOpMode {
-
+    private static final int MINIMUM_COLUMN = 1;
+    private static final int MAXIMUM_COLUMN_ODD_ROW = 5;
+    private static final int MAXIMUM_COLUMN_EVEN_ROW = 6;
+    private static final int MINIMUM_ROW = 1;
+    private static final int MAXIMUM_ROW = 11;
     private AprilTagProcessor aprilTagProcessor;
     private boolean heatSeeking = false;
     @Override
@@ -27,8 +31,13 @@ public class TeleOpR extends LinearOpMode {
         // Initialize the FTC dashboard.
         FtcDashboard.getInstance();
 
-        Gamepad currentGamepad = new Gamepad();
-        Gamepad previousGamepad = new Gamepad();
+        Gamepad currentGamepad1 = new Gamepad();
+        Gamepad previousGamepad1 = new Gamepad();
+        Gamepad currentGamepad2 = new Gamepad();
+        Gamepad previousGamepad2 = new Gamepad();
+
+        int leftColumn = MINIMUM_COLUMN;
+        int leftRow = MINIMUM_ROW;
 
         telemetry.update();
 
@@ -48,12 +57,14 @@ public class TeleOpR extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            previousGamepad.copy(currentGamepad);
-            currentGamepad.copy(gamepad1);
-            if(currentGamepad.dpad_down) {
+            previousGamepad1.copy(currentGamepad1);
+            currentGamepad1.copy(gamepad1);
+            previousGamepad2.copy(currentGamepad2);
+            currentGamepad2.copy(gamepad2);
+            if(currentGamepad1.dpad_down) {
                 heatSeeking = true;
             }
-            if (currentGamepad.dpad_up) {
+            if (currentGamepad1.dpad_up) {
                 heatSeeking = false;
             }
             if (heatSeeking){
@@ -84,6 +95,61 @@ public class TeleOpR extends LinearOpMode {
                     heatSeeking = false;
                 }
             }
+            if (currentGamepad2.b && !previousGamepad2.b){
+                int maximumColumn = getMaximumColumn(leftRow);
+                leftColumn = Math.min(leftColumn + 1, maximumColumn);
+            }
+            if (currentGamepad2.x && !previousGamepad2.x){
+                leftColumn = Math.max(leftColumn - 1, MINIMUM_COLUMN);
+            }
+            if (currentGamepad2.y && !previousGamepad2.y){
+                leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
+            }
+            if (currentGamepad2.a && !previousGamepad2.a){
+                leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
+            }
+            int rightColumn = leftColumn + 1;
+            int rightRow = leftRow;
+            getHexDisplay(leftColumn,leftRow,rightColumn,rightRow);
+            telemetry.addData("Left Column", leftColumn);
+            telemetry.addData("Left Row", leftRow);
+            telemetry.addData("Right Column", rightColumn);
+            telemetry.addData("Right Row", rightRow);
+            telemetry.update();
         }
+    }
+    private static int getMaximumColumn(int row){
+        if (isEven(row)){
+            return MAXIMUM_COLUMN_EVEN_ROW;
+        } else {
+            return MAXIMUM_COLUMN_ODD_ROW;
+        }
+    }
+    private static boolean isEven(int value){
+        if (value%2 == 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private static String getHexDisplay(int leftColumn, int leftRow, int rightColumn, int rightRow){
+        String output = "\n";
+        for(int row = MAXIMUM_ROW; row >= MINIMUM_ROW; row--) {
+            if (!isEven(row)){
+                output += "  ";
+            }
+            int maximumColumn = getMaximumColumn(row);
+            for (int column = MINIMUM_COLUMN; column <= maximumColumn; column++) {
+                if (column == leftColumn && leftRow == row) {
+                    output += "Ⓛ";
+                } else if (column == rightColumn && rightRow == row){
+                    output += "Ⓡ";
+                } else{
+                    output += "〇";
+                }
+            }
+            output += "\n";
+        }
+        return output;
     }
 }
