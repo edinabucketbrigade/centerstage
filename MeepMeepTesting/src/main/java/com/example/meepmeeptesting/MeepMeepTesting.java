@@ -107,28 +107,51 @@ public class MeepMeepTesting {
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(MAXVEL, MAXACCEL, MAXANGVEL, MAXANGACCEL, TRACKWIDTH)
 
+                // Red right start X
+                // 12
+
+                // Red left start X
+                // -36
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-36, -61, Math.toRadians(-90)))
-                        .back(32)
-                        .waitSeconds(DELAY)
+                    // Red right
+                                //.lineToLinearHeading(new Pose2d(44,-36, Math.toRadians(180)))
+                            // Left
+                                //.lineToLinearHeading(new Pose2d(14,-30, Math.toRadians(0)))
+                            // Middle
+                                //.back(26)
+                            // Right
+                                //.setReversed(true)
+                            // Other thing
+                                //.splineTo(new Vector2d(23,-30), Math.toRadians(0))
+
+                        // Red left
+                                // Left
+
+                                // Middle
+                                //.back(32)
+                                // Right
                                 .setReversed(true)
-                                .splineTo(new Vector2d(0, -8), Math.toRadians(0))
-                                .splineTo(new Vector2d(40, -36), Math.toRadians(0))
-                                .waitSeconds(DELAY)
+                                .splineTo(new Vector2d(-35,-30),Math.toRadians(0))
                                 .setReversed(false)
+                                .splineTo(new Vector2d(-45,-30),Math.toRadians(180))
+                                .setReversed(true)
+                                .splineTo(new Vector2d(-35,-10),Math.toRadians(0))
+                                // Other thing
+                                .setReversed(true)
+                                .splineTo(new Vector2d(0,-8),Math.toRadians(0))
+                                .splineTo(new Vector2d(28,-8), Math.toRadians(0))
+                                .splineTo(new Vector2d(44,-36), Math.toRadians(0))
+
+                        // Rest of the route (shortened version for meep meep)
+                                .setReversed(false)
+                                .splineTo(new Vector2d(28,-8), Math.toRadians(180))
                                 .splineTo(new Vector2d(0, -8),Math.toRadians(180))
                                 .splineTo(new Vector2d(-52, -12), Math.toRadians(180))
-//                        .lineToLinearHeading(new Pose2d(35, -56, Math.toRadians(-90)))
-//                        .waitSeconds(DELAY)
-//                        .lineToLinearHeading(new Pose2d(35, -24, Math.toRadians(90)))
-//                        .lineToLinearHeading(new Pose2d(35, 50, Math.toRadians(90)))
-//                        .waitSeconds(DELAY)
-//                        .lineToLinearHeading(new Pose2d(35, 0, Math.toRadians(-90)))
-//                        .lineToLinearHeading(new Pose2d(35, -56, Math.toRadians(-90)))
-//                        .waitSeconds(DELAY)
-//                        .lineToLinearHeading(new Pose2d(35, -24, Math.toRadians(90)))
-//                        .lineToLinearHeading(new Pose2d(35, 50, Math.toRadians(90)))
-//                        .waitSeconds(DELAY)
-                        .build()
+                                .setReversed(true)
+                                .splineTo(new Vector2d(0, -8), Math.toRadians(0))
+                                .splineTo(new Vector2d(28,-8), Math.toRadians(0))
+                                .splineTo(new Vector2d(44, -36), Math.toRadians(0))
+                                .build()
                 );
         return myBot;
     }
@@ -218,23 +241,24 @@ public class MeepMeepTesting {
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(MAXVEL, MAXACCEL, MAXANGVEL, MAXANGACCEL, TRACKWIDTH)
 
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-61, 12, Math.toRadians(0)))
-                        .forward(26)
-                        .waitSeconds(DELAY)
-                        .lineToLinearHeading(new Pose2d(-35, 50, Math.toRadians(90)))
-                        .waitSeconds(DELAY)
-                        .lineToLinearHeading(new Pose2d(-35, 0, Math.toRadians(-90)))
-                        .lineToLinearHeading(new Pose2d(-35, -56, Math.toRadians(-90)))
-                        .waitSeconds(DELAY)
-                        .lineToLinearHeading(new Pose2d(-35, -24, Math.toRadians(90)))
-                        .lineToLinearHeading(new Pose2d(-35, 50, Math.toRadians(90)))
-                        .waitSeconds(DELAY)
-                        .lineToLinearHeading(new Pose2d(-35, 0, Math.toRadians(-90)))
-                        .lineToLinearHeading(new Pose2d(-35, -56, Math.toRadians(-90)))
-                        .waitSeconds(DELAY)
-                        .lineToLinearHeading(new Pose2d(-35, -24, Math.toRadians(90)))
-                        .lineToLinearHeading(new Pose2d(-35, 50, Math.toRadians(90)))
-                        .waitSeconds(DELAY)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(12, 61, Math.toRadians(90)))
+                        .back(26)
+                        .lineToLinearHeading(new Pose2d(44,36, Math.toRadians(180)))
+                        .splineTo(new Vector2d(18,8),Math.toRadians(180))
+                        .splineTo(new Vector2d(0,8),Math.toRadians(180))
+                        .splineTo(new Vector2d(-58,10), Math.toRadians(180))
+                        .setReversed(true)
+                        .splineTo(new Vector2d(0,8),Math.toRadians(0))
+                        .splineTo(new Vector2d(18,8),Math.toRadians(0))
+                        .splineTo(new Vector2d(44,36),Math.toRadians(0))
+                        .setReversed(false)
+                        .splineTo(new Vector2d(18,8),Math.toRadians(180))
+                        .splineTo(new Vector2d(0,8),Math.toRadians(180))
+                        .splineTo(new Vector2d(-58,10), Math.toRadians(180))
+                        .setReversed(true)
+                        .splineTo(new Vector2d(0,8),Math.toRadians(0))
+                        .splineTo(new Vector2d(18,8),Math.toRadians(0))
+                        .splineTo(new Vector2d(44,36),Math.toRadians(0))
                         .build()
                 );
         return myBot;
