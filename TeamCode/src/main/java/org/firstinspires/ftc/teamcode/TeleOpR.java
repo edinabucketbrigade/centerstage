@@ -20,8 +20,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 @TeleOp
 public class TeleOpR extends LinearOpMode {
     private static final int MINIMUM_COLUMN = 1;
-    private static final int MAXIMUM_COLUMN_ODD_ROW = 5;
-    private static final int MAXIMUM_COLUMN_EVEN_ROW = 6;
+    private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
+    private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     private static final int MINIMUM_ROW = 1;
     private static final int MAXIMUM_ROW = 11;
     private AprilTagProcessor aprilTagProcessor;
@@ -97,7 +97,7 @@ public class TeleOpR extends LinearOpMode {
             }
             if (currentGamepad2.b && !previousGamepad2.b){
                 int maximumColumn = getMaximumColumn(leftRow);
-                leftColumn = Math.min(leftColumn + 1, maximumColumn);
+                leftColumn = Math.min(leftColumn + 1, maximumColumn - 1);
             }
             if (currentGamepad2.x && !previousGamepad2.x){
                 leftColumn = Math.max(leftColumn - 1, MINIMUM_COLUMN);
