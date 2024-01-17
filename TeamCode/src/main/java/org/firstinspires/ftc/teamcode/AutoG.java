@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityCons
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
@@ -91,7 +92,7 @@ public class AutoG extends LinearOpMode {
         AprilTagDetection detection = waitForDetection();
 
         // Get the robot's pose.
-        Pose2d startPose = getRobotPose(detection);
+        Pose2d startPose = getRobotPose(detection, telemetry);
 
         // Set the drive's pose estimate.
         drive.setPoseEstimate(startPose);
@@ -238,7 +239,7 @@ public class AutoG extends LinearOpMode {
     }
 
     // Gets the robot's pose from an AprilTag detection.
-    private Pose2d getRobotPose(AprilTagDetection detection) {
+    public static Pose2d getRobotPose(AprilTagDetection detection, Telemetry telemetry) {
 
         // Get the tag's pose.
         AprilTagPoseFtc tagPose = detection.ftcPose;
@@ -334,7 +335,7 @@ public class AutoG extends LinearOpMode {
     }
 
     // Determines whether this is a wall tag.
-    private boolean isWallTag(int tagId) {
+    private static boolean isWallTag(int tagId) {
 
         // Determine whether this is a wall tag.
         boolean isWallTag =
