@@ -1,13 +1,19 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 enum Route {
     RED_LEFT_DIRECT,
@@ -53,6 +59,9 @@ public class AutoF extends LinearOpMode {
     private Boolean redAlliance = null;
     private Boolean startLeft = null;
     private Boolean parkLeft = null;
+
+    OpenCvWebcam camera;
+    private boolean startedStreaming;
 
 
 
@@ -101,30 +110,143 @@ public class AutoF extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        CenterStageCVDetection detector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry);
+        camera.setPipeline(detector);
+        camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
+        log("opening camera");
+        /*
+         *   Below is an example of a lambda expression which is in simply an anonymous function.
+         *   Since we are only executing one statement we are able to remove the curly braces and semicolon
+         *   making it look much cleaner.
+         *   Note that this is a feature strictly for SDK 8+, if Java 7 is being used use this code instead.
+         *   To change preferences press command and ; to open up preference window.
+         *
+         *   * Lambda Expression *
+         *   camera.openCameraDeviceAsync(() -> camera.startStreaming(320,240, OpenCvCameraRotation.UPRIGHT));
+         */
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                /*
+                 * Tell the webcam to start streaming images to us! Note that you must make sure
+                 * the resolution you specify is supported by the camera. If it is not, an exception
+                 * will be thrown.
+                 *
+                 * Keep in mind that the SDK's UVC driver (what OpenCvWebcam uses under the hood) only
+                 * supports streaming from the webcam in the uncompressed YUV image format. This means
+                 * that the maximum resolution you can stream at and still get up to 30FPS is 480p (640x480).
+                 * Streaming at e.g. 720p will limit you to up to 10FPS and so on and so forth.
+                 *
+                 * Also, we specify the rotation that the webcam is used in. This is so that the image
+                 * from the camera sensor can be rotated such that it is always displayed with the image upright.
+                 * For a front facing camera, rotation is defined assuming the user is looking at the screen.
+                 * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
+                 * away from the user.
+                 */
+                camera.startStreaming(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+                startedStreaming = true;
+                log("started camera streaming");
+            }
+
+            @Override
+            public void onError(int errorCode) {
+                /*
+                 * This will be called if the camera could not be opened
+                 */
+                log("error opening camera: " + errorCode);
+            }
+        });
+
+        FtcDashboard.getInstance().startCameraStream(camera, 0);
+
+        while (opModeIsActive() && !startedStreaming) {
+            log("waiting for camera streaming to start");
+            sleep(50);
+        }
+
+        CenterStageCVDetection.Location location = null;
+
+        while (opModeIsActive() && location == null) {
+            log("waiting for location detection");
+            sleep(50);
+            location = detector.getLocation();
+        }
+
         waitForStart();
+
+        location = detector.getLocation();
+
+        camera.stopStreaming();
+
+        camera.closeCameraDevice();
 
         if (isStopRequested()) return;
 
-        TrajectorySequence redLeftSequence = getRedLeftMiddleTrajectorySequence(drive);
-        TrajectorySequence redRightSequence = getRedRightMiddleTrajectorySequence(drive);
-        TrajectorySequence blueLeftSequence = getRedLeftMiddleTrajectorySequence(drive);
-        TrajectorySequence blueRightSequence = getRedRightMiddleTrajectorySequence(drive);
+        TrajectorySequence redLeftLeftSequence = getRedLeftLeftTrajectorySequence(drive);
+        TrajectorySequence redLeftMiddleSequence = getRedLeftMiddleTrajectorySequence(drive);
+        TrajectorySequence redLeftRightSequence = getRedLeftMiddleTrajectorySequence(drive);
+
+        TrajectorySequence redRightLeftSequence = getRedLeftLeftTrajectorySequence(drive);
+        TrajectorySequence redRightMiddleSequence = getRedLeftMiddleTrajectorySequence(drive);
+        TrajectorySequence redRightRightSequence = getRedLeftMiddleTrajectorySequence(drive);
+
+        TrajectorySequence blueLeftLeftSequence = getRedLeftLeftTrajectorySequence(drive);
+        TrajectorySequence blueLeftMiddleSequence = getRedLeftMiddleTrajectorySequence(drive);
+        TrajectorySequence blueLeftRightSequence = getRedLeftMiddleTrajectorySequence(drive);
+
+        TrajectorySequence blueRightLeftSequence = getRedLeftLeftTrajectorySequence(drive);
+        TrajectorySequence blueRightMiddleSequence = getRedLeftMiddleTrajectorySequence(drive);
+        TrajectorySequence blueRightRightSequence = getRedLeftMiddleTrajectorySequence(drive);
 
 
         if (redAlliance) {
             if (startLeft) {
-                drive.followTrajectorySequence(redLeftSequence);
+                if (location == location.Left) {
+                    drive.followTrajectorySequence(redLeftLeftSequence);
+                }
+                if (location == location.Middle) {
+                    drive.followTrajectorySequence(redLeftMiddleSequence);
+                }
+                if (location == location.Right) {
+                    drive.followTrajectorySequence(redLeftRightSequence);
+                }
             }
             else {
-                drive.followTrajectorySequence(redRightSequence);
+                if (location == location.Left) {
+                    drive.followTrajectorySequence(redRightLeftSequence);
+                }
+                if (location == location.Middle) {
+                    drive.followTrajectorySequence(redRightMiddleSequence);
+                }
+                if (location == location.Right) {
+                    drive.followTrajectorySequence(redRightRightSequence);
+                }
             }
         }
         else {
             if (startLeft) {
-                drive.followTrajectorySequence(blueLeftSequence);
+                if (location == location.Left) {
+                    drive.followTrajectorySequence(blueLeftLeftSequence);
+                }
+                if (location == location.Middle) {
+                    drive.followTrajectorySequence(blueLeftMiddleSequence);
+                }
+                if (location == location.Right) {
+                    drive.followTrajectorySequence(blueLeftRightSequence);
+                }
             }
             else {
-                drive.followTrajectorySequence(blueRightSequence);
+                if (location == location.Left) {
+                    drive.followTrajectorySequence(blueRightLeftSequence);
+                }
+                if (location == location.Middle) {
+                    drive.followTrajectorySequence(blueRightMiddleSequence);
+                }
+                if (location == location.Right) {
+                    drive.followTrajectorySequence(blueRightRightSequence);
+                }
             }
         }
     }
@@ -502,5 +624,10 @@ public class AutoF extends LinearOpMode {
                     .build();
             return sequence;
         }
+
+    private void log(String message) {
+        telemetry.addData("Message", message);
+        telemetry.update();
+    }
 
 }
