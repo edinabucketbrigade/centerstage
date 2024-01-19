@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
 import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -7,7 +8,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -24,8 +27,27 @@ public class TeleOpR extends LinearOpMode {
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     private static final int MINIMUM_ROW = 1;
     private static final int MAXIMUM_ROW = 11;
+    private static final String TAG = "Bucket Brigade";
+    private DcMotor leftFrontDrive;
+    private DcMotor leftBackDrive;
+    private DcMotor rightFrontDrive;
+    private DcMotor rightBackDrive;
+    private DcMotor[] driveMotors;
     private AprilTagProcessor aprilTagProcessor;
     private boolean heatSeeking = false;
+    private boolean rightGripOpen;
+    private boolean leftGripOpen;
+    private boolean rightClawOpen;
+    private boolean leftClawOpen;
+    private boolean isBunnyMode = true;
+    private DcMotor spin_motor;
+    private Servo left_grip_servo;
+    private Servo right_grip_servo;
+    private Servo left_claw_servo;
+    private Servo right_claw_servo;
+    private Servo flip_servo;
+    public LinearOpMode opMode;
+
     @Override
     public void runOpMode() throws InterruptedException {
         // Initialize the FTC dashboard.
@@ -35,6 +57,19 @@ public class TeleOpR extends LinearOpMode {
         Gamepad previousGamepad1 = new Gamepad();
         Gamepad currentGamepad2 = new Gamepad();
         Gamepad previousGamepad2 = new Gamepad();
+
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+        spin_motor = hardwareMap.get(DcMotor.class, "spin_motor");
+        left_grip_servo = hardwareMap.get(Servo.class, "left_grip_servo");
+        right_grip_servo = hardwareMap.get(Servo.class, "right_grip_servo");
+        left_claw_servo = hardwareMap.get(Servo.class,"left_claw_servo");
+        right_claw_servo = hardwareMap.get(Servo.class,"right_claw_servo");
+        flip_servo = hardwareMap.get(Servo.class, "flip_servo");
+
+        driveMotors = new DcMotor[] {leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive};
 
         int leftColumn = MINIMUM_COLUMN;
         int leftRow = MINIMUM_ROW;
@@ -61,6 +96,9 @@ public class TeleOpR extends LinearOpMode {
             currentGamepad1.copy(gamepad1);
             previousGamepad2.copy(currentGamepad2);
             currentGamepad2.copy(gamepad2);
+
+            moveRobot();
+
             if(currentGamepad1.dpad_down) {
                 heatSeeking = true;
             }
@@ -95,6 +133,54 @@ public class TeleOpR extends LinearOpMode {
                     heatSeeking = false;
                 }
             }
+            if (currentGamepad1.left_trigger > 0.5){
+                spin_motor.setPower(-0.7);
+            }
+            if (currentGamepad1.right_trigger > 0.5){
+                spin_motor.setPower(0.7);
+            }
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper){
+                if (leftGripOpen){
+                    leftGripOpen = false;
+                    left_grip_servo.setPosition(0);
+                } else {
+                    leftGripOpen = true;
+                    left_grip_servo.setPosition(1);
+                }
+            }
+            if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper){
+                if (rightGripOpen){
+                    rightGripOpen = false;
+                    right_grip_servo.setPosition(0);
+                } else {
+                    rightGripOpen = true;
+                    right_grip_servo.setPosition(1);
+                }
+            }
+            if (currentGamepad1.x && !previousGamepad1.x){
+                if (leftClawOpen){
+                    leftClawOpen = false;
+                    left_claw_servo.setPosition(0);
+                } else {
+                    leftClawOpen = true;
+                    left_claw_servo.setPosition(1);
+                }
+            }
+            if (currentGamepad1.b && !previousGamepad1.b){
+                if (rightClawOpen){
+                    rightClawOpen = false;
+                    right_claw_servo.setPosition(0);
+                } else {
+                    rightClawOpen = true;
+                    right_claw_servo.setPosition(1);
+                }
+            }
+            if (currentGamepad1.y && !previousGamepad1.y){
+                flip_servo.setPosition(1);
+            }
+            if (currentGamepad1.a && !previousGamepad1.y){
+                flip_servo.setPosition(0);
+            }
             if (currentGamepad2.b && !previousGamepad2.b){
                 int maximumColumn = getMaximumColumn(leftRow);
                 leftColumn = Math.min(leftColumn + 1, maximumColumn - 1);
@@ -116,6 +202,81 @@ public class TeleOpR extends LinearOpMode {
             telemetry.addData("Right Column", rightColumn);
             telemetry.addData("Right Row", rightRow);
             telemetry.update();
+        }
+    }
+    public void moveRobot() {
+        double BUNNY_MULTIPLIER = 2;
+        double NORMAL_MULTIPLIER = 1;
+
+        double leftFrontPower;
+        double leftBackPower;
+        double rightFrontPower;
+        double rightBackPower;
+
+        double axial = -opMode.gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+        double lateral = opMode.gamepad1.left_stick_x;
+        double yaw = opMode.gamepad1.right_stick_x;
+
+        double max;
+
+        // Combine the joystick requests for each axis-motion to determine each wheel's power.
+        // Set up a variable for each drive wheel to save the power level for telemetry.
+        leftFrontPower = axial + lateral + yaw;
+        rightFrontPower = axial - lateral - yaw;
+        leftBackPower = axial - lateral + yaw;
+        rightBackPower = axial + lateral - yaw;
+
+        // Normalize the values so no wheel power exceeds 100%
+        // This ensures that the robot maintains the desired motion.
+        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        double multiplier;
+
+        if (isBunnyMode) {
+            multiplier = BUNNY_MULTIPLIER;
+        }
+        else {
+            multiplier = NORMAL_MULTIPLIER;
+        }
+
+        leftFrontPower *= multiplier;
+        leftBackPower *= multiplier;
+        rightBackPower *= multiplier;
+        rightFrontPower *= multiplier;
+
+        moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+    }
+    public void setBunnyMode(boolean isBunnyMode){
+        log("set bunny mode = " + isBunnyMode);
+        this.isBunnyMode = isBunnyMode;
+    }
+    public void toggleBunnyMode() {
+        log("toggle bunny mode");
+        if (isBunnyMode) {
+            setBunnyMode(false);
+        }
+        else {
+            setBunnyMode(true);
+        }
+    }
+    public void moveRobot(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
+    }
+    public void stopDriveMotors() {
+        for(DcMotor driveMotor : driveMotors) {
+            driveMotor.setPower(0);
         }
     }
     private static int getMaximumColumn(int row){
@@ -151,5 +312,8 @@ public class TeleOpR extends LinearOpMode {
             output += "\n";
         }
         return output;
+    }
+    public void log(String message) {
+        Log.d(TAG, message);
     }
 }
