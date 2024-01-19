@@ -89,7 +89,6 @@ public class TeleOpR extends LinearOpMode {
     private Servo rightClawServo;
     private Servo wristServo;
     private Servo elbowServo;
-    public LinearOpMode opMode;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -101,15 +100,15 @@ public class TeleOpR extends LinearOpMode {
         Gamepad currentGamepad2 = new Gamepad();
         Gamepad previousGamepad2 = new Gamepad();
 
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
-        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        spinMotor = hardwareMap.get(DcMotor.class, "spin_motor");
+//        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
+//        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
+//        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
+//        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+//        spinMotor = hardwareMap.get(DcMotor.class, "spin_motor");
         leftGripServo = hardwareMap.get(Servo.class, "left_grip_servo");
         rightGripServo = hardwareMap.get(Servo.class, "right_grip_servo");
-        leftClawServo = hardwareMap.get(Servo.class,"left_claw_servo");
-        rightClawServo = hardwareMap.get(Servo.class,"right_claw_servo");
+//        leftClawServo = hardwareMap.get(Servo.class,"left_claw_servo");
+//        rightClawServo = hardwareMap.get(Servo.class,"right_claw_servo");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
         elbowServo = hardwareMap.get(Servo.class,"elbow_servo");
 
@@ -131,7 +130,7 @@ public class TeleOpR extends LinearOpMode {
                 .build();
 
         // Get a drive.
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        //SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         waitForStart();
 
@@ -141,7 +140,7 @@ public class TeleOpR extends LinearOpMode {
             previousGamepad2.copy(currentGamepad2);
             currentGamepad2.copy(gamepad2);
 
-            moveRobot();
+            //moveRobot();
 
             if(currentGamepad1.dpad_down) {
                 heatSeeking = true;
@@ -160,19 +159,19 @@ public class TeleOpR extends LinearOpMode {
                     Pose2d startPose = AutoG.getRobotPose(detection, telemetry);
 
                     // Set the drive's pose estimate.
-                    drive.setPoseEstimate(startPose);
+                    //drive.setPoseEstimate(startPose);
 
                     // Construct a target pose.
                     Pose2d targetPose = new Pose2d(50, 35, Math.toRadians(180)); // blue backdrop middle
                     //Pose2d targetPose = new Pose2d(50, -35, Math.toRadians(180)); // red backdrop middle
 
                     // Construct a trajectory sequence.
-                    TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                            .lineToLinearHeading(targetPose)
-                            .build();
+//                    TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+//                            .lineToLinearHeading(targetPose)
+//                            .build();
 
                     // Execute the trajectory sequence.
-                    drive.followTrajectorySequence(sequence);
+                    //drive.followTrajectorySequence(sequence);
                     // completing heatseek
                     heatSeeking = false;
                 }
@@ -263,9 +262,9 @@ public class TeleOpR extends LinearOpMode {
         double rightFrontPower;
         double rightBackPower;
 
-        double axial = -opMode.gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-        double lateral = opMode.gamepad1.left_stick_x;
-        double yaw = opMode.gamepad1.right_stick_x;
+        double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+        double lateral = gamepad1.left_stick_x;
+        double yaw = gamepad1.right_stick_x;
 
         double max;
 
