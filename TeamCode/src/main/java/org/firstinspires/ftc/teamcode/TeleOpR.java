@@ -22,11 +22,53 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 @Config
 @TeleOp
 public class TeleOpR extends LinearOpMode {
+    /*
+    Control Hub Portal
+        Expansion Hub 2
+            Motors
+                0 - GoBILDA 5201 series - arm_motor
+                1 - Unspecified Motor - perpendicular_encoder
+                2 - Unspecified Motor - parallel_encoder
+                3 -
+            Digital Devices
+                7 - REV Touch Sensor - touch
+            Servos
+                0 - Servo - right_grip_servo
+                1 - Servo - left_grip_servo
+                2 - Servo - elbow_servo
+                3 - Servo - wrist_servo
+        Control Hub
+            Motors
+                0 - GoBILDA 5201 series - right_back_drive
+                1 - GoBILDA 5201 series - right_front_drive
+                2 - GoBILDA 5201 series - left_front_drive
+                3 - GoBILDA 5201 series - left_back_drive
+            Servos
+                0 - Servo - right_claw_servo
+                1 - Servo - left_claw_servo
+                2 - Servo - wrist_servo
+                3 - Servo - drone_launch_servo
+                4 - Servo - drone_lift_servo
+            Digital Devices
+                4 - Digital Device - green_light_a
+                5 - Digital Device - red_light_a
+                6 - Digital Device - green_light_b
+                7 - Digital Device - red_light_b
+    Webcam 1
+    */
     private static final int MINIMUM_COLUMN = 1;
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     private static final int MINIMUM_ROW = 1;
     private static final int MAXIMUM_ROW = 11;
+    public static int WRIST_MINIMUM = 0;
+    public static int WRIST_MAXIMUM = 1;
+    public static int ELBOW_MINIMUM = 0;
+    public static int ELBOW_MAXIMUM = 1;
+    public static int RIGHT_GRIP_MINIMUM = 0;
+    public static int RIGHT_GRIP_MAXIMUM = 1;
+    public static int LEFT_GRIP_MINIMUM = 0;
+    public static int LEFT_GRIP_MAXIMUM = 1;
     private static final String TAG = "Bucket Brigade";
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -40,12 +82,13 @@ public class TeleOpR extends LinearOpMode {
     private boolean rightClawOpen;
     private boolean leftClawOpen;
     private boolean isBunnyMode = true;
-    private DcMotor spin_motor;
-    private Servo left_grip_servo;
-    private Servo right_grip_servo;
-    private Servo left_claw_servo;
-    private Servo right_claw_servo;
-    private Servo flip_servo;
+    private DcMotor spinMotor;
+    private Servo leftGripServo;
+    private Servo rightGripServo;
+    private Servo leftClawServo;
+    private Servo rightClawServo;
+    private Servo wristServo;
+    private Servo elbowServo;
     public LinearOpMode opMode;
 
     @Override
@@ -62,12 +105,13 @@ public class TeleOpR extends LinearOpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        spin_motor = hardwareMap.get(DcMotor.class, "spin_motor");
-        left_grip_servo = hardwareMap.get(Servo.class, "left_grip_servo");
-        right_grip_servo = hardwareMap.get(Servo.class, "right_grip_servo");
-        left_claw_servo = hardwareMap.get(Servo.class,"left_claw_servo");
-        right_claw_servo = hardwareMap.get(Servo.class,"right_claw_servo");
-        flip_servo = hardwareMap.get(Servo.class, "flip_servo");
+        spinMotor = hardwareMap.get(DcMotor.class, "spin_motor");
+        leftGripServo = hardwareMap.get(Servo.class, "left_grip_servo");
+        rightGripServo = hardwareMap.get(Servo.class, "right_grip_servo");
+        leftClawServo = hardwareMap.get(Servo.class,"left_claw_servo");
+        rightClawServo = hardwareMap.get(Servo.class,"right_claw_servo");
+        wristServo = hardwareMap.get(Servo.class, "wrist_servo");
+        elbowServo = hardwareMap.get(Servo.class,"elbow_servo");
 
         driveMotors = new DcMotor[] {leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive};
 
@@ -134,52 +178,58 @@ public class TeleOpR extends LinearOpMode {
                 }
             }
             if (currentGamepad1.left_trigger > 0.5){
-                spin_motor.setPower(-0.7);
+                spinMotor.setPower(-0.7);
             }
             if (currentGamepad1.right_trigger > 0.5){
-                spin_motor.setPower(0.7);
+                spinMotor.setPower(0.7);
             }
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper){
                 if (leftGripOpen){
                     leftGripOpen = false;
-                    left_grip_servo.setPosition(0);
+                    leftGripServo.setPosition(LEFT_GRIP_MINIMUM);
                 } else {
                     leftGripOpen = true;
-                    left_grip_servo.setPosition(1);
+                    leftGripServo.setPosition(LEFT_GRIP_MAXIMUM);
                 }
             }
             if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper){
                 if (rightGripOpen){
                     rightGripOpen = false;
-                    right_grip_servo.setPosition(0);
+                    rightGripServo.setPosition(RIGHT_GRIP_MINIMUM);
                 } else {
                     rightGripOpen = true;
-                    right_grip_servo.setPosition(1);
+                    rightGripServo.setPosition(RIGHT_GRIP_MAXIMUM);
                 }
             }
             if (currentGamepad1.x && !previousGamepad1.x){
+                elbowServo.setPosition(ELBOW_MAXIMUM);
+            }
+            if (currentGamepad1.b && !previousGamepad1.b){
+                elbowServo.setPosition(ELBOW_MINIMUM);
+            }
+            /*if (currentGamepad1.x && !previousGamepad1.x){
                 if (leftClawOpen){
                     leftClawOpen = false;
-                    left_claw_servo.setPosition(0);
+                    leftClawServo.setPosition(0);
                 } else {
                     leftClawOpen = true;
-                    left_claw_servo.setPosition(1);
+                    leftClawServo.setPosition(1);
                 }
             }
             if (currentGamepad1.b && !previousGamepad1.b){
                 if (rightClawOpen){
                     rightClawOpen = false;
-                    right_claw_servo.setPosition(0);
+                    rightClawServo.setPosition(0);
                 } else {
                     rightClawOpen = true;
-                    right_claw_servo.setPosition(1);
+                    rightClawServo.setPosition(1);
                 }
-            }
+            }*/
             if (currentGamepad1.y && !previousGamepad1.y){
-                flip_servo.setPosition(1);
+                wristServo.setPosition(WRIST_MAXIMUM);
             }
             if (currentGamepad1.a && !previousGamepad1.y){
-                flip_servo.setPosition(0);
+                wristServo.setPosition(WRIST_MINIMUM);
             }
             if (currentGamepad2.b && !previousGamepad2.b){
                 int maximumColumn = getMaximumColumn(leftRow);
