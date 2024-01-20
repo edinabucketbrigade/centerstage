@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Size;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -10,6 +12,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -63,12 +68,15 @@ public class AutoF extends LinearOpMode {
     OpenCvWebcam camera;
     private boolean startedStreaming;
 
+    private static final String TAG = "Bucket Brigade";
+    private AprilTagProcessor aprilTagProcessor;
+
 
 
     public static final Route ROUTE = Route.RED_LEFT_DIRECT;
     public static final double DELAY = 0.5;
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         Gamepad previousGamepad = new Gamepad();
         Gamepad currentGamepad = new Gamepad();
 
@@ -107,6 +115,16 @@ public class AutoF extends LinearOpMode {
                 break;
             }
         }
+
+        // Get an AprilTag processor.
+        aprilTagProcessor = new AprilTagProcessor.Builder().build();
+
+        // Get a vision portal.
+        new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT))
+                .addProcessor(aprilTagProcessor)
+                .build();
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
@@ -200,53 +218,76 @@ public class AutoF extends LinearOpMode {
         TrajectorySequence blueRightMiddleSequence = getRedLeftMiddleTrajectorySequence(drive);
         TrajectorySequence blueRightRightSequence = getRedLeftMiddleTrajectorySequence(drive);
 
+        TrajectorySequence sequence = null;
 
         if (redAlliance) {
             if (startLeft) {
                 if (location == location.Left) {
-                    drive.followTrajectorySequence(redLeftLeftSequence);
+                    sequence = getRedLeftLeftTrajectorySequence(drive);
                 }
                 if (location == location.Middle) {
-                    drive.followTrajectorySequence(redLeftMiddleSequence);
+                    sequence = getRedLeftMiddleTrajectorySequence(drive);
                 }
                 if (location == location.Right) {
-                    drive.followTrajectorySequence(redLeftRightSequence);
+                    sequence = getRedLeftRightTrajectorySequence(drive);
                 }
             }
             else {
                 if (location == location.Left) {
-                    drive.followTrajectorySequence(redRightLeftSequence);
+                    sequence = getRedRightLeftTrajectorySequence(drive);
                 }
                 if (location == location.Middle) {
-                    drive.followTrajectorySequence(redRightMiddleSequence);
+                    sequence = getRedRightMiddleTrajectorySequence(drive);
                 }
                 if (location == location.Right) {
-                    drive.followTrajectorySequence(redRightRightSequence);
+                    sequence = getRedRightRightTrajectorySequence(drive);
                 }
             }
         }
         else {
             if (startLeft) {
                 if (location == location.Left) {
-                    drive.followTrajectorySequence(blueLeftLeftSequence);
+                    sequence = getBlueLeftLeftTrajectorySequence(drive);
                 }
                 if (location == location.Middle) {
-                    drive.followTrajectorySequence(blueLeftMiddleSequence);
+                    sequence = getBlueLeftMiddleTrajectorySequence(drive);
                 }
                 if (location == location.Right) {
-                    drive.followTrajectorySequence(blueLeftRightSequence);
+                    sequence = getBlueLeftRightTrajectorySequence(drive);
                 }
             }
             else {
                 if (location == location.Left) {
-                    drive.followTrajectorySequence(blueRightLeftSequence);
+                    sequence = getBlueRightLeftTrajectorySequence(drive);
                 }
                 if (location == location.Middle) {
-                    drive.followTrajectorySequence(blueRightMiddleSequence);
+                    sequence = getBlueRightMiddleTrajectorySequence(drive);
                 }
                 if (location == location.Right) {
-                    drive.followTrajectorySequence(blueRightRightSequence);
+                    sequence = getBlueRightRightTrajectorySequence(drive);
                 }
+            }
+        }
+
+        if (sequence == null) {
+            throw new InterruptedException("The sequence is missing.");
+        }
+
+        drive.followTrajectorySequenceAsync(sequence);
+
+        while (opModeIsActive()) {
+            drive.update();
+
+            // Get a detection.
+            AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
+
+            // If there is a detection...
+            if (detection != null) {
+                // Get the robot's pose.
+                Pose2d startPose = AutoG.getRobotPose(detection, telemetry);
+
+                // Set the drive's pose estimate.
+                drive.setPoseEstimate(startPose);
             }
         }
     }
@@ -291,7 +332,6 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getRedLeftMiddleTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
-
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(32)
                 .setReversed(true)
@@ -409,7 +449,7 @@ public class AutoF extends LinearOpMode {
     }
 
         // Right
-        private TrajectorySequence getRedRightRightrajectorySequence(SampleMecanumDrive drive) {
+        private TrajectorySequence getRedRightRightTrajectorySequence(SampleMecanumDrive drive) {
             Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
             drive.setPoseEstimate(startPose);
 
@@ -541,7 +581,7 @@ public class AutoF extends LinearOpMode {
     // Right
 
         // Right
-        private TrajectorySequence getBlueRightLefttrajectorySequence(SampleMecanumDrive drive) {
+        private TrajectorySequence getBlueRightLeftTrajectorySequence(SampleMecanumDrive drive) {
             Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
             drive.setPoseEstimate(startPose);
 
@@ -628,6 +668,10 @@ public class AutoF extends LinearOpMode {
     private void log(String message) {
         telemetry.addData("Message", message);
         telemetry.update();
+    }
+
+    private void update() {
+
     }
 
 }
