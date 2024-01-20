@@ -56,14 +56,20 @@ public class TeleOpR extends LinearOpMode {
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     private static final int MINIMUM_ROW = 1;
     private static final int MAXIMUM_ROW = 11;
-    public static int WRIST_MINIMUM = 0;
-    public static int WRIST_MAXIMUM = 1;
-    public static int ELBOW_MINIMUM = 0;
-    public static int ELBOW_MAXIMUM = 1;
-    public static int RIGHT_GRIP_MINIMUM = 0;
-    public static int RIGHT_GRIP_MAXIMUM = 1;
-    public static int LEFT_GRIP_MINIMUM = 0;
-    public static int LEFT_GRIP_MAXIMUM = 1;
+
+    public static double BACKDROP_WRIST_POSITION = 0.35;
+    public static double PICKUP_WRIST_POSITION = 0.775;
+    public static double NEUTRAL_WRIST_POSITION = 0.45;
+    public static double GROUND_WRIST_POSITION = 0.35;
+    public static double BACKDROP_ELBOW_POSITION = 0;
+    public static double PICKUP_ELBOW_POSITION = 0.67;
+    public static double NEUTRAL_ELBOW_POSITION = 0.75;
+    public static double GROUND_ELBOW_POSITION = 0.15;
+
+    public static double RIGHT_GRIP_MINIMUM = 0;
+    public static double RIGHT_GRIP_MAXIMUM = 1;
+    public static double LEFT_GRIP_MINIMUM = 0;
+    public static double LEFT_GRIP_MAXIMUM = 1;
     private static final String TAG = "Bucket Brigade";
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -195,11 +201,15 @@ public class TeleOpR extends LinearOpMode {
                     rightGripServo.setPosition(RIGHT_GRIP_MAXIMUM);
                 }
             }
+            // BACKDROP
             if (currentGamepad1.x && !previousGamepad1.x){
-                elbowServo.setPosition(ELBOW_MAXIMUM);
+                elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
+                wristServo.setPosition(BACKDROP_WRIST_POSITION);
             }
+            // PICKUP
             if (currentGamepad1.b && !previousGamepad1.b){
-                elbowServo.setPosition(ELBOW_MINIMUM);
+                elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+                wristServo.setPosition(PICKUP_WRIST_POSITION);
             }
             /*if (currentGamepad1.x && !previousGamepad1.x){
                 if (leftClawOpen){
@@ -219,11 +229,15 @@ public class TeleOpR extends LinearOpMode {
                     rightClawServo.setPosition(1);
                 }
             }*/
+            // NEUTRAL
             if (currentGamepad1.y && !previousGamepad1.y){
-                wristServo.setPosition(WRIST_MAXIMUM);
+                elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
+                wristServo.setPosition(NEUTRAL_WRIST_POSITION);
             }
-            if (currentGamepad1.a && !previousGamepad1.y){
-                wristServo.setPosition(WRIST_MINIMUM);
+            // GROUND
+            if (currentGamepad1.a && !previousGamepad1.a){
+                elbowServo.setPosition(GROUND_ELBOW_POSITION);
+                wristServo.setPosition(GROUND_WRIST_POSITION);
             }
             if (currentGamepad2.b && !previousGamepad2.b){
                 int maximumColumn = getMaximumColumn(leftRow);
