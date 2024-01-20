@@ -26,29 +26,29 @@ public class TeleOpR extends LinearOpMode {
     Control Hub Portal
         Expansion Hub 2
             Motors
-                0 - GoBILDA 5201 series - arm_motor
-                1 - Unspecified Motor - perpendicular_encoder
-                2 - Unspecified Motor - parallel_encoder
-                3 -
+                0 - intake_motor
+                1 - right_linear_slide_motor
+                2 - GoBILDA 5201 series - left_rear_drive_motor - "2"
+                3 - GoBILDA 5201 series - left_front_drive-motor - "3"
             Digital Devices
-                7 - REV Touch Sensor - touch
+                0 - linear_slide_down_touch_sensor
+                1 - linear_slide_down_touch_sensor
+            Servos
+                0 - Servo - right_claw_servo
+                1 - Servo - left_claw_servo
+                2 - Servo - claw_elbow_servo
+                3 - Servo - claw_wrist_servo
+        Control Hub
+            Motors
+                0 - left_linear_slide_motor
+                1 -
+                2 - GoBILDA 5201 series - right_rear_drive_motor - "0"
+                3 - GoBILDA 5201 series - right_front_drive-motor - "1"
             Servos
                 0 - Servo - right_grip_servo
                 1 - Servo - left_grip_servo
                 2 - Servo - elbow_servo
                 3 - Servo - wrist_servo
-        Control Hub
-            Motors
-                0 - GoBILDA 5201 series - right_back_drive
-                1 - GoBILDA 5201 series - right_front_drive
-                2 - GoBILDA 5201 series - left_front_drive
-                3 - GoBILDA 5201 series - left_back_drive
-            Servos
-                0 - Servo - right_claw_servo
-                1 - Servo - left_claw_servo
-                2 - Servo - wrist_servo
-                3 - Servo - drone_launch_servo
-                4 - Servo - drone_lift_servo
             Digital Devices
                 4 - Digital Device - green_light_a
                 5 - Digital Device - red_light_a
@@ -245,11 +245,12 @@ public class TeleOpR extends LinearOpMode {
             }
             int rightColumn = leftColumn + 1;
             int rightRow = leftRow;
-            getHexDisplay(leftColumn,leftRow,rightColumn,rightRow);
+            String output = getHexDisplay(leftColumn,leftRow,rightColumn,rightRow);
             telemetry.addData("Left Column", leftColumn);
             telemetry.addData("Left Row", leftRow);
             telemetry.addData("Right Column", rightColumn);
             telemetry.addData("Right Row", rightRow);
+            telemetry.addData("output",output);
             telemetry.update();
         }
     }
