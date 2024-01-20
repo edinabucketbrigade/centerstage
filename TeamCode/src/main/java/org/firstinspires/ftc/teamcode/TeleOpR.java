@@ -11,10 +11,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -26,13 +25,12 @@ public class TeleOpR extends LinearOpMode {
     Control Hub Portal
         Expansion Hub 2
             Motors
-                0 - intake_motor
+                0 - roller_motor
                 1 - right_linear_slide_motor
-                2 - GoBILDA 5201 series - left_rear_drive_motor - "2"
-                3 - GoBILDA 5201 series - left_front_drive-motor - "3"
+                2 - GoBILDA 5201 series - left_back_drive - "2"
+                3 - GoBILDA 5201 series - left_front_drive - "3"
             Digital Devices
-                0 - linear_slide_down_touch_sensor
-                1 - linear_slide_down_touch_sensor
+
             Servos
                 0 - Servo - right_claw_servo
                 1 - Servo - left_claw_servo
@@ -42,18 +40,15 @@ public class TeleOpR extends LinearOpMode {
             Motors
                 0 - left_linear_slide_motor
                 1 -
-                2 - GoBILDA 5201 series - right_rear_drive_motor - "0"
-                3 - GoBILDA 5201 series - right_front_drive-motor - "1"
+                2 - GoBILDA 5201 series - right_back_drive - "0"
+                3 - GoBILDA 5201 series - right_front_drive - "1"
             Servos
                 0 - Servo - right_grip_servo
                 1 - Servo - left_grip_servo
                 2 - Servo - elbow_servo
                 3 - Servo - wrist_servo
             Digital Devices
-                4 - Digital Device - green_light_a
-                5 - Digital Device - red_light_a
-                6 - Digital Device - green_light_b
-                7 - Digital Device - red_light_b
+
     Webcam 1
     */
     private static final int MINIMUM_COLUMN = 1;
@@ -82,7 +77,7 @@ public class TeleOpR extends LinearOpMode {
     private boolean rightClawOpen;
     private boolean leftClawOpen;
     private boolean isBunnyMode = true;
-    private DcMotor spinMotor;
+    private DcMotor rollerMotor;
     private Servo leftGripServo;
     private Servo rightGripServo;
     private Servo leftClawServo;
@@ -100,11 +95,11 @@ public class TeleOpR extends LinearOpMode {
         Gamepad currentGamepad2 = new Gamepad();
         Gamepad previousGamepad2 = new Gamepad();
 
-//        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
-//        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
-//        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-//        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-//        spinMotor = hardwareMap.get(DcMotor.class, "spin_motor");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+        rollerMotor = hardwareMap.get(DcMotor.class, "roller_motor");
         leftGripServo = hardwareMap.get(Servo.class, "left_grip_servo");
         rightGripServo = hardwareMap.get(Servo.class, "right_grip_servo");
 //        leftClawServo = hardwareMap.get(Servo.class,"left_claw_servo");
@@ -130,7 +125,7 @@ public class TeleOpR extends LinearOpMode {
                 .build();
 
         // Get a drive.
-        //SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         waitForStart();
 
@@ -140,7 +135,7 @@ public class TeleOpR extends LinearOpMode {
             previousGamepad2.copy(currentGamepad2);
             currentGamepad2.copy(gamepad2);
 
-            //moveRobot();
+            moveRobot();
 
             if(currentGamepad1.dpad_down) {
                 heatSeeking = true;
@@ -177,10 +172,10 @@ public class TeleOpR extends LinearOpMode {
                 }
             }
             if (currentGamepad1.left_trigger > 0.5){
-                spinMotor.setPower(-0.7);
+                rollerMotor.setPower(-0.7);
             }
             if (currentGamepad1.right_trigger > 0.5){
-                spinMotor.setPower(0.7);
+                rollerMotor.setPower(0.7);
             }
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper){
                 if (leftGripOpen){
@@ -302,6 +297,21 @@ public class TeleOpR extends LinearOpMode {
         leftBackPower *= multiplier;
         rightBackPower *= multiplier;
         rightFrontPower *= multiplier;
+
+        // This is test code:
+        //
+        // Uncomment the following code to test your motor directions.
+        // Each button should make the corresponding motor run FORWARD.
+        //   1) First get all the motors to take to correct positions on the robot
+        //      by adjusting your Robot Configuration if necessary.
+        //   2) Then make sure they run in the correct direction by modifying the
+        //      the setDirection() calls above.
+        // Once the correct motors move in the correct direction re-comment this code.
+//        leftBackPower = gamepad1.x ? 1.0 : 0.0;  // X gamepad
+//        leftFrontPower = gamepad1.a ? 1.0 : 0.0;  // A gamepad
+//        rightBackPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
+//        rightFrontPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
+        // Send calculated power to wheels
 
         moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
     }
