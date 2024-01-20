@@ -25,28 +25,27 @@ public class TeleOpR extends LinearOpMode {
     Control Hub Portal
         Expansion Hub 2
             Motors
-                0 - roller_motor
-                1 - right_linear_slide_motor
-                2 - GoBILDA 5201 series - left_back_drive - "2"
-                3 - GoBILDA 5201 series - left_front_drive - "3"
+                0 - GoBILDA 5201 series - roller_motor
+                1 - GoBILDA 5201 series - right_linear_slide_motor
+                2 - GoBILDA 5201 series - right_front_drive
+                3 - GoBILDA 5201 series - right_back_drive
             Digital Devices
-
+            Servos
+                0 - Servo - right_grip_servo (x)
+                1 - Servo - left_grip_servo (x)
+                2 - Servo - elbow_servo (x)
+                3 - Servo - wrist_servo (x)
+        Control Hub
+            Motors
+                0 - GoBILDA 5201 series - left_linear_slide_motor
+                1 - GoBILDA 5201 series - front_encoder
+                2 - GoBILDA 5201 series - left_back_drive
+                3 - GoBILDA 5201 series - left_front_drive
             Servos
                 0 - Servo - right_claw_servo
                 1 - Servo - left_claw_servo
                 2 - Servo - claw_elbow_servo
                 3 - Servo - claw_wrist_servo
-        Control Hub
-            Motors
-                0 - left_linear_slide_motor
-                1 -
-                2 - GoBILDA 5201 series - right_back_drive - "0"
-                3 - GoBILDA 5201 series - right_front_drive - "1"
-            Servos
-                0 - Servo - right_grip_servo
-                1 - Servo - left_grip_servo
-                2 - Servo - elbow_servo
-                3 - Servo - wrist_servo
             Digital Devices
 
     Webcam 1
@@ -119,8 +118,8 @@ public class TeleOpR extends LinearOpMode {
         rollerMotor = hardwareMap.get(DcMotor.class, "roller_motor");
         leftGripServo = hardwareMap.get(Servo.class, "left_grip_servo");
         rightGripServo = hardwareMap.get(Servo.class, "right_grip_servo");
-//        leftClawServo = hardwareMap.get(Servo.class,"left_claw_servo");
-//        rightClawServo = hardwareMap.get(Servo.class,"right_claw_servo");
+        leftClawServo = hardwareMap.get(Servo.class,"left_claw_servo");
+        rightClawServo = hardwareMap.get(Servo.class,"right_claw_servo");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
         elbowServo = hardwareMap.get(Servo.class,"elbow_servo");
 
@@ -225,14 +224,15 @@ public class TeleOpR extends LinearOpMode {
                 if (fromNeutral) {
                     wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
                     elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
-                    sleep(100);
+                    sleep(1000);
                     wristServo.setPosition(BACKDROP_WRIST_POSITION);
                     fromNeutral = false;
                 }
                 if (fromPickup) {
-                    wristServo.setPosition(PICKUP_TRAVERSAL_WRIST_POSITION);
+                    wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
+                    sleep(1000);
                     elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
-                    sleep(100);
+                    sleep(1000);
                     wristServo.setPosition(BACKDROP_WRIST_POSITION);
                     fromPickup = false;
                 }
@@ -242,25 +242,27 @@ public class TeleOpR extends LinearOpMode {
             if (currentGamepad1.b && !previousGamepad1.b){
                 if (fromGround) {
                     elbowServo.setPosition(GROUND_TRAVERSAL_ELBOW_POSITION);
+                    sleep(1000);
                     wristServo.setPosition(GROUND_TRAVERSAL_WRIST_POSITION);
-                    sleep(100);
+                    sleep(1000);
                     elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+                    sleep(1000);
                     wristServo.setPosition(PICKUP_WRIST_POSITION);
                     fromGround = false;
                 }
                 if (fromBackdrop) {
-                    elbowServo.setPosition(PICKUP_TRAVERSAL_ELBOW_POSITION);
                     wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
-                    sleep(100);
+                    sleep(1000);
                     elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+                    sleep(1000);
                     wristServo.setPosition(PICKUP_WRIST_POSITION);
                     fromBackdrop = false;
                 }
                 if (fromNeutral) {
-                    elbowServo.setPosition(PICKUP_TRAVERSAL_ELBOW_POSITION);
                     wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
-                    sleep(100);
+                    sleep(1000);
                     elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+                    sleep(1000);
                     wristServo.setPosition(PICKUP_WRIST_POSITION);
                     fromNeutral = false;
                 }
@@ -297,10 +299,10 @@ public class TeleOpR extends LinearOpMode {
                     fromGround = false;
                 }
                 if (fromBackdrop) {
-                    elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
                     wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
-                    sleep(100);
+                    sleep(1000);
                     elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
+                    sleep(1000);
                     wristServo.setPosition(NEUTRAL_WRIST_POSITION);
                     fromBackdrop = false;
                 }
