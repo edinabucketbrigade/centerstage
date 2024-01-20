@@ -13,8 +13,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -61,20 +59,27 @@ public class TeleOpR extends LinearOpMode {
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     private static final int MINIMUM_ROW = 1;
     private static final int MAXIMUM_ROW = 11;
-
+    public static double GROUND_TRAVERSAL_WRIST_POSITION = 0.1;
+    public static double BACKDROP_TRAVERSAL_WRIST_POSITION = 0.1;
+    public static double PICKUP_TRAVERSAL_WRIST_POSITION = 0.1;
+    public static double NEUTRAL_TRAVERSAL_WRIST_POSITION = 0.1;
     public static double BACKDROP_WRIST_POSITION = 0.35;
     public static double PICKUP_WRIST_POSITION = 0.775;
     public static double NEUTRAL_WRIST_POSITION = 0.45;
     public static double GROUND_WRIST_POSITION = 0.35;
+    public static double GROUND_TRAVERSAL_ELBOW_POSITION = 0;
+    public static double BACKDROP_TRAVERSAL_ELBOW_POSITION = 0;
+    public static double PICKUP_TRAVERSAL_ELBOW_POSITION = 0.67;
+    public static double NEUTRAL_TRAVERSAL_ELBOW_POSITION = 0.75;
     public static double BACKDROP_ELBOW_POSITION = 0;
     public static double PICKUP_ELBOW_POSITION = 0.67;
     public static double NEUTRAL_ELBOW_POSITION = 0.75;
     public static double GROUND_ELBOW_POSITION = 0.15;
-
     public static double RIGHT_GRIP_MINIMUM = 0;
     public static double RIGHT_GRIP_MAXIMUM = 1;
     public static double LEFT_GRIP_MINIMUM = 0;
     public static double LEFT_GRIP_MAXIMUM = 1;
+    public static int ARM_DELAY = 1000;
     private static final String TAG = "Bucket Brigade";
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -82,6 +87,10 @@ public class TeleOpR extends LinearOpMode {
     private DcMotor rightBackDrive;
     private DcMotor[] driveMotors;
     private AprilTagProcessor aprilTagProcessor;
+    private boolean fromGround;
+    private boolean fromBackdrop;
+    private boolean fromPickup;
+    private boolean fromNeutral;
     private boolean heatSeeking = false;
     private boolean rightGripOpen;
     private boolean leftGripOpen;
@@ -137,6 +146,10 @@ public class TeleOpR extends LinearOpMode {
 
         // Get a drive.
         //SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
+        elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
+        wristServo.setPosition(NEUTRAL_WRIST_POSITION);
+        fromNeutral = true;
 
         waitForStart();
 
@@ -208,13 +221,53 @@ public class TeleOpR extends LinearOpMode {
             }
             // BACKDROP
             if (currentGamepad1.x && !previousGamepad1.x){
-                elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
-                wristServo.setPosition(BACKDROP_WRIST_POSITION);
+                if (fromGround) {
+                    elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
+                    wristServo.setPosition(BACKDROP_WRIST_POSITION);
+                }
+                if (fromNeutral) {
+                    wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
+                    elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
+                    sleep(100);
+                    wristServo.setPosition(BACKDROP_WRIST_POSITION);
+                    fromNeutral = false;
+                }
+                if (fromPickup) {
+                    wristServo.setPosition(PICKUP_TRAVERSAL_WRIST_POSITION);
+                    elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
+                    sleep(100);
+                    wristServo.setPosition(BACKDROP_WRIST_POSITION);
+                    fromPickup = false;
+                }
+                fromBackdrop = true;
             }
             // PICKUP
             if (currentGamepad1.b && !previousGamepad1.b){
-                elbowServo.setPosition(PICKUP_ELBOW_POSITION);
-                wristServo.setPosition(PICKUP_WRIST_POSITION);
+                if (fromGround) {
+                    elbowServo.setPosition(GROUND_TRAVERSAL_ELBOW_POSITION);
+                    wristServo.setPosition(GROUND_TRAVERSAL_WRIST_POSITION);
+                    sleep(100);
+                    elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+                    wristServo.setPosition(PICKUP_WRIST_POSITION);
+                    fromGround = false;
+                }
+                if (fromBackdrop) {
+                    elbowServo.setPosition(PICKUP_TRAVERSAL_ELBOW_POSITION);
+                    wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
+                    sleep(100);
+                    elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+                    wristServo.setPosition(PICKUP_WRIST_POSITION);
+                    fromBackdrop = false;
+                }
+                if (fromNeutral) {
+                    elbowServo.setPosition(PICKUP_TRAVERSAL_ELBOW_POSITION);
+                    wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
+                    sleep(100);
+                    elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+                    wristServo.setPosition(PICKUP_WRIST_POSITION);
+                    fromNeutral = false;
+                }
+                fromPickup = true;
             }
             /*if (currentGamepad1.x && !previousGamepad1.x){
                 if (leftClawOpen){
@@ -236,13 +289,56 @@ public class TeleOpR extends LinearOpMode {
             }*/
             // NEUTRAL
             if (currentGamepad1.y && !previousGamepad1.y){
-                elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
-                wristServo.setPosition(NEUTRAL_WRIST_POSITION);
+                if (fromGround) {
+                    elbowServo.setPosition(GROUND_TRAVERSAL_ELBOW_POSITION);
+                    sleep(1000);
+                    wristServo.setPosition(GROUND_TRAVERSAL_WRIST_POSITION);
+                    sleep(1000);
+                    elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
+                    sleep(1000);
+                    wristServo.setPosition(NEUTRAL_WRIST_POSITION);
+                    fromGround = false;
+                }
+                if (fromBackdrop) {
+                    elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
+                    wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
+                    sleep(100);
+                    elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
+                    wristServo.setPosition(NEUTRAL_WRIST_POSITION);
+                    fromBackdrop = false;
+                }
+                if (fromPickup) {
+                    elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
+                    wristServo.setPosition(NEUTRAL_WRIST_POSITION);
+                    fromPickup = false;
+                }
+                fromNeutral = true;
             }
             // GROUND
             if (currentGamepad1.a && !previousGamepad1.a){
-                elbowServo.setPosition(GROUND_ELBOW_POSITION);
-                wristServo.setPosition(GROUND_WRIST_POSITION);
+                if (fromBackdrop) {
+                    elbowServo.setPosition(GROUND_ELBOW_POSITION);
+                    wristServo.setPosition(GROUND_WRIST_POSITION);
+                    fromBackdrop = false;
+                }
+                if (fromNeutral) {
+                    wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
+                    sleep(1000);
+                    elbowServo.setPosition(GROUND_TRAVERSAL_ELBOW_POSITION);
+                    sleep(1000);
+                    elbowServo.setPosition(GROUND_ELBOW_POSITION);
+                    wristServo.setPosition(GROUND_WRIST_POSITION);
+                    fromNeutral = false;
+                }
+                if (fromPickup) {
+                    elbowServo.setPosition(GROUND_TRAVERSAL_ELBOW_POSITION);
+                    wristServo.setPosition(GROUND_TRAVERSAL_WRIST_POSITION);
+                    sleep(100);
+                    elbowServo.setPosition(GROUND_ELBOW_POSITION);
+                    wristServo.setPosition(GROUND_WRIST_POSITION);
+                    fromPickup = false;
+                }
+                fromGround = true;
             }
             if (currentGamepad2.b && !previousGamepad2.b){
                 int maximumColumn = getMaximumColumn(leftRow);
