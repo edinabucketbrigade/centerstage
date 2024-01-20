@@ -112,7 +112,7 @@ public class MeepMeepTesting {
 
                 // Red left start X
                 // -36
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-36, -61, Math.toRadians(-90)))
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(12, -61, Math.toRadians(-90)))
                     // Red right
                             // Left
                                 //.lineToLinearHeading(new Pose2d(14,-30, Math.toRadians(0)))
