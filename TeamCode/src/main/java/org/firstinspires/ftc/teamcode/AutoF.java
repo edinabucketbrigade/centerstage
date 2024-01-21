@@ -39,8 +39,8 @@ enum Route {
 @Autonomous(preselectTeleOp = "TeleOpA")
 //@Disabled
 public class AutoF extends LinearOpMode {
-    public static final Vector2d RED_MIDDLE = new Vector2d(0,-8);
-    public  static final Vector2d RED_DETOUR_BACKDROP = new Vector2d(28,-8);
+    public static final Vector2d RED_MIDDLE = new Vector2d(0,-12);
+    public  static final Vector2d RED_DETOUR_BACKDROP = new Vector2d(28,-12);
     public static final Vector2d RED_BACKDROP = new Vector2d(44,-36);
     public static final Vector2d RED_PIXELS = new Vector2d(-58,-10);
     public static final Vector2d RED_LEFT_START = new Vector2d(-36,-61);
@@ -50,8 +50,8 @@ public class AutoF extends LinearOpMode {
     public static final Vector2d RED_LEFT_RIGHT_RIGGING_POSITION = new Vector2d(-9.5, -35);
     public static final Vector2d RED_LEFT_LEFT_SPIKE_MARK_POSITION = new Vector2d(-34,-34);
 
-    public static final Vector2d BLUE_MIDDLE = new Vector2d(0,8);
-    public  static final Vector2d BLUE_DETOUR_BACKDROP = new Vector2d(28,8);
+    public static final Vector2d BLUE_MIDDLE = new Vector2d(0,12);
+    public  static final Vector2d BLUE_DETOUR_BACKDROP = new Vector2d(28,12);
     public static final Vector2d BLUE_BACKDROP = new Vector2d(44,36);
     public static final Vector2d BLUE_PIXELS = new Vector2d(-58,10);
     public static final Vector2d BLUE_LEFT_START = new Vector2d(12,61);
@@ -128,12 +128,12 @@ public class AutoF extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        CenterStageCVDetection detector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry);
-        camera.setPipeline(detector);
-        camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
-        log("opening camera");
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+//        CenterStageCVDetection detector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry);
+//        camera.setPipeline(detector);
+//        camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
+//        log("opening camera");
         /*
          *   Below is an example of a lambda expression which is in simply an anonymous function.
          *   Since we are only executing one statement we are able to remove the curly braces and semicolon
@@ -144,9 +144,9 @@ public class AutoF extends LinearOpMode {
          *   * Lambda Expression *
          *   camera.openCameraDeviceAsync(() -> camera.startStreaming(320,240, OpenCvCameraRotation.UPRIGHT));
          */
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
+        //camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            //@Override
+            //public void onOpened() {
                 /*
                  * Tell the webcam to start streaming images to us! Note that you must make sure
                  * the resolution you specify is supported by the camera. If it is not, an exception
@@ -163,133 +163,120 @@ public class AutoF extends LinearOpMode {
                  * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
                  * away from the user.
                  */
-                camera.startStreaming(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
-                startedStreaming = true;
-                log("started camera streaming");
-            }
+//                camera.startStreaming(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+//                startedStreaming = true;
+//                log("started camera streaming");
+//            }
 
-            @Override
-            public void onError(int errorCode) {
-                /*
-                 * This will be called if the camera could not be opened
-                 */
-                log("error opening camera: " + errorCode);
-            }
-        });
+//            @Override
+//            public void onError(int errorCode) {
+//                /*
+//                 * This will be called if the camera could not be opened
+//                 */
+//                log("error opening camera: " + errorCode);
+//            }
+//        });
 
-        FtcDashboard.getInstance().startCameraStream(camera, 0);
+        //FtcDashboard.getInstance().startCameraStream(camera, 0);
 
-        while (opModeIsActive() && !startedStreaming) {
-            log("waiting for camera streaming to start");
-            sleep(50);
-        }
-
-        CenterStageCVDetection.Location location = null;
-
-        while (opModeIsActive() && location == null) {
-            log("waiting for location detection");
-            sleep(50);
-            location = detector.getLocation();
-        }
+//        while (opModeIsActive() && !startedStreaming) {
+//            log("waiting for camera streaming to start");
+//            sleep(50);
+//        }
+//
+//        CenterStageCVDetection.Location location = null;
+//
+//        while (opModeIsActive() && location == null) {
+//            log("waiting for location detection");
+//            sleep(50);
+//            location = detector.getLocation();
+//        }
 
         waitForStart();
 
-        location = detector.getLocation();
+//        location = detector.getLocation();
+//
+//        camera.stopStreaming();
+//
+//        camera.closeCameraDevice();
 
-        camera.stopStreaming();
+        //if (isStopRequested()) return;
 
-        camera.closeCameraDevice();
+        //TrajectorySequence sequence = null;
 
-        if (isStopRequested()) return;
+        TrajectorySequence sequence = getRedLeftMiddleTrajectorySequence(drive);
 
-        TrajectorySequence redLeftLeftSequence = getRedLeftLeftTrajectorySequence(drive);
-        TrajectorySequence redLeftMiddleSequence = getRedLeftMiddleTrajectorySequence(drive);
-        TrajectorySequence redLeftRightSequence = getRedLeftMiddleTrajectorySequence(drive);
+//        if (redAlliance) {
+//            if (startLeft) {
+//                if (location == location.Left) {
+//                    sequence = getRedLeftLeftTrajectorySequence(drive);
+//                }
+//                if (location == location.Middle) {
+//                    sequence = getRedLeftMiddleTrajectorySequence(drive);
+//                }
+//                if (location == location.Right) {
+//                    sequence = getRedLeftRightTrajectorySequence(drive);
+//                }
+//            }
+//            else {
+//                if (location == location.Left) {
+//                    sequence = getRedRightLeftTrajectorySequence(drive);
+//                }
+//                if (location == location.Middle) {
+//                    sequence = getRedRightMiddleTrajectorySequence(drive);
+//                }
+//                if (location == location.Right) {
+//                    sequence = getRedRightRightTrajectorySequence(drive);
+//                }
+//            }
+//        }
+//        else {
+//            if (startLeft) {
+//                if (location == location.Left) {
+//                    sequence = getBlueLeftLeftTrajectorySequence(drive);
+//                }
+//                if (location == location.Middle) {
+//                    sequence = getBlueLeftMiddleTrajectorySequence(drive);
+//                }
+//                if (location == location.Right) {
+//                    sequence = getBlueLeftRightTrajectorySequence(drive);
+//                }
+//            }
+//            else {
+//                if (location == location.Left) {
+//                    sequence = getBlueRightLeftTrajectorySequence(drive);
+//                }
+//                if (location == location.Middle) {
+//                    sequence = getBlueRightMiddleTrajectorySequence(drive);
+//                }
+//                if (location == location.Right) {
+//                    sequence = getBlueRightRightTrajectorySequence(drive);
+//                }
+//            }
+//        }
+//
+//        if (sequence == null) {
+//            throw new InterruptedException("The sequence is missing.");
+//        }
 
-        TrajectorySequence redRightLeftSequence = getRedLeftLeftTrajectorySequence(drive);
-        TrajectorySequence redRightMiddleSequence = getRedLeftMiddleTrajectorySequence(drive);
-        TrajectorySequence redRightRightSequence = getRedLeftMiddleTrajectorySequence(drive);
+        //drive.followTrajectorySequenceAsync(sequence);
+        drive.followTrajectorySequence(sequence);
 
-        TrajectorySequence blueLeftLeftSequence = getRedLeftLeftTrajectorySequence(drive);
-        TrajectorySequence blueLeftMiddleSequence = getRedLeftMiddleTrajectorySequence(drive);
-        TrajectorySequence blueLeftRightSequence = getRedLeftMiddleTrajectorySequence(drive);
-
-        TrajectorySequence blueRightLeftSequence = getRedLeftLeftTrajectorySequence(drive);
-        TrajectorySequence blueRightMiddleSequence = getRedLeftMiddleTrajectorySequence(drive);
-        TrajectorySequence blueRightRightSequence = getRedLeftMiddleTrajectorySequence(drive);
-
-        TrajectorySequence sequence = null;
-
-        if (redAlliance) {
-            if (startLeft) {
-                if (location == location.Left) {
-                    sequence = getRedLeftLeftTrajectorySequence(drive);
-                }
-                if (location == location.Middle) {
-                    sequence = getRedLeftMiddleTrajectorySequence(drive);
-                }
-                if (location == location.Right) {
-                    sequence = getRedLeftRightTrajectorySequence(drive);
-                }
-            }
-            else {
-                if (location == location.Left) {
-                    sequence = getRedRightLeftTrajectorySequence(drive);
-                }
-                if (location == location.Middle) {
-                    sequence = getRedRightMiddleTrajectorySequence(drive);
-                }
-                if (location == location.Right) {
-                    sequence = getRedRightRightTrajectorySequence(drive);
-                }
-            }
-        }
-        else {
-            if (startLeft) {
-                if (location == location.Left) {
-                    sequence = getBlueLeftLeftTrajectorySequence(drive);
-                }
-                if (location == location.Middle) {
-                    sequence = getBlueLeftMiddleTrajectorySequence(drive);
-                }
-                if (location == location.Right) {
-                    sequence = getBlueLeftRightTrajectorySequence(drive);
-                }
-            }
-            else {
-                if (location == location.Left) {
-                    sequence = getBlueRightLeftTrajectorySequence(drive);
-                }
-                if (location == location.Middle) {
-                    sequence = getBlueRightMiddleTrajectorySequence(drive);
-                }
-                if (location == location.Right) {
-                    sequence = getBlueRightRightTrajectorySequence(drive);
-                }
-            }
-        }
-
-        if (sequence == null) {
-            throw new InterruptedException("The sequence is missing.");
-        }
-
-        drive.followTrajectorySequenceAsync(sequence);
-
-        while (opModeIsActive()) {
-            drive.update();
-
-            // Get a detection.
-            AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
-
-            // If there is a detection...
-            if (detection != null) {
-                // Get the robot's pose.
-                Pose2d startPose = AutoG.getRobotPose(detection, telemetry);
-
-                // Set the drive's pose estimate.
-                drive.setPoseEstimate(startPose);
-            }
-        }
+//        while (opModeIsActive()) {
+//            drive.update();
+//
+//            // Get a detection.
+//            AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
+//
+//            // If there is a detection...
+//            if (detection != null) {
+//                // Get the robot's pose.
+//                Pose2d startPose = AutoG.getRobotPose(detection, telemetry);
+//
+//                // Set the drive's pose estimate.
+//                drive.setPoseEstimate(startPose);
+//            }
+//        }
     }
 // Red
 
@@ -668,10 +655,6 @@ public class AutoF extends LinearOpMode {
     private void log(String message) {
         telemetry.addData("Message", message);
         telemetry.update();
-    }
-
-    private void update() {
-
     }
 
 }

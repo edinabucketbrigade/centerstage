@@ -22,33 +22,33 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 @TeleOp
 public class TeleOpR extends LinearOpMode {
     /*
+    Webcam 1
+
     Control Hub Portal
-        Expansion Hub 2
-            Motors
-                0 - GoBILDA 5201 series - roller_motor
-                1 - GoBILDA 5201 series - right_linear_slide_motor
-                2 - GoBILDA 5201 series - right_front_drive
-                3 - GoBILDA 5201 series - right_back_drive
-            Digital Devices
-            Servos
-                0 - Servo - right_grip_servo (x)
-                1 - Servo - left_grip_servo (x)
-                2 - Servo - elbow_servo (x)
-                3 - Servo - wrist_servo (x)
         Control Hub
             Motors
                 0 - GoBILDA 5201 series - left_linear_slide_motor
                 1 - GoBILDA 5201 series - front_encoder
-                2 - GoBILDA 5201 series - left_back_drive
-                3 - GoBILDA 5201 series - left_front_drive
+                2 - GoBILDA 5201 series - left_back_drive (encoder port returns 0 and -1)
+                3 - GoBILDA 5201 series - left_front_drive (left encoder)
             Servos
                 0 - Servo - right_claw_servo
                 1 - Servo - left_claw_servo
                 2 - Servo - claw_elbow_servo
                 3 - Servo - claw_wrist_servo
             Digital Devices
-
-    Webcam 1
+        Expansion Hub 2
+            Motors
+                0 - GoBILDA 5201 series - roller_motor (right encoder)
+                1 - GoBILDA 5201 series - right_linear_slide_motor
+                2 - GoBILDA 5201 series - right_front_drive (encoder port has bent pin)
+                3 - GoBILDA 5201 series - right_back_drive
+            Digital Devices
+            Servos
+                0 - Servo - right_grip_servo
+                1 - Servo - left_grip_servo
+                2 - Servo - elbow_servo
+                3 - Servo - wrist_servo
     */
     private static final int MINIMUM_COLUMN = 1;
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
