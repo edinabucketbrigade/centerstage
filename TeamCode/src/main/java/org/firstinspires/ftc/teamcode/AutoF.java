@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -20,25 +21,21 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-enum Route {
-    RED_LEFT_DIRECT,
-    RED_LEFT_INDIRECT,
-    RED_RIGHT_DIRECT,
-    RED_RIGHT_INDIRECT,
-    BLUE_LEFT_DIRECT,
-    BLUE_LEFT_INDIRECT,
-    BLUE_RIGHT_DIRECT,
-    BLUE_RIGHT_INDIRECT,
-    SPEED_TEST,
-    CYCLE_TEST,
-    PARK_LEFT,
-    PARK_RIGHT
-
-}
-
-@Autonomous(preselectTeleOp = "TeleOpA")
-//@Disabled
+@Config
+@Autonomous
+//@Autonomous(preselectTeleOp = "TeleOpR")
 public class AutoF extends LinearOpMode {
+    enum Route {
+        RED_LEFT_DIRECT,
+        RED_LEFT_INDIRECT,
+        RED_RIGHT_DIRECT,
+        RED_RIGHT_INDIRECT,
+        BLUE_LEFT_DIRECT,
+        BLUE_LEFT_INDIRECT,
+        BLUE_RIGHT_DIRECT,
+        BLUE_RIGHT_INDIRECT,
+    }
+
     public static final Vector2d RED_MIDDLE = new Vector2d(0,-12);
     public  static final Vector2d RED_DETOUR_BACKDROP = new Vector2d(28,-12);
     public static final Vector2d RED_BACKDROP = new Vector2d(44,-36);
@@ -49,7 +46,6 @@ public class AutoF extends LinearOpMode {
     public static final Vector2d RED_RIGHT_RIGHT_POSITION = new Vector2d(23,-30);
     public static final Vector2d RED_LEFT_RIGHT_RIGGING_POSITION = new Vector2d(-9.5, -35);
     public static final Vector2d RED_LEFT_LEFT_SPIKE_MARK_POSITION = new Vector2d(-34,-34);
-
     public static final Vector2d BLUE_MIDDLE = new Vector2d(0,12);
     public  static final Vector2d BLUE_DETOUR_BACKDROP = new Vector2d(28,12);
     public static final Vector2d BLUE_BACKDROP = new Vector2d(44,36);
@@ -60,147 +56,50 @@ public class AutoF extends LinearOpMode {
     public static final Vector2d BLUE_RIGHT_RIGHT_POSITION = new Vector2d(14,30);
     public static final Vector2d BLUE_LEFT_LEFT_RIGGING_POSITION = new Vector2d(-9.5,35);
     public static final Vector2d BLUE_LEFT_RIGHT_SPIKE_MARK_POSITION = new Vector2d(-34,34);
-
+    public static final Route ROUTE = Route.RED_LEFT_DIRECT;
+    public static final double DELAY = 0.5;
+    private static final String TAG = "Bucket Brigade";
     private Boolean redAlliance = null;
     private Boolean startLeft = null;
     private Boolean parkLeft = null;
-
-    OpenCvWebcam camera;
+    private OpenCvWebcam camera;
     private boolean startedStreaming;
-
-    private static final String TAG = "Bucket Brigade";
     private AprilTagProcessor aprilTagProcessor;
-
-
-
-    public static final Route ROUTE = Route.RED_LEFT_DIRECT;
-    public static final double DELAY = 0.5;
+    private Gamepad previousGamepad = new Gamepad();
+    private Gamepad currentGamepad = new Gamepad();
+    private FtcDashboard ftcDashboard;
+    private CenterStageCVDetection.Location location;
+    private CenterStageCVDetection teamPropDetector;
     @Override
     public void runOpMode() throws InterruptedException {
-        Gamepad previousGamepad = new Gamepad();
-        Gamepad currentGamepad = new Gamepad();
 
-        while (true) {
-            previousGamepad.copy(currentGamepad);
-            currentGamepad.copy(gamepad1);
+        // Get an FTC dashboard.
+        ftcDashboard = FtcDashboard.getInstance();
 
-            if (redAlliance == null) {
-                telemetry.addData("Alliance", "X = blue, B = red");
-                telemetry.update();
-                if (currentGamepad.x && !previousGamepad.x) {
-                    redAlliance = false;
-                }
-                if (currentGamepad.b && !previousGamepad.b) {
-                    redAlliance = true;
-                }
-            } else if (startLeft == null) {
-                telemetry.addData("Start", "X = left, B = right");
-                telemetry.update();
-                if (currentGamepad.x && !previousGamepad.x) {
-                    startLeft = true;
-                }
-                if (currentGamepad.b && !previousGamepad.b) {
-                    startLeft = false;
-                }
-            } else if (parkLeft == null) {
-                telemetry.addData("Park", "X = left, B = right");
-                telemetry.update();
-                if (currentGamepad.x && !previousGamepad.x) {
-                    parkLeft = true;
-                }
-                if (currentGamepad.b && !previousGamepad.b) {
-                    parkLeft = false;
-                }
-            } else {
-                break;
-            }
-        }
+        // Construct a drive interface.
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        // Get an AprilTag processor.
+        // Wait for menu selection.
+        waitForMenuSelection();
+
+        // Wait for the camera to open.
+        waitForCameraOpen();
+
+        // Wait for start.
+        waitForStart();
+
+        // Wait for team prop detection.
+        waitForTeamPropDetection();
+
+        // Construct an AprilTag processor.
         aprilTagProcessor = new AprilTagProcessor.Builder().build();
 
-        // Get a vision portal.
+        // Construct a vision portal.
         new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                 .setCameraResolution(new Size(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT))
                 .addProcessor(aprilTagProcessor)
                 .build();
-
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-
-//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-//        CenterStageCVDetection detector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry);
-//        camera.setPipeline(detector);
-//        camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
-//        log("opening camera");
-        /*
-         *   Below is an example of a lambda expression which is in simply an anonymous function.
-         *   Since we are only executing one statement we are able to remove the curly braces and semicolon
-         *   making it look much cleaner.
-         *   Note that this is a feature strictly for SDK 8+, if Java 7 is being used use this code instead.
-         *   To change preferences press command and ; to open up preference window.
-         *
-         *   * Lambda Expression *
-         *   camera.openCameraDeviceAsync(() -> camera.startStreaming(320,240, OpenCvCameraRotation.UPRIGHT));
-         */
-        //camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            //@Override
-            //public void onOpened() {
-                /*
-                 * Tell the webcam to start streaming images to us! Note that you must make sure
-                 * the resolution you specify is supported by the camera. If it is not, an exception
-                 * will be thrown.
-                 *
-                 * Keep in mind that the SDK's UVC driver (what OpenCvWebcam uses under the hood) only
-                 * supports streaming from the webcam in the uncompressed YUV image format. This means
-                 * that the maximum resolution you can stream at and still get up to 30FPS is 480p (640x480).
-                 * Streaming at e.g. 720p will limit you to up to 10FPS and so on and so forth.
-                 *
-                 * Also, we specify the rotation that the webcam is used in. This is so that the image
-                 * from the camera sensor can be rotated such that it is always displayed with the image upright.
-                 * For a front facing camera, rotation is defined assuming the user is looking at the screen.
-                 * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
-                 * away from the user.
-                 */
-//                camera.startStreaming(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
-//                startedStreaming = true;
-//                log("started camera streaming");
-//            }
-
-//            @Override
-//            public void onError(int errorCode) {
-//                /*
-//                 * This will be called if the camera could not be opened
-//                 */
-//                log("error opening camera: " + errorCode);
-//            }
-//        });
-
-        //FtcDashboard.getInstance().startCameraStream(camera, 0);
-
-//        while (opModeIsActive() && !startedStreaming) {
-//            log("waiting for camera streaming to start");
-//            sleep(50);
-//        }
-//
-//        CenterStageCVDetection.Location location = null;
-//
-//        while (opModeIsActive() && location == null) {
-//            log("waiting for location detection");
-//            sleep(50);
-//            location = detector.getLocation();
-//        }
-
-        waitForStart();
-
-//        location = detector.getLocation();
-//
-//        camera.stopStreaming();
-//
-//        camera.closeCameraDevice();
-
-        //if (isStopRequested()) return;
 
         //TrajectorySequence sequence = null;
 
@@ -262,7 +161,7 @@ public class AutoF extends LinearOpMode {
         //drive.followTrajectorySequenceAsync(sequence);
         drive.followTrajectorySequence(sequence);
 
-//        while (opModeIsActive()) {
+//        while (!isStopRequested()) {
 //            drive.update();
 //
 //            // Get a detection.
@@ -657,4 +556,125 @@ public class AutoF extends LinearOpMode {
         telemetry.update();
     }
 
+    private void waitForMenuSelection() {
+        while (!isStopRequested()) {
+            previousGamepad.copy(currentGamepad);
+            currentGamepad.copy(gamepad1);
+
+            if (redAlliance == null) {
+                telemetry.addData("Alliance", "X = blue, B = red");
+                telemetry.update();
+                if (currentGamepad.x && !previousGamepad.x) {
+                    redAlliance = false;
+                }
+                if (currentGamepad.b && !previousGamepad.b) {
+                    redAlliance = true;
+                }
+            } else if (startLeft == null) {
+                telemetry.addData("Start", "X = left, B = right");
+                telemetry.update();
+                if (currentGamepad.x && !previousGamepad.x) {
+                    startLeft = true;
+                }
+                if (currentGamepad.b && !previousGamepad.b) {
+                    startLeft = false;
+                }
+            } else if (parkLeft == null) {
+                telemetry.addData("Park", "X = left, B = right");
+                telemetry.update();
+                if (currentGamepad.x && !previousGamepad.x) {
+                    parkLeft = true;
+                }
+                if (currentGamepad.b && !previousGamepad.b) {
+                    parkLeft = false;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    private void waitForCameraOpen() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(ftcDashboard == null) {
+            throw new InterruptedException("The FTC dashboard is missing.");
+        }
+        if(hardwareMap == null) {
+            throw new InterruptedException("The hardware map is missing.");
+        }
+        if(parkLeft == null) {
+            throw new InterruptedException("The park left value is missing.");
+        }
+        if(redAlliance == null) {
+            throw new InterruptedException("The red alliance value is missing.");
+        }
+        if(startLeft == null) {
+            throw new InterruptedException("The start left value is missing.");
+        }
+        if(telemetry == null) {
+            throw new InterruptedException("The telemetry is missing.");
+        }
+
+        // Initialize the camera.
+        log("initializing camera");
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry);
+        camera.setPipeline(teamPropDetector);
+        camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
+
+        // Open the camera.
+        log("opening camera");
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+                startedStreaming = true;
+                log("opened camera");
+            }
+            @Override
+            public void onError(int errorCode) {
+                log("error opening camera: " + errorCode);
+            }
+        });
+
+        // Wait for streaming to start.
+        while (!isStopRequested() && !startedStreaming) {
+            log("waiting for camera to start streaming");
+            sleep(50);
+        }
+
+        // Show the camera stream in the FTC dashboard.
+        ftcDashboard.startCameraStream(camera, 0);
+
+    }
+
+    private void waitForTeamPropDetection() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(camera == null) {
+            throw new InterruptedException("The camera is missing.");
+        }
+        if(teamPropDetector == null) {
+            throw new InterruptedException("The team prop detector is missing.");
+        }
+
+        // Wait for team prop detection.
+        while (!isStopRequested() && location == null) {
+            log("waiting for location detection");
+            sleep(50);
+            location = teamPropDetector.getLocation();
+        }
+
+        // Display the location.
+        log("location is " + location);
+
+        // Stop streaming.
+        camera.stopStreaming();
+
+        // Close the camera.
+        camera.closeCameraDevice();
+
+    }
 }
