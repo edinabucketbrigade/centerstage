@@ -14,9 +14,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.List;
 
 @Config
 @TeleOp
@@ -128,8 +131,6 @@ public class TeleOpR extends LinearOpMode {
         int leftColumn = MINIMUM_COLUMN;
         int leftRow = MINIMUM_ROW;
 
-        telemetry.update();
-
         // Get an AprilTag processor.
         aprilTagProcessor = new AprilTagProcessor.Builder().build();
 
@@ -149,6 +150,8 @@ public class TeleOpR extends LinearOpMode {
 
         waitForStart();
 
+        boolean localized = false;
+
         while (opModeIsActive()) {
             previousGamepad1.copy(currentGamepad1);
             currentGamepad1.copy(gamepad1);
@@ -157,40 +160,55 @@ public class TeleOpR extends LinearOpMode {
 
             moveRobot();
 
+            drive.update();
+
+            // Get a detection.
+            AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
+
+            // If there is a detection...
+            if (detection != null) {
+
+                // Get the robot's pose.
+                Pose2d pose = AutoG.getRobotPose(detection, telemetry);
+
+                // Update the driver interface.
+                drive.setPoseEstimate(pose);
+
+                // Remember that we localized the robot.
+                localized = true;
+
+            }
+
             if(currentGamepad1.dpad_down) {
                 heatSeeking = true;
             }
             if (currentGamepad1.dpad_up) {
                 heatSeeking = false;
             }
-            if (heatSeeking){
 
-                // Get a detection.
-                AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
+            // If we are heat seeking and we know the robot's location...
+            if (heatSeeking && localized) {
 
-                // If there is a detection...
-                if (detection != null) {
-                    // Get the robot's pose.
-                    Pose2d startPose = AutoG.getRobotPose(detection, telemetry);
+                // Get the robot's current pose.
+                Pose2d currentPose = drive.getPoseEstimate();
 
-                    // Set the drive's pose estimate.
-                    //drive.setPoseEstimate(startPose);
+                // Construct a target pose.
+                //Pose2d targetPose = new Pose2d(50, 35, Math.toRadians(180)); // blue backdrop middle
+                Pose2d targetPose = new Pose2d(50, -35, Math.toRadians(180)); // red backdrop middle
 
-                    // Construct a target pose.
-                    Pose2d targetPose = new Pose2d(50, 35, Math.toRadians(180)); // blue backdrop middle
-                    //Pose2d targetPose = new Pose2d(50, -35, Math.toRadians(180)); // red backdrop middle
+                // Construct a trajectory sequence.
+                TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
+                        .lineToLinearHeading(targetPose)
+                        .build();
 
-                    // Construct a trajectory sequence.
-//                    TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-//                            .lineToLinearHeading(targetPose)
-//                            .build();
+                // Execute the trajectory sequence.
+                drive.followTrajectorySequence(sequence);
 
-                    // Execute the trajectory sequence.
-                    //drive.followTrajectorySequence(sequence);
-                    // completing heatseek
-                    heatSeeking = false;
-                }
+                // Remember that we are done heat seeking.
+                heatSeeking = false;
+
             }
+
             if (currentGamepad1.left_trigger > 0.5){
                 rollerMotor.setPower(-0.7);
             }
@@ -354,18 +372,32 @@ public class TeleOpR extends LinearOpMode {
             }
             int rightColumn = leftColumn + 1;
             int rightRow = leftRow;
+
+            // Get the hex display.
             String output = getHexDisplay(leftColumn,leftRow,rightColumn,rightRow);
+
+            // Get the robot's pose.
+            Pose2d pose = drive.getPoseEstimate();
+
+            // Convert the pose to a string.
+            String poseString = AutoF.toString(pose);
+
+            // Update the telemetry.
+            telemetry.addData("Localized", localized);
+            telemetry.addData("Pose", poseString);
             telemetry.addData("Left Column", leftColumn);
             telemetry.addData("Left Row", leftRow);
             telemetry.addData("Right Column", rightColumn);
             telemetry.addData("Right Row", rightRow);
-            telemetry.addData("output",output);
+            telemetry.addData("Output", output);
             telemetry.update();
+
         }
+
     }
     public void moveRobot() {
-        double BUNNY_MULTIPLIER = 2;
-        double NORMAL_MULTIPLIER = 1;
+        double BUNNY_MULTIPLIER = 1;
+        double NORMAL_MULTIPLIER = 0.6;
 
         double leftFrontPower;
         double leftBackPower;

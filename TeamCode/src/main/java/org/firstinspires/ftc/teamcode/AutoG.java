@@ -94,6 +94,9 @@ public class AutoG extends LinearOpMode {
         // Get the robot's pose.
         Pose2d startPose = getRobotPose(detection, telemetry);
 
+        // Update the telemetry.
+        telemetry.update();
+
         // Set the drive's pose estimate.
         drive.setPoseEstimate(startPose);
 
@@ -179,7 +182,7 @@ public class AutoG extends LinearOpMode {
     }
 
     // Determines whether an AprilTag detection is a match.
-    private static boolean isMatch(AprilTagDetection detection) {
+    public static boolean isMatch(AprilTagDetection detection) {
 
         // If the detection's metdata is missing...
         if (detection.metadata == null) {
@@ -301,7 +304,6 @@ public class AutoG extends LinearOpMode {
         telemetry.addData("Tag Pose", "x %.2f, y %.2f, z %.2f, bearing %.2f, yaw %.2f, pitch %.2f, elevation %.2f, range %.2f, roll %.2f", tagPose.x, tagPose.y, tagPose.z, tagPose.bearing, tagPose.yaw, tagPose.pitch, tagPose.elevation, tagPose.range, tagPose.roll);
         telemetry.addData("camera", "x %.2f, y %.2f, heading %.2f", cameraX, cameraY, cameraHeading);
         telemetry.addData("robot", "x %.2f, y %.2f, heading %.2f", robotX, robotY, robotHeading);
-        telemetry.update();
 
         // Return the robot's pose.
         return robotPose;
