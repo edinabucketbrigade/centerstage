@@ -171,6 +171,8 @@ public class TeleOpR extends LinearOpMode {
 
         elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
         wristServo.setPosition(NEUTRAL_WRIST_POSITION);
+        leftGripServo.setPosition(LEFT_GRIP_CLOSED);
+        rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
         fromNeutral = true;
 
         waitForStart();
