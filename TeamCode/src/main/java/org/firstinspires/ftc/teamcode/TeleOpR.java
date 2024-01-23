@@ -89,7 +89,7 @@ public class TeleOpR extends LinearOpMode {
     public static double TRIGGER_THRESHOLD = 0.5;
     public static double ROLLER_POWER = 0.7;
     public static double LIFT_POWER = 0.2;
-    public static int LIFT_UP_POSITION = 200;
+    public static int LIFT_UP_POSITION = 1000;
     public static int LIFT_DOWN_POSITION = 0;
     public static double INTAKE_SERVO_UP_POSITION = 1;
     public static double INTAKE_SERVO_DOWN_POSITION = 0.38;
@@ -124,6 +124,7 @@ public class TeleOpR extends LinearOpMode {
     private DcMotor rightLiftMotor;
     private TouchSensor liftTouch;
     private boolean isLiftReady;
+    private boolean isLoweringLift;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -171,6 +172,7 @@ public class TeleOpR extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
+        sleep(1000);
         wristServo.setPosition(NEUTRAL_WRIST_POSITION);
         leftGripServo.setPosition(LEFT_GRIP_CLOSED);
         rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
@@ -481,6 +483,10 @@ public class TeleOpR extends LinearOpMode {
             // Determine whether the lift is down.
             boolean isLiftDown = liftTouch.isPressed();
 
+            // Get the lift's position.
+            int leftLiftPosition = leftLiftMotor.getCurrentPosition();
+            int rightLiftPosition = rightLiftMotor.getCurrentPosition();
+
             // If the lift is down...
             if (isLiftDown) {
 
@@ -495,14 +501,18 @@ public class TeleOpR extends LinearOpMode {
 
                 }
 
-                // Reset the lift.
-                resetLift();
+                // If we finished lowering the lift...
+                if(isLoweringLift) {
+
+                    // Reset the lift.
+                    resetLift();
+
+                    // Remember that we finished lowering the lift.
+                    isLoweringLift = false;
+
+                }
 
             }
-
-            // Get the lift's position.
-            int leftLiftPosition = leftLiftMotor.getCurrentPosition();
-            int rightLiftPosition = rightLiftMotor.getCurrentPosition();
 
             // Get the lift's power.
             double leftLiftPower = leftLiftMotor.getPower();
@@ -663,6 +673,7 @@ public class TeleOpR extends LinearOpMode {
     private static void initializeLift(DcMotor liftMotor, DcMotor.Direction direction) {
         liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         liftMotor.setDirection(direction);
+        resetLift(liftMotor);
     }
 
     private void resetLift() {
@@ -671,6 +682,7 @@ public class TeleOpR extends LinearOpMode {
     }
 
     private static void resetLift(DcMotor liftMotor) {
+        liftMotor.setPower(0);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
@@ -683,6 +695,7 @@ public class TeleOpR extends LinearOpMode {
     private void lowerLift() {
         setLiftPosition(leftLiftMotor, LIFT_DOWN_POSITION);
         setLiftPosition(rightLiftMotor, LIFT_DOWN_POSITION);
+        isLoweringLift = true;
     }
 
     private void setLiftPosition(DcMotor liftMotor, int position) {
