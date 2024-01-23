@@ -35,8 +35,8 @@ public class TeleOpR extends LinearOpMode {
             Servos
                 0 - Servo - right_claw_servo
                 1 - Servo - left_claw_servo
-                2 - Servo - claw_elbow_servo
-                3 - Servo - claw_wrist_servo
+                2 - Servo - claw_flip_servo
+                3 - Servo - intake_servo
             Digital Devices
         Expansion Hub 2
             Motors
@@ -59,7 +59,7 @@ public class TeleOpR extends LinearOpMode {
     public static double GROUND_TRAVERSAL_WRIST_POSITION = 0.1;
     public static double BACKDROP_TRAVERSAL_WRIST_POSITION = 0.05;
     public static double PICKUP_TRAVERSAL_WRIST_POSITION = 0.1;
-    public static double NEUTRAL_TRAVERSAL_WRIST_POSITION = 0.88;
+    public static double NEUTRAL_TRAVERSAL_WRIST_POSITION = 0.9;
     public static double BACKDROP_WRIST_POSITION = 0.35;
     public static double PICKUP_WRIST_POSITION = 0.832;
     public static double NEUTRAL_WRIST_POSITION = 0.45;
@@ -76,6 +76,12 @@ public class TeleOpR extends LinearOpMode {
     public static double RIGHT_GRIP_CLOSED = 0.47;
     public static double LEFT_GRIP_OPEN = 0.25;
     public static double LEFT_GRIP_CLOSED = 0.38;
+    public static double LEFT_CLAW_OPEN = 0.32;
+    public static double LEFT_CLAW_CLOSED = 0.5;
+    public static double RIGHT_CLAW_OPEN = 0.71;
+    public static double RIGHT_CLAW_CLOSED = 0.5;
+    public static double CLAW_FLIP_SERVO_UP = 1;
+    public static double CLAW_FLIP_SERVO_DOWN = 0;
     public static int ARM_DELAY = 1000;
     private static final String TAG = "Bucket Brigade";
     private DcMotor leftFrontDrive;
@@ -93,6 +99,7 @@ public class TeleOpR extends LinearOpMode {
     private boolean leftGripOpen;
     private boolean rightClawOpen;
     private boolean leftClawOpen;
+    private boolean clawFlipServoUp;
     private boolean isBunnyMode = true;
     private DcMotor rollerMotor;
     private Servo leftGripServo;
@@ -101,6 +108,8 @@ public class TeleOpR extends LinearOpMode {
     private Servo rightClawServo;
     private Servo wristServo;
     private Servo elbowServo;
+    private Servo clawFlipServo;
+    private Servo intakeServo;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -123,6 +132,8 @@ public class TeleOpR extends LinearOpMode {
         rightClawServo = hardwareMap.get(Servo.class,"right_claw_servo");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
         elbowServo = hardwareMap.get(Servo.class,"elbow_servo");
+        clawFlipServo = hardwareMap.get(Servo.class, "claw_flip_servo");
+        intakeServo = hardwareMap.get(Servo.class,"intake_servo");
 
         driveMotors = new DcMotor[] {leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive};
 
@@ -207,6 +218,35 @@ public class TeleOpR extends LinearOpMode {
 
             }
 
+            if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left) {
+                if (leftClawOpen) {
+                    leftClawServo.setPosition(LEFT_CLAW_CLOSED);
+                    leftClawOpen = false;
+                }
+                else {
+                    leftClawServo.setPosition(LEFT_CLAW_OPEN);
+                    leftClawOpen = true;
+                }
+
+                if (rightClawOpen) {
+                    rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
+                    rightClawOpen = false;
+                }
+                else {
+                    rightClawServo.setPosition(RIGHT_CLAW_OPEN);
+                    rightClawOpen = true;
+                }
+            }
+            if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right) {
+                if (clawFlipServoUp) {
+                    clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+                    clawFlipServoUp = false;
+                }
+                else {
+                    clawFlipServo.setPosition(CLAW_FLIP_SERVO_UP);
+                    clawFlipServoUp = true;
+                }
+            }
             if (currentGamepad1.left_trigger > 0.5){
                 rollerMotor.setPower(-0.7);
             }
