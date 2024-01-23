@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -37,7 +39,6 @@ public class TeleOpR extends LinearOpMode {
                 1 - Servo - left_claw_servo
                 2 - Servo - claw_flip_servo
                 3 - Servo - intake_servo
-            Digital Devices
         Expansion Hub 2
             Motors
                 0 - GoBILDA 5201 series - roller_motor (right encoder)
@@ -45,6 +46,7 @@ public class TeleOpR extends LinearOpMode {
                 2 - GoBILDA 5201 series - right_front_drive (encoder port has bent pin)
                 3 - GoBILDA 5201 series - right_back_drive
             Digital Devices
+                3 - REV Touch Sensor - lift_touch
             Servos
                 0 - Servo - right_grip_servo
                 1 - Servo - elbow_servo
@@ -115,6 +117,7 @@ public class TeleOpR extends LinearOpMode {
     private Servo intakeServo;
     private DcMotor leftSlideMotor;
     private DcMotor rightSlideMotor;
+    private TouchSensor liftTouch;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -141,6 +144,7 @@ public class TeleOpR extends LinearOpMode {
         intakeServo = hardwareMap.get(Servo.class,"intake_servo");
         leftSlideMotor = hardwareMap.get(DcMotor.class,"left_slide_motor");
         rightSlideMotor = hardwareMap.get(DcMotor.class,"right_slide_motor");
+        liftTouch = hardwareMap.get(TouchSensor.class, "lift_touch");
 
         driveMotors = new DcMotor[] {leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive};
 
@@ -450,7 +454,11 @@ public class TeleOpR extends LinearOpMode {
             // Convert the pose to a string.
             String poseString = AutoF.toString(pose);
 
+            // Determine whether the lift is down.
+            boolean isLiftDown = liftTouch.isPressed();
+
             // Update the telemetry.
+            telemetry.addData("Lift Down", isLiftDown);
             telemetry.addData("Localized", localized);
             telemetry.addData("Pose", poseString);
             telemetry.addData("Left Column", leftColumn);
