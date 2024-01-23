@@ -92,6 +92,8 @@ public class TeleOpR extends LinearOpMode {
     public static double LIFT_POWER = 0.2;
     public static int LIFT_UP_POSITION = 200;
     public static int LIFT_DOWN_POSITION = 0;
+    public static double INTAKE_SERVO_UP_POSITION = 1;
+    public static double INTAKE_SERVO_DOWN_POSITION = 0.38;
     private static final String TAG = "Bucket Brigade";
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -173,6 +175,7 @@ public class TeleOpR extends LinearOpMode {
         wristServo.setPosition(NEUTRAL_WRIST_POSITION);
         leftGripServo.setPosition(LEFT_GRIP_CLOSED);
         rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
+        intakeServo.setPosition(INTAKE_SERVO_DOWN_POSITION);
         fromNeutral = true;
 
         waitForStart();
@@ -271,27 +274,16 @@ public class TeleOpR extends LinearOpMode {
             if (currentGamepad1.right_trigger > TRIGGER_THRESHOLD){
                 rollerMotor.setPower(ROLLER_POWER);
             }
-/*
+
             if (currentGamepad2.left_stick_y > TRIGGER_THRESHOLD){
                 leftLiftMotor.setPower(-LIFT_POWER);
-            }
-            else if (currentGamepad2.left_stick_y < -TRIGGER_THRESHOLD){
-                leftLiftMotor.setPower(LIFT_POWER);
-            }
-            else {
-                leftLiftMotor.setPower(0);
-            }
-
-            if (currentGamepad2.right_stick_y > TRIGGER_THRESHOLD){
                 rightLiftMotor.setPower(-LIFT_POWER);
             }
-            else if (currentGamepad2.right_stick_y < -TRIGGER_THRESHOLD){
-                rightLiftMotor.setPower(LIFT_POWER);
-            }
-            else {
+            else if (currentGamepad2.left_stick_y < -TRIGGER_THRESHOLD){
+                leftLiftMotor.setPower(0);
                 rightLiftMotor.setPower(0);
             }
-*/
+
             if(currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
                 lowerLift();
             }
