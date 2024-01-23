@@ -47,8 +47,8 @@ public class TeleOpR extends LinearOpMode {
             Digital Devices
             Servos
                 0 - Servo - right_grip_servo
-                1 - Servo - left_grip_servo
-                2 - Servo - elbow_servo
+                1 - Servo - elbow_servo
+                2 - Servo - left_grip_servo
                 3 - Servo - wrist_servo
     */
     private static final int MINIMUM_COLUMN = 1;
