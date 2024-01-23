@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.AutoG.getDetection;
-import static org.firstinspires.ftc.teamcode.AutoG.getRobotPose;
-import static org.firstinspires.ftc.teamcode.AutoG.isMatch;
-
 import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;

@@ -28,7 +28,7 @@ public class TeleOpR extends LinearOpMode {
     Control Hub Portal
         Control Hub
             Motors
-                0 - GoBILDA 5201 series - left_linear_slide_motor
+                0 - GoBILDA 5201 series - left_slide_motor
                 1 - GoBILDA 5201 series - front_encoder
                 2 - GoBILDA 5201 series - left_back_drive (encoder port returns 0 and -1)
                 3 - GoBILDA 5201 series - left_front_drive (left encoder)
@@ -41,7 +41,7 @@ public class TeleOpR extends LinearOpMode {
         Expansion Hub 2
             Motors
                 0 - GoBILDA 5201 series - roller_motor (right encoder)
-                1 - GoBILDA 5201 series - right_linear_slide_motor
+                1 - GoBILDA 5201 series - right_slide_motor
                 2 - GoBILDA 5201 series - right_front_drive (encoder port has bent pin)
                 3 - GoBILDA 5201 series - right_back_drive
             Digital Devices
@@ -83,6 +83,9 @@ public class TeleOpR extends LinearOpMode {
     public static double CLAW_FLIP_SERVO_UP = 1;
     public static double CLAW_FLIP_SERVO_DOWN = 0;
     public static int ARM_DELAY = 1000;
+    public static double TRIGGER_THRESHOLD = 0.5;
+    public static double ROLLER_POWER = 0.7;
+    public static double LIFT_POWER = 0.2;
     private static final String TAG = "Bucket Brigade";
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -110,6 +113,8 @@ public class TeleOpR extends LinearOpMode {
     private Servo elbowServo;
     private Servo clawFlipServo;
     private Servo intakeServo;
+    private DcMotor leftSlideMotor;
+    private DcMotor rightSlideMotor;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -134,6 +139,8 @@ public class TeleOpR extends LinearOpMode {
         elbowServo = hardwareMap.get(Servo.class,"elbow_servo");
         clawFlipServo = hardwareMap.get(Servo.class, "claw_flip_servo");
         intakeServo = hardwareMap.get(Servo.class,"intake_servo");
+        leftSlideMotor = hardwareMap.get(DcMotor.class,"left_slide_motor");
+        rightSlideMotor = hardwareMap.get(DcMotor.class,"right_slide_motor");
 
         driveMotors = new DcMotor[] {leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive};
 
@@ -247,12 +254,33 @@ public class TeleOpR extends LinearOpMode {
                     clawFlipServoUp = true;
                 }
             }
-            if (currentGamepad1.left_trigger > 0.5){
-                rollerMotor.setPower(-0.7);
+            if (currentGamepad1.left_trigger > TRIGGER_THRESHOLD){
+                rollerMotor.setPower(-ROLLER_POWER);
             }
-            if (currentGamepad1.right_trigger > 0.5){
-                rollerMotor.setPower(0.7);
+            if (currentGamepad1.right_trigger > TRIGGER_THRESHOLD){
+                rollerMotor.setPower(ROLLER_POWER);
             }
+
+            if (currentGamepad2.left_stick_y > TRIGGER_THRESHOLD){
+                leftSlideMotor.setPower(-LIFT_POWER);
+            }
+            else if (currentGamepad2.left_stick_y < -TRIGGER_THRESHOLD){
+                leftSlideMotor.setPower(LIFT_POWER);
+            }
+            else {
+                leftSlideMotor.setPower(0);
+            }
+
+            if (currentGamepad2.right_stick_y > TRIGGER_THRESHOLD){
+                rightSlideMotor.setPower(-LIFT_POWER);
+            }
+            else if (currentGamepad2.right_stick_y < -TRIGGER_THRESHOLD){
+                rightSlideMotor.setPower(LIFT_POWER);
+            }
+            else {
+                rightSlideMotor.setPower(0);
+            }
+
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper){
                 if (leftGripOpen){
                     leftGripOpen = false;
