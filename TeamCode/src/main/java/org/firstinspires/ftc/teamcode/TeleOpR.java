@@ -9,6 +9,8 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -30,7 +32,7 @@ public class TeleOpR extends LinearOpMode {
     Control Hub Portal
         Control Hub
             Motors
-                0 - GoBILDA 5201 series - left_slide_motor
+                0 - GoBILDA 5201 series - left_lift_motor
                 1 - GoBILDA 5201 series - front_encoder
                 2 - GoBILDA 5201 series - left_back_drive (encoder port returns 0 and -1)
                 3 - GoBILDA 5201 series - left_front_drive (left encoder)
@@ -42,7 +44,7 @@ public class TeleOpR extends LinearOpMode {
         Expansion Hub 2
             Motors
                 0 - GoBILDA 5201 series - roller_motor (right encoder)
-                1 - GoBILDA 5201 series - right_slide_motor
+                1 - GoBILDA 5201 series - right_lift_motor
                 2 - GoBILDA 5201 series - right_front_drive (encoder port has bent pin)
                 3 - GoBILDA 5201 series - right_back_drive
             Digital Devices
@@ -88,6 +90,8 @@ public class TeleOpR extends LinearOpMode {
     public static double TRIGGER_THRESHOLD = 0.5;
     public static double ROLLER_POWER = 0.7;
     public static double LIFT_POWER = 0.2;
+    public static int LIFT_UP_POSITION = 200;
+    public static int LIFT_DOWN_POSITION = 0;
     private static final String TAG = "Bucket Brigade";
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -115,9 +119,10 @@ public class TeleOpR extends LinearOpMode {
     private Servo elbowServo;
     private Servo clawFlipServo;
     private Servo intakeServo;
-    private DcMotor leftSlideMotor;
-    private DcMotor rightSlideMotor;
+    private DcMotor leftLiftMotor;
+    private DcMotor rightLiftMotor;
     private TouchSensor liftTouch;
+    private boolean isLiftReady;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -142,9 +147,19 @@ public class TeleOpR extends LinearOpMode {
         elbowServo = hardwareMap.get(Servo.class,"elbow_servo");
         clawFlipServo = hardwareMap.get(Servo.class, "claw_flip_servo");
         intakeServo = hardwareMap.get(Servo.class,"intake_servo");
-        leftSlideMotor = hardwareMap.get(DcMotor.class,"left_slide_motor");
-        rightSlideMotor = hardwareMap.get(DcMotor.class,"right_slide_motor");
+        leftLiftMotor = hardwareMap.get(DcMotor.class,"left_lift_motor");
+        rightLiftMotor = hardwareMap.get(DcMotor.class,"right_lift_motor");
         liftTouch = hardwareMap.get(TouchSensor.class, "lift_touch");
+
+        leftLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftLiftMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        rightLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightLiftMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         driveMotors = new DcMotor[] {leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive};
 
@@ -264,25 +279,33 @@ public class TeleOpR extends LinearOpMode {
             if (currentGamepad1.right_trigger > TRIGGER_THRESHOLD){
                 rollerMotor.setPower(ROLLER_POWER);
             }
-
+/*
             if (currentGamepad2.left_stick_y > TRIGGER_THRESHOLD){
-                leftSlideMotor.setPower(-LIFT_POWER);
+                leftLiftMotor.setPower(-LIFT_POWER);
             }
             else if (currentGamepad2.left_stick_y < -TRIGGER_THRESHOLD){
-                leftSlideMotor.setPower(LIFT_POWER);
+                leftLiftMotor.setPower(LIFT_POWER);
             }
             else {
-                leftSlideMotor.setPower(0);
+                leftLiftMotor.setPower(0);
             }
 
             if (currentGamepad2.right_stick_y > TRIGGER_THRESHOLD){
-                rightSlideMotor.setPower(-LIFT_POWER);
+                rightLiftMotor.setPower(-LIFT_POWER);
             }
             else if (currentGamepad2.right_stick_y < -TRIGGER_THRESHOLD){
-                rightSlideMotor.setPower(LIFT_POWER);
+                rightLiftMotor.setPower(LIFT_POWER);
             }
             else {
-                rightSlideMotor.setPower(0);
+                rightLiftMotor.setPower(0);
+            }
+*/
+            if(currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
+                lowerLift();
+            }
+
+            if(currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
+                raiseLift();
             }
 
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper){
@@ -457,8 +480,40 @@ public class TeleOpR extends LinearOpMode {
             // Determine whether the lift is down.
             boolean isLiftDown = liftTouch.isPressed();
 
+            // If the lift is down...
+            if (isLiftDown) {
+
+                // If the lift is not ready...
+                if(!isLiftReady) {
+
+                    // Initialize the lift.
+                    initializeLift();
+
+                    // Remember that the lift is ready.
+                    isLiftReady = true;
+
+                }
+
+                // Reset the lift.
+                //resetLift();
+
+            }
+
+            // Get the lift's position.
+            int leftLiftPosition = leftLiftMotor.getCurrentPosition();
+            int rightLiftPosition = rightLiftMotor.getCurrentPosition();
+
+            // Get the lift's power.
+            double leftLiftPower = leftLiftMotor.getPower();
+            double rightLiftPower = rightLiftMotor.getPower();
+
             // Update the telemetry.
             telemetry.addData("Lift Down", isLiftDown);
+            telemetry.addData("Lift Ready", isLiftReady);
+            telemetry.addData("Left Lift Position", leftLiftPosition);
+            telemetry.addData("Right Lift Position", rightLiftPosition);
+            telemetry.addData("Left Lift Power", leftLiftPower);
+            telemetry.addData("Right Lift Power", rightLiftPower);
             telemetry.addData("Localized", localized);
             telemetry.addData("Pose", poseString);
             telemetry.addData("Left Column", leftColumn);
@@ -597,5 +652,46 @@ public class TeleOpR extends LinearOpMode {
     }
     public void log(String message) {
         Log.d(TAG, message);
+    }
+
+    private void initializeLift() {
+        initializeLift(leftLiftMotor);
+        initializeLift(rightLiftMotor);
+    }
+
+    private void initializeLift(DcMotor liftMotor) {
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    private void resetLift() {
+        resetLift(leftLiftMotor);
+        resetLift(rightLiftMotor);
+    }
+
+    private void resetLift(DcMotor liftMotor) {
+        liftMotor.setDirection(DcMotor.Direction.REVERSE);
+        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    private void raiseLift() {
+        setLiftPosition(leftLiftMotor, LIFT_UP_POSITION);
+        //setLiftPosition(rightLiftMotor, LIFT_UP_POSITION);
+    }
+
+    private void lowerLift() {
+        setLiftPosition(leftLiftMotor, LIFT_DOWN_POSITION);
+        //setLiftPosition(rightLiftMotor, LIFT_DOWN_POSITION);
+    }
+
+    private void setLiftPosition(DcMotor liftMotor, int position) {
+        if(!isLiftReady) {
+            return;
+        }
+        liftMotor.setTargetPosition(position);
+        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        liftMotor.setPower(LIFT_POWER);
     }
 }
