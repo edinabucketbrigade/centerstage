@@ -19,8 +19,6 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-import java.util.List;
-
 @Config
 @TeleOp
 public class TeleOpR extends LinearOpMode {
@@ -59,25 +57,25 @@ public class TeleOpR extends LinearOpMode {
     private static final int MINIMUM_ROW = 1;
     private static final int MAXIMUM_ROW = 11;
     public static double GROUND_TRAVERSAL_WRIST_POSITION = 0.1;
-    public static double BACKDROP_TRAVERSAL_WRIST_POSITION = 0.1;
+    public static double BACKDROP_TRAVERSAL_WRIST_POSITION = 0.05;
     public static double PICKUP_TRAVERSAL_WRIST_POSITION = 0.1;
-    public static double NEUTRAL_TRAVERSAL_WRIST_POSITION = 0.1;
+    public static double NEUTRAL_TRAVERSAL_WRIST_POSITION = 0.88;
     public static double BACKDROP_WRIST_POSITION = 0.35;
-    public static double PICKUP_WRIST_POSITION = 0.775;
+    public static double PICKUP_WRIST_POSITION = 0.832;
     public static double NEUTRAL_WRIST_POSITION = 0.45;
     public static double GROUND_WRIST_POSITION = 0.35;
     public static double GROUND_TRAVERSAL_ELBOW_POSITION = 0;
-    public static double BACKDROP_TRAVERSAL_ELBOW_POSITION = 0;
+    public static double BACKDROP_TRAVERSAL_ELBOW_POSITION = 0.8;
     public static double PICKUP_TRAVERSAL_ELBOW_POSITION = 0.67;
-    public static double NEUTRAL_TRAVERSAL_ELBOW_POSITION = 0.75;
+    public static double NEUTRAL_TRAVERSAL_ELBOW_POSITION = 0.78;
     public static double BACKDROP_ELBOW_POSITION = 0;
-    public static double PICKUP_ELBOW_POSITION = 0.67;
+    public static double PICKUP_ELBOW_POSITION = 0.715;
     public static double NEUTRAL_ELBOW_POSITION = 0.75;
     public static double GROUND_ELBOW_POSITION = 0.15;
-    public static double RIGHT_GRIP_MINIMUM = 0;
-    public static double RIGHT_GRIP_MAXIMUM = 1;
-    public static double LEFT_GRIP_MINIMUM = 0;
-    public static double LEFT_GRIP_MAXIMUM = 1;
+    public static double RIGHT_GRIP_OPEN = 0.36;
+    public static double RIGHT_GRIP_CLOSED = 0.47;
+    public static double LEFT_GRIP_OPEN = 0.25;
+    public static double LEFT_GRIP_CLOSED = 0.38;
     public static int ARM_DELAY = 1000;
     private static final String TAG = "Bucket Brigade";
     private DcMotor leftFrontDrive;
@@ -218,19 +216,19 @@ public class TeleOpR extends LinearOpMode {
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper){
                 if (leftGripOpen){
                     leftGripOpen = false;
-                    leftGripServo.setPosition(LEFT_GRIP_MINIMUM);
+                    leftGripServo.setPosition(LEFT_GRIP_OPEN);
                 } else {
                     leftGripOpen = true;
-                    leftGripServo.setPosition(LEFT_GRIP_MAXIMUM);
+                    leftGripServo.setPosition(LEFT_GRIP_CLOSED);
                 }
             }
             if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper){
                 if (rightGripOpen){
                     rightGripOpen = false;
-                    rightGripServo.setPosition(RIGHT_GRIP_MINIMUM);
+                    rightGripServo.setPosition(RIGHT_GRIP_OPEN);
                 } else {
                     rightGripOpen = true;
-                    rightGripServo.setPosition(RIGHT_GRIP_MAXIMUM);
+                    rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
                 }
             }
             // BACKDROP
@@ -247,6 +245,8 @@ public class TeleOpR extends LinearOpMode {
                     fromNeutral = false;
                 }
                 if (fromPickup) {
+                    elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
+                    sleep(500);
                     wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
                     sleep(1000);
                     elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
@@ -277,10 +277,10 @@ public class TeleOpR extends LinearOpMode {
                     fromBackdrop = false;
                 }
                 if (fromNeutral) {
+                    elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
                     wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
                     sleep(1000);
                     elbowServo.setPosition(PICKUP_ELBOW_POSITION);
-                    sleep(1000);
                     wristServo.setPosition(PICKUP_WRIST_POSITION);
                     fromNeutral = false;
                 }
