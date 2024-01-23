@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -275,13 +274,31 @@ public class TeleOpR extends LinearOpMode {
                 rollerMotor.setPower(ROLLER_POWER);
             }
 
+            // If the second gamepad's left stick is down...
             if (currentGamepad2.left_stick_y > TRIGGER_THRESHOLD){
+
+                // Lower the lift.
                 leftLiftMotor.setPower(-LIFT_POWER);
                 rightLiftMotor.setPower(-LIFT_POWER);
+
             }
-            else if (currentGamepad2.left_stick_y < -TRIGGER_THRESHOLD){
+
+            // If the second gamepad's left stick is up...
+            if (currentGamepad2.left_stick_y < -TRIGGER_THRESHOLD){
+
+                // Raise the lift.
+                leftLiftMotor.setPower(LIFT_POWER);
+                rightLiftMotor.setPower(LIFT_POWER);
+
+            }
+
+            // If the second gamepad's left stick is left or right...
+            if (currentGamepad2.left_stick_x < -TRIGGER_THRESHOLD || currentGamepad2.left_stick_x > TRIGGER_THRESHOLD) {
+
+                // Stop the lift motors.
                 leftLiftMotor.setPower(0);
                 rightLiftMotor.setPower(0);
+
             }
 
             if(currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
