@@ -151,16 +151,6 @@ public class TeleOpR extends LinearOpMode {
         rightLiftMotor = hardwareMap.get(DcMotor.class,"right_lift_motor");
         liftTouch = hardwareMap.get(TouchSensor.class, "lift_touch");
 
-        leftLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        leftLiftMotor.setDirection(DcMotor.Direction.FORWARD);
-        leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        rightLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        rightLiftMotor.setDirection(DcMotor.Direction.FORWARD);
-        rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         driveMotors = new DcMotor[] {leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive};
 
         int leftColumn = MINIMUM_COLUMN;
@@ -495,7 +485,7 @@ public class TeleOpR extends LinearOpMode {
                 }
 
                 // Reset the lift.
-                //resetLift();
+                resetLift();
 
             }
 
@@ -655,13 +645,13 @@ public class TeleOpR extends LinearOpMode {
     }
 
     private void initializeLift() {
-        initializeLift(leftLiftMotor);
-        initializeLift(rightLiftMotor);
+        initializeLift(leftLiftMotor, DcMotor.Direction.FORWARD);
+        initializeLift(rightLiftMotor, DcMotor.Direction.REVERSE);
     }
 
-    private void initializeLift(DcMotor liftMotor) {
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    private static void initializeLift(DcMotor liftMotor, DcMotor.Direction direction) {
+        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        liftMotor.setDirection(direction);
     }
 
     private void resetLift() {
@@ -669,21 +659,19 @@ public class TeleOpR extends LinearOpMode {
         resetLift(rightLiftMotor);
     }
 
-    private void resetLift(DcMotor liftMotor) {
-        liftMotor.setDirection(DcMotor.Direction.REVERSE);
-        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+    private static void resetLift(DcMotor liftMotor) {
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     private void raiseLift() {
         setLiftPosition(leftLiftMotor, LIFT_UP_POSITION);
-        //setLiftPosition(rightLiftMotor, LIFT_UP_POSITION);
+        setLiftPosition(rightLiftMotor, LIFT_UP_POSITION);
     }
 
     private void lowerLift() {
         setLiftPosition(leftLiftMotor, LIFT_DOWN_POSITION);
-        //setLiftPosition(rightLiftMotor, LIFT_DOWN_POSITION);
+        setLiftPosition(rightLiftMotor, LIFT_DOWN_POSITION);
     }
 
     private void setLiftPosition(DcMotor liftMotor, int position) {
