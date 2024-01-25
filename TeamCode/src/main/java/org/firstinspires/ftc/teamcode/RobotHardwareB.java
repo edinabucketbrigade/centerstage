@@ -5,6 +5,7 @@ import android.util.Size;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -90,6 +91,9 @@ public class RobotHardwareB {
     public static double INTAKE_SERVO_UP_POSITION = 1;
     public static double INTAKE_SERVO_DOWN_POSITION = 0.38;
     public static double INTAKE_SERVO_PLACEMENT_POSITION = 0.45;
+    public static double HEAT_SEEK_X = 40;
+    public static double HEAT_SEEK_RED_Y = -35;
+    public static double HEAT_SEEK_BLUE_Y = 35;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -231,13 +235,15 @@ public class RobotHardwareB {
         Telemetry telemetry = opMode.telemetry;
 
         // Update the telemetry.
+        telemetry.addData("Localized", isLocalized);
+        if(isLocalized) {
+            telemetry.addData("Pose", poseString);
+        }
         telemetry.addData("Lift Down", isLiftDown);
         telemetry.addData("Left Lift Position", leftLiftPosition);
         telemetry.addData("Right Lift Position", rightLiftPosition);
         telemetry.addData("Left Lift Power", leftLiftPower);
         telemetry.addData("Right Lift Power", rightLiftPower);
-        telemetry.addData("Localized", isLocalized);
-        telemetry.addData("Pose", poseString);
 
     }
 
@@ -595,9 +601,11 @@ public class RobotHardwareB {
         // Get the robot's current pose.
         Pose2d currentPose = drive.getPoseEstimate();
 
+        // Construct a target position.
+        Vector2d targetPosition = new Vector2d(HEAT_SEEK_X, HEAT_SEEK_RED_Y);
+
         // Construct a target pose.
-        //Pose2d targetPose = new Pose2d(50, 35, Math.toRadians(180)); // blue backdrop middle
-        Pose2d targetPose = new Pose2d(50, -35, Math.toRadians(180)); // red backdrop middle
+        Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
 
         // Construct a trajectory sequence.
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
