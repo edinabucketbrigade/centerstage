@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.util.Size;
-
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -13,18 +10,14 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-import java.util.List;
-
 @Config
-@Autonomous(preselectTeleOp = "TeleOpR")
+@Autonomous
+//@Autonomous(preselectTeleOp = "TeleOpR")
 public class AutoF extends LinearOpMode {
     enum Route {
         RED_LEFT_DIRECT,
@@ -65,21 +58,20 @@ public class AutoF extends LinearOpMode {
     private Boolean parkLeft = null;
     private OpenCvWebcam camera;
     private boolean startedStreaming;
-    private AprilTagProcessor aprilTagProcessor;
     private Gamepad previousGamepad = new Gamepad();
     private Gamepad currentGamepad = new Gamepad();
-    private FtcDashboard ftcDashboard;
     private CenterStageCVDetection.Location location;
     private CenterStageCVDetection teamPropDetector;
+    private RobotHardwareB robotHardware;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        // Get an FTC dashboard.
-        ftcDashboard = FtcDashboard.getInstance();
+        // Get the robot hardware.
+        robotHardware = new RobotHardwareB(this);
 
-        // Construct a drive interface.
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        // Wait for the user to lower the lift.
+        robotHardware.waitForLiftDown();
 
         // Wait for menu selection.
         waitForMenuSelection();
@@ -112,17 +104,13 @@ public class AutoF extends LinearOpMode {
 
         }
 
-        // Construct an AprilTag processor.
-        aprilTagProcessor = new AprilTagProcessor.Builder().build();
-
-        // Construct a vision portal.
-        new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .setCameraResolution(new Size(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT))
-                .addProcessor(aprilTagProcessor)
-                .build();
+        // Start looking for AprilTags.
+        robotHardware.startLookingForAprilTags();
 
         //TrajectorySequence sequence = null;
+
+        // Get the drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
 
         TrajectorySequence sequence = getRedLeftMiddleTrajectorySequence(drive);
 
@@ -182,41 +170,13 @@ public class AutoF extends LinearOpMode {
         drive.followTrajectorySequenceAsync(sequence);
         //drive.followTrajectorySequence(sequence);
 
-        // Initialize a localized value.
-        boolean localized = false;
-
         // While the op mode is active...
         while (!isStopRequested()) {
 
-            // Update the robot.
-            drive.update();
-
-            // Get a detection.
-            AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
-
-            // If there is a detection...
-            if (detection != null) {
-
-                // Get the robot's pose.
-                Pose2d pose = AutoG.getRobotPose(detection, telemetry);
-
-                // Update the driver interface.
-                drive.setPoseEstimate(pose);
-
-                // Remember that we localized the robot using an AprilTag.
-                localized = true;
-
-            }
-
-            // Get the robot's pose.
-            Pose2d pose = drive.getPoseEstimate();
-
-            // Convert the pose to a string.
-            String poseString = toString(pose);
+            // Update the robot hardware.
+            robotHardware.update();
 
             // Update the telemetry.
-            telemetry.addData("Localized", localized);
-            telemetry.addData("Pose", poseString);
             telemetry.update();
 
         }
@@ -283,7 +243,7 @@ public class AutoF extends LinearOpMode {
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(32)
-                .setReversed(true)
+                /*.setReversed(true)
                 .splineTo(RED_MIDDLE,Math.toRadians(0))
                 .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
                 .splineTo(RED_BACKDROP, Math.toRadians(0))
@@ -302,7 +262,7 @@ public class AutoF extends LinearOpMode {
                 .setReversed(true)
                 .splineTo(RED_MIDDLE,Math.toRadians(0))
                 .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP,Math.toRadians(0))
+                .splineTo(RED_BACKDROP,Math.toRadians(0))*/
                 .build();
         return sequence;
     }
@@ -689,29 +649,6 @@ public class AutoF extends LinearOpMode {
     // Waits for menu selection.
     private void waitForMenuSelection() throws InterruptedException {
 
-        // Verify inputs exist.
-        if(currentGamepad == null) {
-            throw new InterruptedException("The current gamepad is missing.");
-        }
-        if(gamepad1 == null) {
-            throw new InterruptedException("The gamepad 1 is missing.");
-        }
-        if (parkLeft == null) {
-            throw new InterruptedException("The park left value is missing.");
-        }
-        if(previousGamepad == null) {
-            throw new InterruptedException("The previous gamepad is missing.");
-        }
-        if (redAlliance == null) {
-            throw new InterruptedException("The red alliance value is missing.");
-        }
-        if (startLeft == null) {
-            throw new InterruptedException("The start left value is missing.");
-        }
-        if (telemetry == null) {
-            throw new InterruptedException("The telemetry is missing.");
-        }
-
         // While the op mode is active...
         while (!isStopRequested()) {
 
@@ -771,9 +708,6 @@ public class AutoF extends LinearOpMode {
     private void waitForCameraOpen() throws InterruptedException {
 
         // Verify inputs exist.
-        if (ftcDashboard == null) {
-            throw new InterruptedException("The FTC dashboard is missing.");
-        }
         if (hardwareMap == null) {
             throw new InterruptedException("The hardware map is missing.");
         }
@@ -837,7 +771,7 @@ public class AutoF extends LinearOpMode {
         }
 
         // Show the camera stream in the FTC dashboard.
-        ftcDashboard.startCameraStream(camera, 0);
+        robotHardware.startCameraStream(camera);
 
     }
 

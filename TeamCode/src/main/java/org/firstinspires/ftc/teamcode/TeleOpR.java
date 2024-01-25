@@ -52,6 +52,9 @@ public class TeleOpR extends LinearOpMode {
         // Get the robot hardware.
         robotHardware = new RobotHardwareB(this);
 
+        // Start looking for AprilTags.
+        robotHardware.startLookingForAprilTags();
+
         // Initialize gamepads.
         Gamepad currentGamepad1 = new Gamepad();
         Gamepad previousGamepad1 = new Gamepad();
@@ -333,7 +336,7 @@ public class TeleOpR extends LinearOpMode {
                 } else {
                     output += WHITE_CIRCLE;
                 }
-                
+
             }
 
             // If this is not the bottom row...

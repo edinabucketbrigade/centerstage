@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -120,6 +121,7 @@ public class RobotHardwareB {
     private SampleMecanumDrive drive;
     private AprilTagProcessor aprilTagProcessor;
     private boolean isLocalized;
+    private FtcDashboard ftcDashboard;
 
     // Initializes this.
     public RobotHardwareB(LinearOpMode opMode) {
@@ -128,7 +130,7 @@ public class RobotHardwareB {
         this.opMode = opMode;
 
         // Initialize the FTC dashboard.
-        FtcDashboard.getInstance();
+        ftcDashboard = FtcDashboard.getInstance();
 
         // Get the hardware map.
         HardwareMap hardwareMap = opMode.hardwareMap;
@@ -163,13 +165,6 @@ public class RobotHardwareB {
         // Get an AprilTag processor.
         aprilTagProcessor = new AprilTagProcessor.Builder().build();
 
-        // Get a vision portal.
-        new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .setCameraResolution(new Size(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT))
-                .addProcessor(aprilTagProcessor)
-                .build();
-
         // Get the telemetry.
         Telemetry telemetry = opMode.telemetry;
 
@@ -180,6 +175,9 @@ public class RobotHardwareB {
 
     // Update this.
     public void update() throws InterruptedException {
+
+        // Update the robot.
+        drive.update();
 
         // Get a detection.
         AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
@@ -773,6 +771,37 @@ public class RobotHardwareB {
 
         // Stop the roller.
         rollerMotor.setPower(0);
+
+    }
+
+    // Shows the camera stream in the FTC dashboard.
+    public void startCameraStream(CameraStreamSource camera) {
+
+        // Show the camera stream in the FTC dashboard.
+        ftcDashboard.startCameraStream(camera, 0);
+
+    }
+
+    // Get the drive interface.
+    public SampleMecanumDrive getDrive() {
+
+        // Returns the drive interface.
+        return drive;
+
+    }
+
+    // Starts looking for AprilTags.
+    public void startLookingForAprilTags() {
+
+        // Get the hardware map.
+        HardwareMap hardwareMap = opMode.hardwareMap;
+
+        // Construct a vision portal.
+        new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT))
+                .addProcessor(aprilTagProcessor)
+                .build();
 
     }
 
