@@ -89,11 +89,12 @@ public class TeleOpR extends LinearOpMode {
     public static int ARM_DELAY = 1000;
     public static double TRIGGER_THRESHOLD = 0.5;
     public static double ROLLER_POWER = 0.7;
-    public static double LIFT_POWER = 0.2;
-    public static int LIFT_UP_POSITION = 1000;
+    public static double LIFT_POWER = 0.4;
+    public static int LIFT_UP_POSITION = 3000;
     public static int LIFT_DOWN_POSITION = 0;
     public static double INTAKE_SERVO_UP_POSITION = 1;
     public static double INTAKE_SERVO_DOWN_POSITION = 0.38;
+    public static double INTAKE_SERVO_PLACEMENT_POSITION = 0.45;
     private static final String TAG = "Bucket Brigade";
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
@@ -301,6 +302,7 @@ public class TeleOpR extends LinearOpMode {
             }
 
             if (currentGamepad1.back && !previousGamepad1.back) {
+                intakeServo.setPosition(INTAKE_SERVO_PLACEMENT_POSITION);
                 leftClawServo.setPosition(LEFT_CLAW_CLOSED);
                 rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
                 sleep(500);
@@ -323,15 +325,12 @@ public class TeleOpR extends LinearOpMode {
                 rightGripServo.setPosition(RIGHT_GRIP_OPEN);
 
                 raiseLift();
+                sleep(3000);
 
-                elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
-                sleep(500);
-                wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
-                sleep(1000);
                 elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
-                sleep(1000);
                 wristServo.setPosition(BACKDROP_WRIST_POSITION);
                 fromPickup = false;
+                sleep(1000);
 
                 leftGripServo.setPosition(LEFT_GRIP_CLOSED);
                 rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
