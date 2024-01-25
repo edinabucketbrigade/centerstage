@@ -305,13 +305,27 @@ public class TeleOpR extends LinearOpMode {
 
         // Previous symbols: 〇 Ⓛ Ⓡ
 
+        // Initialize the output.
         String output = "\n";
+
+        // For each row...
         for (int row = MAXIMUM_ROW; row >= MINIMUM_ROW; row--) {
+
+            // If the row is odd...
             if (!isEven(row)) {
+
+                // Append a space.
                 output += "  ";
+
             }
+
+            // Get the row's column count.
             int maximumColumn = getMaximumColumn(row);
+
+            // For each column...
             for (int column = MINIMUM_COLUMN; column <= maximumColumn; column++) {
+
+                // Append the appropriate symbol.
                 if (column == leftColumn && leftRow == row) {
                     output += ORANGE_CIRCLE;
                 } else if (column == rightColumn && rightRow == row) {
@@ -319,12 +333,22 @@ public class TeleOpR extends LinearOpMode {
                 } else {
                     output += WHITE_CIRCLE;
                 }
+                
             }
+
+            // If this is not the bottom row...
             if(row > MINIMUM_ROW) {
+
+                // Append a newline.
                 output += "\n";
+
             }
+
         }
+
+        // Return the output.
         return output;
+
     }
 
 }
