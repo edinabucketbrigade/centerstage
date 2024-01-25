@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.RobotHardwareB.MAXIMUM_ROW;
+import static org.firstinspires.ftc.teamcode.RobotHardwareB.MINIMUM_COLUMN;
+import static org.firstinspires.ftc.teamcode.RobotHardwareB.MINIMUM_ROW;
+import static org.firstinspires.ftc.teamcode.RobotHardwareB.getMaximumColumn;
+import static org.firstinspires.ftc.teamcode.RobotHardwareB.isEven;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -33,17 +39,19 @@ public class TeleOpR extends LinearOpMode {
     - dpad up = stop heat seek
      */
 
-    private static final int MINIMUM_COLUMN = 1;
-    private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
-    private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
-    private static final int MINIMUM_ROW = 1;
-    private static final int MAXIMUM_ROW = 11;
     public static double TRIGGER_THRESHOLD = 0.5;
     public static String WHITE_CIRCLE = "⚪"; // See https://unicode-explorer.com/list/geometric-shapes
     public static String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
+    public static int HANG_LIFT_POSITION = 3000;
 
     private boolean heatSeeking = false;
     private RobotHardwareB robotHardware;
+    // Initialize gamepads.
+    private Gamepad currentGamepad1 = new Gamepad();
+    private Gamepad previousGamepad1 = new Gamepad();
+    private Gamepad currentGamepad2 = new Gamepad();
+    private Gamepad previousGamepad2 = new Gamepad();
+    private Boolean redAlliance = null;
 
     // Runs the op mode.
     @Override
@@ -55,15 +63,12 @@ public class TeleOpR extends LinearOpMode {
         // Start looking for AprilTags.
         robotHardware.startLookingForAprilTags();
 
-        // Initialize gamepads.
-        Gamepad currentGamepad1 = new Gamepad();
-        Gamepad previousGamepad1 = new Gamepad();
-        Gamepad currentGamepad2 = new Gamepad();
-        Gamepad previousGamepad2 = new Gamepad();
-
         // Initialize left pixel's column and row.
         int leftColumn = MINIMUM_COLUMN;
         int leftRow = MINIMUM_ROW;
+
+        // Wait for menu selection.
+        waitForMenuSelection();
 
         // Wait for the user to lower the lift.
         robotHardware.waitForLiftDown();
@@ -125,7 +130,7 @@ public class TeleOpR extends LinearOpMode {
             if (heatSeeking && localized) {
 
                 // Heat seek.
-                robotHardware.heatSeek();
+                robotHardware.heatSeek(leftColumn, leftRow, redAlliance);
 
                 // Remember that we are done heat seeking.
                 heatSeeking = false;
@@ -133,7 +138,7 @@ public class TeleOpR extends LinearOpMode {
             }
 
             if (currentGamepad1.back && !previousGamepad1.back) {
-                robotHardware.placePixelsOnBackdrop();
+                robotHardware.placePixelsOnBackdrop(leftRow);
             }
 
             // If the robot driver pressed x...
@@ -196,7 +201,7 @@ public class TeleOpR extends LinearOpMode {
             if(currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
 
                 // Raise the lift.
-                robotHardware.raiseLift();
+                robotHardware.raiseLift(HANG_LIFT_POSITION);
 
             }
 
@@ -285,24 +290,6 @@ public class TeleOpR extends LinearOpMode {
 
     }
 
-    // Gets the column count for a specified row.
-    private static int getMaximumColumn(int row){
-        if (isEven(row)){
-            return MAXIMUM_COLUMN_EVEN_ROW;
-        } else {
-            return MAXIMUM_COLUMN_ODD_ROW;
-        }
-    }
-
-    // Determines whether a number is even.
-    private static boolean isEven(int value){
-        if (value%2 == 0){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     // Gets a hex display.
     private static String getHexDisplay(int leftColumn, int leftRow, int rightColumn, int rightRow) {
 
@@ -351,6 +338,40 @@ public class TeleOpR extends LinearOpMode {
 
         // Return the output.
         return output;
+
+    }
+
+    // Waits for menu selection.
+    private void waitForMenuSelection() throws InterruptedException {
+
+        // While the op mode is active...
+        while (!isStopRequested()) {
+
+            // Update the gamepads.
+            previousGamepad1.copy(currentGamepad1);
+            currentGamepad1.copy(gamepad1);
+
+            // If the user has not selected an alliance...
+            if (redAlliance == null) {
+                telemetry.addData("Alliance", "X = blue, B = red");
+                telemetry.update();
+                if (currentGamepad1.x && !previousGamepad1.x) {
+                    redAlliance = false;
+                }
+                if (currentGamepad1.b && !previousGamepad1.b) {
+                    redAlliance = true;
+                }
+            }
+
+            // Otherwise (if the user finished making menu selections)...
+            else {
+
+                // Stop prompting the user for inputs.
+                break;
+
+            }
+
+        }
 
     }
 

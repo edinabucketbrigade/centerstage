@@ -86,14 +86,23 @@ public class RobotHardwareB {
     public static int ARM_DELAY = 1000;
     public static double ROLLER_POWER = 0.7;
     public static double LIFT_POWER = 1;
-    public static int LIFT_UP_POSITION = 3000;
     public static int LIFT_DOWN_POSITION = 0;
     public static double INTAKE_SERVO_UP_POSITION = 1;
     public static double INTAKE_SERVO_DOWN_POSITION = 0.38;
     public static double INTAKE_SERVO_PLACEMENT_POSITION = 0.45;
     public static double HEAT_SEEK_X = 40;
-    public static double HEAT_SEEK_RED_Y = -35;
-    public static double HEAT_SEEK_BLUE_Y = 35;
+    public static double TILE_SIZE = 24;
+    public static double HEAT_SEEK_Y_OFFSET = 6;
+    public static double HEAT_SEEK_RED_Y = -TILE_SIZE - HEAT_SEEK_Y_OFFSET;
+    public static double HEAT_SEEK_BLUE_Y = 2 * TILE_SIZE - HEAT_SEEK_Y_OFFSET;
+    public static int HEAT_SEEK_LIFT_POSITION = 2000;
+    public static int HEAT_SEEK_LIFT_INCREMENT = 300;
+    public static double PIXEL_WIDTH = 3;
+    public static final int MINIMUM_COLUMN = 1;
+    private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
+    private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
+    public static final int MINIMUM_ROW = 1;
+    public static final int MAXIMUM_ROW = 11;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -390,11 +399,11 @@ public class RobotHardwareB {
     }
 
     // Raises the lift.
-    public void raiseLift() {
+    public void raiseLift(int position) {
 
         // Raise the lift.
-        setLiftPosition(leftLiftMotor, LIFT_UP_POSITION);
-        setLiftPosition(rightLiftMotor, LIFT_UP_POSITION);
+        setLiftPosition(leftLiftMotor, position);
+        setLiftPosition(rightLiftMotor, position);
         isLoweringLift = false;
 
     }
@@ -570,7 +579,7 @@ public class RobotHardwareB {
     }
 
     // Drives to the backdrop and places pixels.
-    public void heatSeek() throws InterruptedException {
+    public void heatSeek(int leftColumn, int row, boolean redAlliance) throws InterruptedException {
 
         // Verify inputs exist.
         if(clawFlipServo == null) {
@@ -601,14 +610,21 @@ public class RobotHardwareB {
         // Get the robot's current pose.
         Pose2d currentPose = drive.getPoseEstimate();
 
+        // Get a heat seek y coordinate.
+        double heatSeekY = getHeatSeekY(leftColumn, row, redAlliance);
+
         // Construct a target position.
-        Vector2d targetPosition = new Vector2d(HEAT_SEEK_X, HEAT_SEEK_RED_Y);
+        Vector2d targetPosition = new Vector2d(HEAT_SEEK_X, heatSeekY);
 
         // Construct a target pose.
         Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
 
+        // Get a lift position.
+        int liftPosition = getHeatSeekLiftPosition(row);
+
         // Construct a trajectory sequence.
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
+                /*
                 .addDisplacementMarker(0, () -> {
                     leftClawServo.setPosition(LEFT_CLAW_CLOSED);
                     rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
@@ -633,7 +649,7 @@ public class RobotHardwareB {
                     leftGripServo.setPosition(LEFT_GRIP_OPEN);
                     rightGripServo.setPosition(RIGHT_GRIP_OPEN);
 
-                    raiseLift();
+                    raiseLift(liftPosition);
 
                     elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
                 })
@@ -652,11 +668,13 @@ public class RobotHardwareB {
 
                     fromBackdrop = true;
                 })
+                */
                 .lineToLinearHeading(targetPose)
                 .build();
 
         // Execute the trajectory sequence.
-        drive.followTrajectorySequenceAsync(sequence);
+        drive.followTrajectorySequence(sequence);
+        //drive.followTrajectorySequenceAsync(sequence);
     }
 
     // Toggles the claws.
@@ -704,7 +722,7 @@ public class RobotHardwareB {
     }
 
     // Places pixels on the backdrop.
-    public void placePixelsOnBackdrop() {
+    public void placePixelsOnBackdrop(int row) {
         intakeServo.setPosition(INTAKE_SERVO_PLACEMENT_POSITION);
         leftClawServo.setPosition(LEFT_CLAW_CLOSED);
         rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
@@ -727,7 +745,10 @@ public class RobotHardwareB {
         leftGripServo.setPosition(LEFT_GRIP_OPEN);
         rightGripServo.setPosition(RIGHT_GRIP_OPEN);
 
-        raiseLift();
+        // Get a lift position.
+        int liftPosition = getHeatSeekLiftPosition(row);
+
+        raiseLift(liftPosition);
         opMode.sleep(3000);
 
         elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
@@ -812,5 +833,79 @@ public class RobotHardwareB {
                 .build();
 
     }
+
+    // Get a heat seek y coordinate.
+    public double getHeatSeekY(int leftColumn, int row, boolean redAlliance) throws InterruptedException {
+
+        // If the row is invalid...
+        if(row < MINIMUM_ROW || row > MAXIMUM_ROW) {
+
+            // Complain.
+            throw new InterruptedException("The row is invalid.");
+
+        }
+
+        // Get the row's column count.
+        int maximumColumn = getMaximumColumn(row);
+
+        // If the left column is invalid...
+        if(leftColumn < MINIMUM_COLUMN || leftColumn > maximumColumn - 1) {
+
+            // Complain.
+            throw new InterruptedException("The left column is invalid.");
+
+        }
+
+        // Initialize a heat seek y coordinate.
+        double heatSeekY = redAlliance ? HEAT_SEEK_RED_Y : HEAT_SEEK_BLUE_Y;
+
+        // Determine whether this is an even row.
+        boolean isEvenRow = isEven(row);
+
+        // If this is an even row...
+        if(isEvenRow) {
+
+            // Shift the robot up by half a pixel width.
+            heatSeekY += PIXEL_WIDTH / 2;
+
+        }
+
+        // Shift the robot down to the appropriate column.
+        heatSeekY -= (leftColumn - 1) * PIXEL_WIDTH;
+
+        // Return the result.
+        return heatSeekY;
+
+    }
+
+    // Gets the column count for a specified row.
+    public static int getMaximumColumn(int row){
+        if (isEven(row)){
+            return MAXIMUM_COLUMN_EVEN_ROW;
+        } else {
+            return MAXIMUM_COLUMN_ODD_ROW;
+        }
+    }
+
+    // Determines whether a number is even.
+    public static boolean isEven(int value) {
+        if (value % 2 == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Gets a heat seek lift position.
+    private static int getHeatSeekLiftPosition(int row) {
+
+        // Get a heat seek lift position.
+        int position =  HEAT_SEEK_LIFT_POSITION + (row - 1) * HEAT_SEEK_LIFT_INCREMENT;
+
+        // Return the result.
+        return position;
+
+    }
+
 
 }

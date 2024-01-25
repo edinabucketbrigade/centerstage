@@ -70,11 +70,11 @@ public class AutoF extends LinearOpMode {
         // Get the robot hardware.
         robotHardware = new RobotHardwareB(this);
 
-        // Wait for the user to lower the lift.
-        robotHardware.waitForLiftDown();
-
         // Wait for menu selection.
         waitForMenuSelection();
+
+        // Wait for the user to lower the lift.
+        robotHardware.waitForLiftDown();
 
         // Wait for the camera to open.
         waitForCameraOpen();
