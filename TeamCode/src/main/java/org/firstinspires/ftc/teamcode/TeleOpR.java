@@ -110,8 +110,8 @@ public class TeleOpR extends LinearOpMode {
     public static double RIGHT_CLAW_CLOSED = 0.5;
     public static double LEFT_CLAW_OPEN = 0.71;
     public static double LEFT_CLAW_CLOSED = 0.5;
-    public static double CLAW_FLIP_SERVO_UP = 1;
-    public static double CLAW_FLIP_SERVO_DOWN = 0;
+    public static double CLAW_FLIP_SERVO_DOWN = 1;
+    public static double CLAW_FLIP_SERVO_UP = 0;
     public static int ARM_DELAY = 1000;
     public static double TRIGGER_THRESHOLD = 0.5;
     public static double ROLLER_POWER = 0.7;
@@ -756,8 +756,14 @@ public class TeleOpR extends LinearOpMode {
         if(intakeServo == null) {
             throw new InterruptedException("The intake servo is missing.");
         }
+        if(leftClawServo == null) {
+            throw new InterruptedException("The left claw servo is missing.");
+        }
         if(leftGripServo == null) {
             throw new InterruptedException("The left grip servo is missing.");
+        }
+        if(rightClawServo == null) {
+            throw new InterruptedException("The right claw servo is missing.");
         }
         if(rightGripServo == null) {
             throw new InterruptedException("The right grip servo is missing.");
@@ -779,12 +785,19 @@ public class TeleOpR extends LinearOpMode {
 
         // Initialize the robot.
         wristServo.setPosition(INITIALIZE_WRIST_POSITION);
+        leftClawServo.setPosition(LEFT_CLAW_CLOSED);
+        rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
+        intakeServo.setPosition(INTAKE_SERVO_PLACEMENT_POSITION);
         sleep(2000);
         elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
         sleep(1000);
         wristServo.setPosition(NEUTRAL_WRIST_POSITION);
         leftGripServo.setPosition(LEFT_GRIP_CLOSED);
         rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
+        clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+        sleep(1000);
+        leftClawServo.setPosition(LEFT_CLAW_OPEN);
+        rightClawServo.setPosition(RIGHT_CLAW_OPEN);
         intakeServo.setPosition(INTAKE_SERVO_DOWN_POSITION);
         fromNeutral = true;
 
@@ -836,7 +849,7 @@ public class TeleOpR extends LinearOpMode {
                     rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
                 })
                 .addDisplacementMarker(0.5, () -> {
-                    clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+                    clawFlipServo.setPosition(CLAW_FLIP_SERVO_UP);
                 })
                 .addDisplacementMarker(1.5, () -> {
                     elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
@@ -930,7 +943,7 @@ public class TeleOpR extends LinearOpMode {
         leftClawServo.setPosition(LEFT_CLAW_CLOSED);
         rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
         sleep(500);
-        clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+        clawFlipServo.setPosition(CLAW_FLIP_SERVO_UP);
         sleep(1000);
 
         elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
