@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -153,6 +154,11 @@ public class TeleOpR extends LinearOpMode {
         rightLiftMotor = hardwareMap.get(DcMotor.class,"right_lift_motor");
         liftTouch = hardwareMap.get(TouchSensor.class, "lift_touch");
 
+        leftLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
         driveMotors = new DcMotor[] {leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive};
 
         int leftColumn = MINIMUM_COLUMN;
@@ -178,6 +184,17 @@ public class TeleOpR extends LinearOpMode {
         rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
         intakeServo.setPosition(INTAKE_SERVO_DOWN_POSITION);
         fromNeutral = true;
+
+        while (opModeInInit()) {
+            if (gamepad1.back && !liftTouch.isPressed()) {
+                leftLiftMotor.setPower(-LIFT_POWER);
+                rightLiftMotor.setPower(-LIFT_POWER);
+            }
+            else {
+                leftLiftMotor.setPower(0);
+                rightLiftMotor.setPower(0);
+            }
+        }
 
         waitForStart();
 
@@ -229,6 +246,49 @@ public class TeleOpR extends LinearOpMode {
 
                 // Construct a trajectory sequence.
                 TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
+                        .addDisplacementMarker(0, () -> {
+                            leftClawServo.setPosition(LEFT_CLAW_CLOSED);
+                            rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
+                        })
+                        .addDisplacementMarker(0.5, () -> {
+                            clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+                        })
+                        .addDisplacementMarker(1.5, () -> {
+                            elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
+                            wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
+                        })
+                        .addDisplacementMarker(2.5, () -> {
+                            elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+                            wristServo.setPosition(PICKUP_WRIST_POSITION);
+                            fromNeutral = false;
+                        })
+                        .addDisplacementMarker(3.5, () -> {
+                            leftClawServo.setPosition(LEFT_CLAW_OPEN);
+                            rightClawServo.setPosition(RIGHT_CLAW_OPEN);
+                        })
+                        .addDisplacementMarker(4, () -> {
+                            leftGripServo.setPosition(LEFT_GRIP_OPEN);
+                            rightGripServo.setPosition(RIGHT_GRIP_OPEN);
+
+                            raiseLift();
+
+                            elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
+                        })
+                        .addDisplacementMarker(4.5, () -> {
+                            wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
+                        })
+                        .addDisplacementMarker(5.5, () -> {
+                            elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
+                        })
+                        .addDisplacementMarker(6.5, () -> {
+                            wristServo.setPosition(BACKDROP_WRIST_POSITION);
+                            fromPickup = false;
+
+                            leftGripServo.setPosition(LEFT_GRIP_CLOSED);
+                            rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
+
+                            fromBackdrop = true;
+                        })
                         .lineToLinearHeading(targetPose)
                         .build();
 
@@ -238,6 +298,45 @@ public class TeleOpR extends LinearOpMode {
                 // Remember that we are done heat seeking.
                 heatSeeking = false;
 
+            }
+
+            if (currentGamepad1.back && !previousGamepad1.back) {
+                leftClawServo.setPosition(LEFT_CLAW_CLOSED);
+                rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
+                sleep(500);
+                clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+                sleep(1000);
+
+                elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
+                wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
+                sleep(1000);
+                elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+                wristServo.setPosition(PICKUP_WRIST_POSITION);
+                fromNeutral = false;
+                sleep(1000);
+
+                leftClawServo.setPosition(LEFT_CLAW_OPEN);
+                rightClawServo.setPosition(RIGHT_CLAW_OPEN);
+                sleep(500);
+
+                leftGripServo.setPosition(LEFT_GRIP_OPEN);
+                rightGripServo.setPosition(RIGHT_GRIP_OPEN);
+
+                raiseLift();
+
+                elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
+                sleep(500);
+                wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
+                sleep(1000);
+                elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
+                sleep(1000);
+                wristServo.setPosition(BACKDROP_WRIST_POSITION);
+                fromPickup = false;
+
+                leftGripServo.setPosition(LEFT_GRIP_CLOSED);
+                rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
+
+                fromBackdrop = true;
             }
 
             if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left) {
@@ -272,35 +371,8 @@ public class TeleOpR extends LinearOpMode {
             if (currentGamepad1.left_trigger > TRIGGER_THRESHOLD){
                 rollerMotor.setPower(-ROLLER_POWER);
             }
-            if (currentGamepad1.right_trigger > TRIGGER_THRESHOLD){
+            if (currentGamepad1.right_trigger > TRIGGER_THRESHOLD) {
                 rollerMotor.setPower(ROLLER_POWER);
-            }
-
-            // If the second gamepad's left stick is down...
-            if (currentGamepad2.left_stick_y > TRIGGER_THRESHOLD){
-
-                // Lower the lift.
-                leftLiftMotor.setPower(-LIFT_POWER);
-                rightLiftMotor.setPower(-LIFT_POWER);
-
-            }
-
-            // If the second gamepad's left stick is up...
-            if (currentGamepad2.left_stick_y < -TRIGGER_THRESHOLD){
-
-                // Raise the lift.
-                leftLiftMotor.setPower(LIFT_POWER);
-                rightLiftMotor.setPower(LIFT_POWER);
-
-            }
-
-            // If the second gamepad's left stick is left or right...
-            if (currentGamepad2.left_stick_x < -TRIGGER_THRESHOLD || currentGamepad2.left_stick_x > TRIGGER_THRESHOLD) {
-
-                // Stop the lift motors.
-                leftLiftMotor.setPower(0);
-                rightLiftMotor.setPower(0);
-
             }
 
             if(currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
@@ -493,8 +565,8 @@ public class TeleOpR extends LinearOpMode {
                 // If the lift is not ready...
                 if(!isLiftReady) {
 
-                    // Initialize the lift.
-                    initializeLift();
+                    // Reset the lift.
+                    resetLift();
 
                     // Remember that the lift is ready.
                     isLiftReady = true;
@@ -663,17 +735,6 @@ public class TeleOpR extends LinearOpMode {
     }
     public void log(String message) {
         Log.d(TAG, message);
-    }
-
-    private void initializeLift() {
-        initializeLift(leftLiftMotor, DcMotor.Direction.FORWARD);
-        initializeLift(rightLiftMotor, DcMotor.Direction.REVERSE);
-    }
-
-    private static void initializeLift(DcMotor liftMotor, DcMotor.Direction direction) {
-        liftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        liftMotor.setDirection(direction);
-        resetLift(liftMotor);
     }
 
     private void resetLift() {
