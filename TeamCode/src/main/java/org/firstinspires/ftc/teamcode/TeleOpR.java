@@ -971,6 +971,8 @@ public class TeleOpR extends LinearOpMode {
         leftGripServo.setPosition(LEFT_GRIP_CLOSED);
         rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
 
+        intakeServo.setPosition(INTAKE_SERVO_DOWN_POSITION);
+
         fromBackdrop = true;
     }
 
