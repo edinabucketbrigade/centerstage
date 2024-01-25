@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp
 @Config
+@Disabled
 public class TeleOpQ extends LinearOpMode {
 
     public static double ELBOW_PICK_UP = 0.6;

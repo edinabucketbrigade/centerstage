@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.util.Log;
 import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -26,6 +25,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 @Config
 @TeleOp
 public class TeleOpR extends LinearOpMode {
+
     /*
     Webcam 1
 
@@ -37,8 +37,8 @@ public class TeleOpR extends LinearOpMode {
                 2 - GoBILDA 5201 series - left_back_drive (encoder port returns 0 and -1)
                 3 - GoBILDA 5201 series - left_front_drive (left encoder)
             Servos
-                0 - Servo - right_claw_servo
-                1 - Servo - left_claw_servo
+                0 - Servo - left_claw_servo
+                1 - Servo - right_claw_servo
                 2 - Servo - claw_flip_servo
                 3 - Servo - intake_servo
         Expansion Hub 2
@@ -55,11 +55,37 @@ public class TeleOpR extends LinearOpMode {
                 2 - Servo - left_grip_servo
                 3 - Servo - wrist_servo
     */
+
+    /*
+    Gamepad 1: Robot Driver
+
+    - left stick = move robot
+    - right stick = rotate robot
+    - left trigger = roller intake
+    - right trigger = roller eject
+    - x = toggle left claw
+    - b = toggle right claw
+    - a = toggle both claws
+    - y = hold for turtle mode
+    - dpad up = raise lift
+    - dpad down = lower lift
+
+    Gamepad 2: Pixel Driver
+
+    - x = move pixels left
+    - b = move pixels right
+    - a = move pixels down
+    - y = move pixels up
+    - dpad down = start heat seek
+    - dpad up = stop heat seek
+     */
+
     private static final int MINIMUM_COLUMN = 1;
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     private static final int MINIMUM_ROW = 1;
     private static final int MAXIMUM_ROW = 11;
+    public static double INITIALIZE_WRIST_POSITION = 0.1;
     public static double GROUND_TRAVERSAL_WRIST_POSITION = 0.1;
     public static double BACKDROP_TRAVERSAL_WRIST_POSITION = 0.05;
     public static double PICKUP_TRAVERSAL_WRIST_POSITION = 0.1;
@@ -80,27 +106,25 @@ public class TeleOpR extends LinearOpMode {
     public static double RIGHT_GRIP_CLOSED = 0.47;
     public static double LEFT_GRIP_OPEN = 0.25;
     public static double LEFT_GRIP_CLOSED = 0.38;
-    public static double LEFT_CLAW_OPEN = 0.32;
-    public static double LEFT_CLAW_CLOSED = 0.5;
-    public static double RIGHT_CLAW_OPEN = 0.71;
+    public static double RIGHT_CLAW_OPEN = 0.32;
     public static double RIGHT_CLAW_CLOSED = 0.5;
+    public static double LEFT_CLAW_OPEN = 0.71;
+    public static double LEFT_CLAW_CLOSED = 0.5;
     public static double CLAW_FLIP_SERVO_UP = 1;
     public static double CLAW_FLIP_SERVO_DOWN = 0;
     public static int ARM_DELAY = 1000;
     public static double TRIGGER_THRESHOLD = 0.5;
     public static double ROLLER_POWER = 0.7;
-    public static double LIFT_POWER = 0.4;
+    public static double LIFT_POWER = 1;
     public static int LIFT_UP_POSITION = 3000;
     public static int LIFT_DOWN_POSITION = 0;
     public static double INTAKE_SERVO_UP_POSITION = 1;
     public static double INTAKE_SERVO_DOWN_POSITION = 0.38;
     public static double INTAKE_SERVO_PLACEMENT_POSITION = 0.45;
-    private static final String TAG = "Bucket Brigade";
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
-    private DcMotor[] driveMotors;
     private AprilTagProcessor aprilTagProcessor;
     private boolean fromGround;
     private boolean fromBackdrop;
@@ -112,7 +136,7 @@ public class TeleOpR extends LinearOpMode {
     private boolean rightClawOpen;
     private boolean leftClawOpen;
     private boolean clawFlipServoUp;
-    private boolean isBunnyMode = true;
+    private boolean isTurtleMode = false;
     private DcMotor rollerMotor;
     private Servo leftGripServo;
     private Servo rightGripServo;
@@ -125,19 +149,22 @@ public class TeleOpR extends LinearOpMode {
     private DcMotor leftLiftMotor;
     private DcMotor rightLiftMotor;
     private TouchSensor liftTouch;
-    private boolean isLiftReady;
     private boolean isLoweringLift;
+    private SampleMecanumDrive drive;
 
     @Override
     public void runOpMode() throws InterruptedException {
+
         // Initialize the FTC dashboard.
         FtcDashboard.getInstance();
 
+        // Initialize gamepads.
         Gamepad currentGamepad1 = new Gamepad();
         Gamepad previousGamepad1 = new Gamepad();
         Gamepad currentGamepad2 = new Gamepad();
         Gamepad previousGamepad2 = new Gamepad();
 
+        // Get hardware.
         leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
@@ -155,13 +182,13 @@ public class TeleOpR extends LinearOpMode {
         rightLiftMotor = hardwareMap.get(DcMotor.class,"right_lift_motor");
         liftTouch = hardwareMap.get(TouchSensor.class, "lift_touch");
 
+        // Initialize hardware.
         leftLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         leftLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        driveMotors = new DcMotor[] {leftFrontDrive, leftBackDrive, rightFrontDrive, rightBackDrive};
-
+        // Initialize left pixel's column and row.
         int leftColumn = MINIMUM_COLUMN;
         int leftRow = MINIMUM_ROW;
 
@@ -176,39 +203,49 @@ public class TeleOpR extends LinearOpMode {
                 .build();
 
         // Get a drive.
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        drive = new SampleMecanumDrive(hardwareMap);
 
-        elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
-        sleep(1000);
-        wristServo.setPosition(NEUTRAL_WRIST_POSITION);
-        leftGripServo.setPosition(LEFT_GRIP_CLOSED);
-        rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
-        intakeServo.setPosition(INTAKE_SERVO_DOWN_POSITION);
-        fromNeutral = true;
+        // Wait for the user to lower the lift.
+        waitForLiftDown();
 
-        while (opModeInInit()) {
-            if (gamepad1.back && !liftTouch.isPressed()) {
-                leftLiftMotor.setPower(-LIFT_POWER);
-                rightLiftMotor.setPower(-LIFT_POWER);
-            }
-            else {
-                leftLiftMotor.setPower(0);
-                rightLiftMotor.setPower(0);
-            }
+        // Initialize the robot.
+        initializeRobot();
+
+        // If stop is requested...
+        if(isStopRequested()) {
+
+            // Exit the method.
+            return;
+
         }
 
+        // Notify the user that we are waiting for start.
+        log("Waiting for start...");
+
+        // Wait for start.
         waitForStart();
 
+        // Remember that the robot is not localized.
         boolean localized = false;
 
+        // While the op mode is active...
         while (opModeIsActive()) {
+
+            // Update the gamepads.
             previousGamepad1.copy(currentGamepad1);
             currentGamepad1.copy(gamepad1);
             previousGamepad2.copy(currentGamepad2);
             currentGamepad2.copy(gamepad2);
 
-            moveRobot();
+            // If we are not heat seeking...
+            if(!heatSeeking) {
 
+                // Move the robot.
+                moveRobot();
+
+            }
+
+            // Update the drive interface.
             drive.update();
 
             // Get a detection.
@@ -228,73 +265,27 @@ public class TeleOpR extends LinearOpMode {
 
             }
 
-            if(currentGamepad1.dpad_down) {
+            // If the pixel driver pressed dpad down...
+            if(currentGamepad2.dpad_down) {
+
+                // Start heat seeking.
                 heatSeeking = true;
+
             }
-            if (currentGamepad1.dpad_up) {
+
+            // If the pixel drive pressed dpad up...
+            if (currentGamepad2.dpad_up) {
+
+                // Stop heat seeking.
                 heatSeeking = false;
+
             }
 
             // If we are heat seeking and we know the robot's location...
             if (heatSeeking && localized) {
 
-                // Get the robot's current pose.
-                Pose2d currentPose = drive.getPoseEstimate();
-
-                // Construct a target pose.
-                //Pose2d targetPose = new Pose2d(50, 35, Math.toRadians(180)); // blue backdrop middle
-                Pose2d targetPose = new Pose2d(50, -35, Math.toRadians(180)); // red backdrop middle
-
-                // Construct a trajectory sequence.
-                TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
-                        .addDisplacementMarker(0, () -> {
-                            leftClawServo.setPosition(LEFT_CLAW_CLOSED);
-                            rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
-                        })
-                        .addDisplacementMarker(0.5, () -> {
-                            clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
-                        })
-                        .addDisplacementMarker(1.5, () -> {
-                            elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
-                            wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
-                        })
-                        .addDisplacementMarker(2.5, () -> {
-                            elbowServo.setPosition(PICKUP_ELBOW_POSITION);
-                            wristServo.setPosition(PICKUP_WRIST_POSITION);
-                            fromNeutral = false;
-                        })
-                        .addDisplacementMarker(3.5, () -> {
-                            leftClawServo.setPosition(LEFT_CLAW_OPEN);
-                            rightClawServo.setPosition(RIGHT_CLAW_OPEN);
-                        })
-                        .addDisplacementMarker(4, () -> {
-                            leftGripServo.setPosition(LEFT_GRIP_OPEN);
-                            rightGripServo.setPosition(RIGHT_GRIP_OPEN);
-
-                            raiseLift();
-
-                            elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
-                        })
-                        .addDisplacementMarker(4.5, () -> {
-                            wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
-                        })
-                        .addDisplacementMarker(5.5, () -> {
-                            elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
-                        })
-                        .addDisplacementMarker(6.5, () -> {
-                            wristServo.setPosition(BACKDROP_WRIST_POSITION);
-                            fromPickup = false;
-
-                            leftGripServo.setPosition(LEFT_GRIP_CLOSED);
-                            rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
-
-                            fromBackdrop = true;
-                        })
-                        .lineToLinearHeading(targetPose)
-                        .build();
-
-                // Execute the trajectory sequence.
-                drive.followTrajectorySequence(sequence);
+                // Heat seek.
+                heatSeek();
 
                 // Remember that we are done heat seeking.
                 heatSeeking = false;
@@ -302,243 +293,135 @@ public class TeleOpR extends LinearOpMode {
             }
 
             if (currentGamepad1.back && !previousGamepad1.back) {
-                intakeServo.setPosition(INTAKE_SERVO_PLACEMENT_POSITION);
-                leftClawServo.setPosition(LEFT_CLAW_CLOSED);
-                rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
-                sleep(500);
-                clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
-                sleep(1000);
-
-                elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
-                wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
-                sleep(1000);
-                elbowServo.setPosition(PICKUP_ELBOW_POSITION);
-                wristServo.setPosition(PICKUP_WRIST_POSITION);
-                fromNeutral = false;
-                sleep(1000);
-
-                leftClawServo.setPosition(LEFT_CLAW_OPEN);
-                rightClawServo.setPosition(RIGHT_CLAW_OPEN);
-                sleep(500);
-
-                leftGripServo.setPosition(LEFT_GRIP_OPEN);
-                rightGripServo.setPosition(RIGHT_GRIP_OPEN);
-
-                raiseLift();
-                sleep(3000);
-
-                elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
-                wristServo.setPosition(BACKDROP_WRIST_POSITION);
-                fromPickup = false;
-                sleep(1000);
-
-                leftGripServo.setPosition(LEFT_GRIP_CLOSED);
-                rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
-
-                fromBackdrop = true;
+                placePixelsOnBackdrop();
             }
 
-            if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left) {
-                if (leftClawOpen) {
-                    leftClawServo.setPosition(LEFT_CLAW_CLOSED);
-                    leftClawOpen = false;
-                }
-                else {
-                    leftClawServo.setPosition(LEFT_CLAW_OPEN);
-                    leftClawOpen = true;
-                }
+            // If the robot driver pressed x...
+            if(currentGamepad1.x && !previousGamepad1.x) {
 
-                if (rightClawOpen) {
-                    rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
-                    rightClawOpen = false;
-                }
-                else {
-                    rightClawServo.setPosition(RIGHT_CLAW_OPEN);
-                    rightClawOpen = true;
-                }
-            }
-            if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right) {
-                if (clawFlipServoUp) {
-                    clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
-                    clawFlipServoUp = false;
-                }
-                else {
-                    clawFlipServo.setPosition(CLAW_FLIP_SERVO_UP);
-                    clawFlipServoUp = true;
-                }
-            }
-            if (currentGamepad1.left_trigger > TRIGGER_THRESHOLD){
-                rollerMotor.setPower(-ROLLER_POWER);
-            }
-            if (currentGamepad1.right_trigger > TRIGGER_THRESHOLD) {
-                rollerMotor.setPower(ROLLER_POWER);
+                // Toggle the left claw.
+                toggleLeftClaw();
+
             }
 
-            if(currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
+            // If the robot driver pressed b...
+            if(currentGamepad1.b && !previousGamepad1.b) {
+
+                // Toggle the right claw.
+                toggleRightClaw();
+
+            }
+
+            // If the robot driver pressed a...
+            if(currentGamepad1.a && !previousGamepad1.a) {
+
+                // Toggle the claws.
+                toggleClaws();
+
+            }
+
+            // If the robot driver is holding the left trigger...
+            if (currentGamepad1.left_trigger > TRIGGER_THRESHOLD) {
+
+                // Power the roller to intake.
+                intakeRoller();
+
+            }
+
+            // Otherwise, if the robot driver is hold the right trigger...
+            else if (currentGamepad1.right_trigger > TRIGGER_THRESHOLD) {
+
+                // Power the roller to eject.
+                ejectRoller();
+
+            }
+
+            // Otherwise (if the robot driver is not holding a trigger)...
+            else {
+
+                // Stop the intake.
+                stopRoller();
+
+            }
+
+            // If the robot driver pressed dpad down...
+            if(currentGamepad1.dpad_down && !previousGamepad1.dpad_down) {
+
+                // Lower the lift.
                 lowerLift();
+
             }
 
-            if(currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
+            // If the robot driver pressed dpad up...
+            if(currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
+
+                // Raise the lift.
                 raiseLift();
+
             }
 
-            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper){
-                if (leftGripOpen){
-                    leftGripOpen = false;
-                    leftGripServo.setPosition(LEFT_GRIP_OPEN);
-                } else {
-                    leftGripOpen = true;
-                    leftGripServo.setPosition(LEFT_GRIP_CLOSED);
-                }
+            // If the robot driver is holding y...
+            if(currentGamepad1.y) {
+
+                // Enable turtle mode.
+                setTurtleMode(true);
+
             }
-            if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper){
-                if (rightGripOpen){
-                    rightGripOpen = false;
-                    rightGripServo.setPosition(RIGHT_GRIP_OPEN);
-                } else {
-                    rightGripOpen = true;
-                    rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
-                }
+
+            // Otherwise (if the robot driver is not holding y)...
+            else {
+
+                // Disable turtle mode.
+                setTurtleMode(false);
+
             }
-            // BACKDROP
-            if (currentGamepad1.x && !previousGamepad1.x){
-                if (fromGround) {
-                    elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
-                    wristServo.setPosition(BACKDROP_WRIST_POSITION);
-                }
-                if (fromNeutral) {
-                    wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
-                    elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
-                    sleep(1000);
-                    wristServo.setPosition(BACKDROP_WRIST_POSITION);
-                    fromNeutral = false;
-                }
-                if (fromPickup) {
-                    elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
-                    sleep(500);
-                    wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
-                    sleep(1000);
-                    elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
-                    sleep(1000);
-                    wristServo.setPosition(BACKDROP_WRIST_POSITION);
-                    fromPickup = false;
-                }
-                fromBackdrop = true;
-            }
-            // PICKUP
-            if (currentGamepad1.b && !previousGamepad1.b){
-                if (fromGround) {
-                    elbowServo.setPosition(GROUND_TRAVERSAL_ELBOW_POSITION);
-                    sleep(1000);
-                    wristServo.setPosition(GROUND_TRAVERSAL_WRIST_POSITION);
-                    sleep(1000);
-                    elbowServo.setPosition(PICKUP_ELBOW_POSITION);
-                    sleep(1000);
-                    wristServo.setPosition(PICKUP_WRIST_POSITION);
-                    fromGround = false;
-                }
-                if (fromBackdrop) {
-                    wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
-                    sleep(1000);
-                    elbowServo.setPosition(PICKUP_ELBOW_POSITION);
-                    sleep(1000);
-                    wristServo.setPosition(PICKUP_WRIST_POSITION);
-                    fromBackdrop = false;
-                }
-                if (fromNeutral) {
-                    elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
-                    wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
-                    sleep(1000);
-                    elbowServo.setPosition(PICKUP_ELBOW_POSITION);
-                    wristServo.setPosition(PICKUP_WRIST_POSITION);
-                    fromNeutral = false;
-                }
-                fromPickup = true;
-            }
-            /*if (currentGamepad1.x && !previousGamepad1.x){
-                if (leftClawOpen){
-                    leftClawOpen = false;
-                    leftClawServo.setPosition(0);
-                } else {
-                    leftClawOpen = true;
-                    leftClawServo.setPosition(1);
-                }
-            }
-            if (currentGamepad1.b && !previousGamepad1.b){
-                if (rightClawOpen){
-                    rightClawOpen = false;
-                    rightClawServo.setPosition(0);
-                } else {
-                    rightClawOpen = true;
-                    rightClawServo.setPosition(1);
-                }
-            }*/
-            // NEUTRAL
-            if (currentGamepad1.y && !previousGamepad1.y){
-                if (fromGround) {
-                    elbowServo.setPosition(GROUND_TRAVERSAL_ELBOW_POSITION);
-                    sleep(1000);
-                    wristServo.setPosition(GROUND_TRAVERSAL_WRIST_POSITION);
-                    sleep(1000);
-                    elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
-                    sleep(1000);
-                    wristServo.setPosition(NEUTRAL_WRIST_POSITION);
-                    fromGround = false;
-                }
-                if (fromBackdrop) {
-                    wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
-                    sleep(1000);
-                    elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
-                    sleep(1000);
-                    wristServo.setPosition(NEUTRAL_WRIST_POSITION);
-                    fromBackdrop = false;
-                }
-                if (fromPickup) {
-                    elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
-                    wristServo.setPosition(NEUTRAL_WRIST_POSITION);
-                    fromPickup = false;
-                }
-                fromNeutral = true;
-            }
-            // GROUND
-            if (currentGamepad1.a && !previousGamepad1.a){
-                if (fromBackdrop) {
-                    elbowServo.setPosition(GROUND_ELBOW_POSITION);
-                    wristServo.setPosition(GROUND_WRIST_POSITION);
-                    fromBackdrop = false;
-                }
-                if (fromNeutral) {
-                    wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
-                    sleep(1000);
-                    elbowServo.setPosition(GROUND_TRAVERSAL_ELBOW_POSITION);
-                    sleep(1000);
-                    elbowServo.setPosition(GROUND_ELBOW_POSITION);
-                    wristServo.setPosition(GROUND_WRIST_POSITION);
-                    fromNeutral = false;
-                }
-                if (fromPickup) {
-                    elbowServo.setPosition(GROUND_TRAVERSAL_ELBOW_POSITION);
-                    wristServo.setPosition(GROUND_TRAVERSAL_WRIST_POSITION);
-                    sleep(100);
-                    elbowServo.setPosition(GROUND_ELBOW_POSITION);
-                    wristServo.setPosition(GROUND_WRIST_POSITION);
-                    fromPickup = false;
-                }
-                fromGround = true;
-            }
-            if (currentGamepad2.b && !previousGamepad2.b){
+
+            // If the pixel driver pressed b...
+            if (currentGamepad2.b && !previousGamepad2.b) {
+
+                // Increment the left column.
                 int maximumColumn = getMaximumColumn(leftRow);
                 leftColumn = Math.min(leftColumn + 1, maximumColumn - 1);
+
             }
-            if (currentGamepad2.x && !previousGamepad2.x){
+
+            // If the pixel driver pressed x...
+            if (currentGamepad2.x && !previousGamepad2.x) {
+
+                // Decrement the left column.
                 leftColumn = Math.max(leftColumn - 1, MINIMUM_COLUMN);
+
             }
+
+            // If the pixel driver pressed y...
             if (currentGamepad2.y && !previousGamepad2.y){
+
+                // Increment the left row.
                 leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
+
+                // Update the left column if needed.
+                int maximumColumn = getMaximumColumn(leftRow);
+                if(leftColumn >= maximumColumn) {
+                    leftColumn = maximumColumn - 1;
+                }
+
             }
+
+            // If the pixel driver pressed a...
             if (currentGamepad2.a && !previousGamepad2.a){
+
+                // Decrement the left row.
                 leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
+
+                // Update the left column if needed.
+                int maximumColumn = getMaximumColumn(leftRow);
+                if(leftColumn >= maximumColumn) {
+                    leftColumn = maximumColumn - 1;
+                }
+
             }
+
+            // Compute the right column and row.
             int rightColumn = leftColumn + 1;
             int rightRow = leftRow;
 
@@ -558,30 +441,14 @@ public class TeleOpR extends LinearOpMode {
             int leftLiftPosition = leftLiftMotor.getCurrentPosition();
             int rightLiftPosition = rightLiftMotor.getCurrentPosition();
 
-            // If the lift is down...
-            if (isLiftDown) {
+            // If we finished lowering the lift...
+            if (isLoweringLift && isLiftDown) {
 
-                // If the lift is not ready...
-                if(!isLiftReady) {
+                // Reset the lift.
+                resetLift();
 
-                    // Reset the lift.
-                    resetLift();
-
-                    // Remember that the lift is ready.
-                    isLiftReady = true;
-
-                }
-
-                // If we finished lowering the lift...
-                if(isLoweringLift) {
-
-                    // Reset the lift.
-                    resetLift();
-
-                    // Remember that we finished lowering the lift.
-                    isLoweringLift = false;
-
-                }
+                // Remember that we finished lowering the lift.
+                isLoweringLift = false;
 
             }
 
@@ -591,7 +458,6 @@ public class TeleOpR extends LinearOpMode {
 
             // Update the telemetry.
             telemetry.addData("Lift Down", isLiftDown);
-            telemetry.addData("Lift Ready", isLiftReady);
             telemetry.addData("Left Lift Position", leftLiftPosition);
             telemetry.addData("Right Lift Position", rightLiftPosition);
             telemetry.addData("Left Lift Power", leftLiftPower);
@@ -608,9 +474,15 @@ public class TeleOpR extends LinearOpMode {
         }
 
     }
-    public void moveRobot() {
-        double BUNNY_MULTIPLIER = 1;
-        double NORMAL_MULTIPLIER = 0.6;
+    public void moveRobot() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(gamepad1 == null) {
+            throw new InterruptedException("The gamepad 1 is missing.");
+        }
+
+        double NORMAL_MULTIPLIER = 1;
+        double TURTLE_MULTIPLIER = 0.6;
 
         double leftFrontPower;
         double leftBackPower;
@@ -645,8 +517,8 @@ public class TeleOpR extends LinearOpMode {
 
         double multiplier;
 
-        if (isBunnyMode) {
-            multiplier = BUNNY_MULTIPLIER;
+        if (isTurtleMode) {
+            multiplier = TURTLE_MULTIPLIER;
         }
         else {
             multiplier = NORMAL_MULTIPLIER;
@@ -674,30 +546,33 @@ public class TeleOpR extends LinearOpMode {
 
         moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
     }
-    public void setBunnyMode(boolean isBunnyMode){
-        log("set bunny mode = " + isBunnyMode);
-        this.isBunnyMode = isBunnyMode;
+    public void setTurtleMode(boolean isTurtleMode){
+        this.isTurtleMode = isTurtleMode;
     }
-    public void toggleBunnyMode() {
-        log("toggle bunny mode");
-        if (isBunnyMode) {
-            setBunnyMode(false);
+    public void moveRobot(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) throws InterruptedException {
+
+        // Verify inputs exist.
+        if(leftFrontDrive == null) {
+            throw new InterruptedException("The left front drive motor is missing.");
         }
-        else {
-            setBunnyMode(true);
+        if(rightFrontDrive == null) {
+            throw new InterruptedException("The right front drive motor is missing.");
         }
-    }
-    public void moveRobot(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
+        if(leftBackDrive == null) {
+            throw new InterruptedException("The left back drive motor is missing.");
+        }
+        if(rightBackDrive == null) {
+            throw new InterruptedException("The right back drive motor is missing.");
+        }
+
+        // Move the robot.
         leftFrontDrive.setPower(leftFrontPower);
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
+
     }
-    public void stopDriveMotors() {
-        for(DcMotor driveMotor : driveMotors) {
-            driveMotor.setPower(0);
-        }
-    }
+
     private static int getMaximumColumn(int row){
         if (isEven(row)){
             return MAXIMUM_COLUMN_EVEN_ROW;
@@ -712,19 +587,19 @@ public class TeleOpR extends LinearOpMode {
             return false;
         }
     }
-    private static String getHexDisplay(int leftColumn, int leftRow, int rightColumn, int rightRow){
+    private static String getHexDisplay(int leftColumn, int leftRow, int rightColumn, int rightRow) {
         String output = "\n";
-        for(int row = MAXIMUM_ROW; row >= MINIMUM_ROW; row--) {
-            if (!isEven(row)){
+        for (int row = MAXIMUM_ROW; row >= MINIMUM_ROW; row--) {
+            if (!isEven(row)) {
                 output += "  ";
             }
             int maximumColumn = getMaximumColumn(row);
             for (int column = MINIMUM_COLUMN; column <= maximumColumn; column++) {
                 if (column == leftColumn && leftRow == row) {
-                    output += "Ⓛ";
-                } else if (column == rightColumn && rightRow == row){
-                    output += "Ⓡ";
-                } else{
+                    output += "⬤"; //"Ⓛ";
+                } else if (column == rightColumn && rightRow == row) {
+                    output += "⬤"; //"Ⓡ";
+                } else {
                     output += "〇";
                 }
             }
@@ -732,38 +607,398 @@ public class TeleOpR extends LinearOpMode {
         }
         return output;
     }
-    public void log(String message) {
-        Log.d(TAG, message);
+
+    private void log(String message) {
+
+        // If the telemetry is missing...
+        if (telemetry == null) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Show the message.
+        telemetry.addData("Message", message);
+        telemetry.update();
+
     }
 
-    private void resetLift() {
+    private void resetLift() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(leftLiftMotor == null) {
+            throw new InterruptedException("The left lift motor is missing.");
+        }
+        if(rightLiftMotor == null) {
+            throw new InterruptedException("The right lift motor is missing.");
+        }
+
+        // Reset the lift.
         resetLift(leftLiftMotor);
         resetLift(rightLiftMotor);
+
     }
 
-    private static void resetLift(DcMotor liftMotor) {
+    private static void resetLift(DcMotor liftMotor) throws InterruptedException {
+
+        // Verify inputs exist.
+        if(liftMotor == null) {
+            throw new InterruptedException("The lift motor is missing.");
+        }
+
+        // Reset the lift.
         liftMotor.setPower(0);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     private void raiseLift() {
+
+        // Raise the lift.
         setLiftPosition(leftLiftMotor, LIFT_UP_POSITION);
         setLiftPosition(rightLiftMotor, LIFT_UP_POSITION);
+        isLoweringLift = false;
+
     }
 
-    private void lowerLift() {
+    private void lowerLift() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(leftLiftMotor == null) {
+            throw new InterruptedException("The left lift motor is missing.");
+        }
+        if(rightLiftMotor == null) {
+            throw new InterruptedException("The right lift motor is missing.");
+        }
+
+        // Lower the lift.
         setLiftPosition(leftLiftMotor, LIFT_DOWN_POSITION);
         setLiftPosition(rightLiftMotor, LIFT_DOWN_POSITION);
         isLoweringLift = true;
+
     }
 
     private void setLiftPosition(DcMotor liftMotor, int position) {
-        if(!isLiftReady) {
-            return;
-        }
+
+        // Set the lift position.
         liftMotor.setTargetPosition(position);
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         liftMotor.setPower(LIFT_POWER);
+
     }
+
+    // Waits for the user to lower the lift.
+    private void waitForLiftDown() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(gamepad1 == null) {
+            throw new InterruptedException("The gamepad 1 is missing.");
+        }
+        if(leftLiftMotor == null) {
+            throw new InterruptedException("The left lift motor is missing.");
+        }
+        if(rightLiftMotor == null) {
+            throw new InterruptedException("The right lift motor is missing.");
+        }
+
+        // While the lift is up...
+        while (!isStopRequested() && !liftTouch.isPressed()) {
+
+            // Instruct the user to lower the lift.
+            log("Press gamepad 1 back to lower lift...");
+
+            // If the user is pressing back...
+            if (gamepad1.back) {
+
+                // Lower the lift.
+                leftLiftMotor.setPower(-LIFT_POWER);
+                rightLiftMotor.setPower(-LIFT_POWER);
+
+            }
+
+            // Otherwise (if the user is not pressing back)...
+            else {
+
+                // Stop the lift.
+                leftLiftMotor.setPower(0);
+                rightLiftMotor.setPower(0);
+
+            }
+
+        }
+
+        // If stop is requested...
+        if(isStopRequested()) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Notify the user that the lift is down.
+        log("Lift is down");
+
+        // Reset the lift.
+        resetLift();
+
+    }
+
+    private void initializeRobot() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(clawFlipServo == null) {
+            throw new InterruptedException("The claw flip servo is missing.");
+        }
+        if(elbowServo == null) {
+            throw new InterruptedException("The elbow servo is missing.");
+        }
+        if(intakeServo == null) {
+            throw new InterruptedException("The intake servo is missing.");
+        }
+        if(leftGripServo == null) {
+            throw new InterruptedException("The left grip servo is missing.");
+        }
+        if(rightGripServo == null) {
+            throw new InterruptedException("The right grip servo is missing.");
+        }
+        if(wristServo == null) {
+            throw new InterruptedException("The wrist servo is missing.");
+        }
+
+        // If stop is requested...
+        if(isStopRequested()) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Notify the user that we are initializing the robot.
+        log("Initializing robot...");
+
+        // Initialize the robot.
+        wristServo.setPosition(INITIALIZE_WRIST_POSITION);
+        sleep(2000);
+        elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
+        sleep(1000);
+        wristServo.setPosition(NEUTRAL_WRIST_POSITION);
+        leftGripServo.setPosition(LEFT_GRIP_CLOSED);
+        rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
+        intakeServo.setPosition(INTAKE_SERVO_DOWN_POSITION);
+        fromNeutral = true;
+
+        // Notify the user that the robot is initialized.
+        log("Initialized robot");
+
+    }
+
+    // Drives to the backdrop and places pixels.
+    private void heatSeek() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(clawFlipServo == null) {
+            throw new InterruptedException("The claw flip servo is missing.");
+        }
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+        if(elbowServo == null) {
+            throw new InterruptedException("The elbow servo is missing.");
+        }
+        if(leftClawServo == null) {
+            throw new InterruptedException("The left claw servo is missing.");
+        }
+        if(leftGripServo == null) {
+            throw new InterruptedException("The left grip servo is missing.");
+        }
+        if(rightClawServo == null) {
+            throw new InterruptedException("The right claw servo is missing.");
+        }
+        if(rightGripServo == null) {
+            throw new InterruptedException("The right grip servo is missing.");
+        }
+        if(wristServo == null) {
+            throw new InterruptedException("The wrist servo is missing.");
+        }
+
+        // Get the robot's current pose.
+        Pose2d currentPose = drive.getPoseEstimate();
+
+        // Construct a target pose.
+        //Pose2d targetPose = new Pose2d(50, 35, Math.toRadians(180)); // blue backdrop middle
+        Pose2d targetPose = new Pose2d(50, -35, Math.toRadians(180)); // red backdrop middle
+
+        // Construct a trajectory sequence.
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
+                .addDisplacementMarker(0, () -> {
+                    leftClawServo.setPosition(LEFT_CLAW_CLOSED);
+                    rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
+                })
+                .addDisplacementMarker(0.5, () -> {
+                    clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+                })
+                .addDisplacementMarker(1.5, () -> {
+                    elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
+                    wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
+                })
+                .addDisplacementMarker(2.5, () -> {
+                    elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+                    wristServo.setPosition(PICKUP_WRIST_POSITION);
+                    fromNeutral = false;
+                })
+                .addDisplacementMarker(3.5, () -> {
+                    leftClawServo.setPosition(LEFT_CLAW_OPEN);
+                    rightClawServo.setPosition(RIGHT_CLAW_OPEN);
+                })
+                .addDisplacementMarker(4, () -> {
+                    leftGripServo.setPosition(LEFT_GRIP_OPEN);
+                    rightGripServo.setPosition(RIGHT_GRIP_OPEN);
+
+                    raiseLift();
+
+                    elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
+                })
+                .addDisplacementMarker(4.5, () -> {
+                    wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
+                })
+                .addDisplacementMarker(5.5, () -> {
+                    elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
+                })
+                .addDisplacementMarker(6.5, () -> {
+                    wristServo.setPosition(BACKDROP_WRIST_POSITION);
+                    fromPickup = false;
+
+                    leftGripServo.setPosition(LEFT_GRIP_CLOSED);
+                    rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
+
+                    fromBackdrop = true;
+                })
+                .lineToLinearHeading(targetPose)
+                .build();
+
+        // Execute the trajectory sequence.
+        drive.followTrajectorySequence(sequence);
+    }
+
+    // Toggles the claws.
+    private void toggleClaws() throws InterruptedException {
+        toggleLeftClaw();
+        toggleRightClaw();
+    }
+
+    // Toggles the left claw.
+    private void toggleLeftClaw() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(leftClawServo == null) {
+            throw new InterruptedException("The left claw servo is missing.");
+        }
+
+        // Toggle the left claw.
+        if (leftClawOpen) {
+            leftClawServo.setPosition(LEFT_CLAW_CLOSED);
+            leftClawOpen = false;
+        } else {
+            leftClawServo.setPosition(LEFT_CLAW_OPEN);
+            leftClawOpen = true;
+        }
+
+    }
+
+    // Toggles the right claw.
+    private void toggleRightClaw() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(rightClawServo == null) {
+            throw new InterruptedException("The right claw servo is missing.");
+        }
+
+        // Toggle the right claw.
+        if (rightClawOpen) {
+            rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
+            rightClawOpen = false;
+        } else {
+            rightClawServo.setPosition(RIGHT_CLAW_OPEN);
+            rightClawOpen = true;
+        }
+
+    }
+
+    private void placePixelsOnBackdrop() {
+        intakeServo.setPosition(INTAKE_SERVO_PLACEMENT_POSITION);
+        leftClawServo.setPosition(LEFT_CLAW_CLOSED);
+        rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
+        sleep(500);
+        clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+        sleep(1000);
+
+        elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
+        wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
+        sleep(1000);
+        elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+        wristServo.setPosition(PICKUP_WRIST_POSITION);
+        fromNeutral = false;
+        sleep(1000);
+
+        leftClawServo.setPosition(LEFT_CLAW_OPEN);
+        rightClawServo.setPosition(RIGHT_CLAW_OPEN);
+        sleep(500);
+
+        leftGripServo.setPosition(LEFT_GRIP_OPEN);
+        rightGripServo.setPosition(RIGHT_GRIP_OPEN);
+
+        raiseLift();
+        sleep(3000);
+
+        elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
+        wristServo.setPosition(BACKDROP_WRIST_POSITION);
+        fromPickup = false;
+        sleep(1000);
+
+        leftGripServo.setPosition(LEFT_GRIP_CLOSED);
+        rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
+
+        fromBackdrop = true;
+    }
+
+    // Powers the roller to intake.
+    private void intakeRoller() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(rollerMotor == null) {
+            throw new InterruptedException("The roller motor is missing.");
+        }
+
+        // Power the roller to intake.
+        rollerMotor.setPower(-ROLLER_POWER);
+
+    }
+
+    // Powers the roller to eject.
+    private void ejectRoller() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(rollerMotor == null) {
+            throw new InterruptedException("The roller motor is missing.");
+        }
+
+        // Power the roller to eject.
+        rollerMotor.setPower(ROLLER_POWER);
+
+    }
+
+    // Stops the roller
+    private void stopRoller() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(rollerMotor == null) {
+            throw new InterruptedException("The roller motor is missing.");
+        }
+
+        // Stop the roller.
+        rollerMotor.setPower(0);
+
+    }
+
 }

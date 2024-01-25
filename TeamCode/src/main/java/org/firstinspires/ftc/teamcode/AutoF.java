@@ -24,8 +24,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.List;
 
 @Config
-@Autonomous
-//@Autonomous(preselectTeleOp = "TeleOpR")
+@Autonomous(preselectTeleOp = "TeleOpR")
 public class AutoF extends LinearOpMode {
     enum Route {
         RED_LEFT_DIRECT,
@@ -88,11 +87,30 @@ public class AutoF extends LinearOpMode {
         // Wait for the camera to open.
         waitForCameraOpen();
 
+        // If stop is requested...
+        if(isStopRequested()) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Notify the user that we are waiting for start.
+        log("Waiting for start...");
+
         // Wait for start.
         waitForStart();
 
         // Wait for team prop detection.
         waitForTeamPropDetection();
+
+        // If stop is requested...
+        if(isStopRequested()) {
+
+            // Exit the method.
+            return;
+
+        }
 
         // Construct an AprilTag processor.
         aprilTagProcessor = new AprilTagProcessor.Builder().build();
@@ -215,7 +233,13 @@ public class AutoF extends LinearOpMode {
         return output;
     }
 
-    private TrajectorySequence getRedLeftLeftTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getRedLeftLeftTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
@@ -248,7 +272,13 @@ public class AutoF extends LinearOpMode {
     }
 
     // Middle
-    private TrajectorySequence getRedLeftMiddleTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getRedLeftMiddleTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
@@ -278,7 +308,13 @@ public class AutoF extends LinearOpMode {
     }
 
     // Right
-    private TrajectorySequence getRedLeftRightTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getRedLeftRightTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
@@ -313,7 +349,13 @@ public class AutoF extends LinearOpMode {
     // Right
 
     // Left
-    private TrajectorySequence getRedRightLeftTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getRedRightLeftTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
@@ -341,7 +383,13 @@ public class AutoF extends LinearOpMode {
     }
 
     // Middle
-    private TrajectorySequence getRedRightMiddleTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getRedRightMiddleTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
@@ -369,7 +417,13 @@ public class AutoF extends LinearOpMode {
     }
 
     // Right
-    private TrajectorySequence getRedRightRightTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getRedRightRightTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
@@ -397,12 +451,13 @@ public class AutoF extends LinearOpMode {
         return sequence;
     }
 
-// Blue
+    private TrajectorySequence getBlueLeftLeftTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
 
-    // Left
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
 
-    // Left
-    private TrajectorySequence getBlueLeftLeftTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
 
@@ -435,7 +490,13 @@ public class AutoF extends LinearOpMode {
     }
 
     // Middle
-    private TrajectorySequence getBlueLeftMiddleTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getBlueLeftMiddleTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
 
@@ -466,7 +527,13 @@ public class AutoF extends LinearOpMode {
     }
 
     // Right
-    private TrajectorySequence getBlueLeftRightTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getBlueLeftRightTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
 
@@ -501,7 +568,13 @@ public class AutoF extends LinearOpMode {
     // Right
 
     // Right
-    private TrajectorySequence getBlueRightLeftTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getBlueRightLeftTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
 
@@ -530,7 +603,13 @@ public class AutoF extends LinearOpMode {
     }
 
     // Middle
-    private TrajectorySequence getBlueRightMiddleTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getBlueRightMiddleTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
 
@@ -558,7 +637,13 @@ public class AutoF extends LinearOpMode {
     }
 
     // Right
-    private TrajectorySequence getBlueRightRightTrajectorySequence(SampleMecanumDrive drive) {
+    private TrajectorySequence getBlueRightRightTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
 
@@ -586,15 +671,55 @@ public class AutoF extends LinearOpMode {
     }
 
     private void log(String message) {
+
+        // If the telemetry is missing...
+        if (telemetry == null) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Show the message.
         telemetry.addData("Message", message);
         telemetry.update();
+
     }
 
-    private void waitForMenuSelection() {
+    // Waits for menu selection.
+    private void waitForMenuSelection() throws InterruptedException {
+
+        // Verify inputs exist.
+        if(currentGamepad == null) {
+            throw new InterruptedException("The current gamepad is missing.");
+        }
+        if(gamepad1 == null) {
+            throw new InterruptedException("The gamepad 1 is missing.");
+        }
+        if (parkLeft == null) {
+            throw new InterruptedException("The park left value is missing.");
+        }
+        if(previousGamepad == null) {
+            throw new InterruptedException("The previous gamepad is missing.");
+        }
+        if (redAlliance == null) {
+            throw new InterruptedException("The red alliance value is missing.");
+        }
+        if (startLeft == null) {
+            throw new InterruptedException("The start left value is missing.");
+        }
+        if (telemetry == null) {
+            throw new InterruptedException("The telemetry is missing.");
+        }
+
+        // While the op mode is active...
         while (!isStopRequested()) {
+
+            // Update the gamepads.
             previousGamepad.copy(currentGamepad);
             currentGamepad.copy(gamepad1);
 
+            // If the user has not selected an alliance...
             if (redAlliance == null) {
                 telemetry.addData("Alliance", "X = blue, B = red");
                 telemetry.update();
@@ -604,7 +729,10 @@ public class AutoF extends LinearOpMode {
                 if (currentGamepad.b && !previousGamepad.b) {
                     redAlliance = true;
                 }
-            } else if (startLeft == null) {
+            }
+
+            // Otherwise, if the user has not selected a starting location...
+            else if (startLeft == null) {
                 telemetry.addData("Start", "X = left, B = right");
                 telemetry.update();
                 if (currentGamepad.x && !previousGamepad.x) {
@@ -613,7 +741,10 @@ public class AutoF extends LinearOpMode {
                 if (currentGamepad.b && !previousGamepad.b) {
                     startLeft = false;
                 }
-            } else if (parkLeft == null) {
+            }
+
+            // Otherwise, if the user has not selected a parking location...
+            else if (parkLeft == null) {
                 telemetry.addData("Park", "X = left, B = right");
                 telemetry.update();
                 if (currentGamepad.x && !previousGamepad.x) {
@@ -622,12 +753,21 @@ public class AutoF extends LinearOpMode {
                 if (currentGamepad.b && !previousGamepad.b) {
                     parkLeft = false;
                 }
-            } else {
-                break;
             }
+
+            // Otherwise (if the user finished making menu selections)...
+            else {
+
+                // Stop prompting the user for inputs.
+                break;
+
+            }
+
         }
+
     }
 
+    // Waits for the camera to open.
     private void waitForCameraOpen() throws InterruptedException {
 
         // Verify inputs exist.
@@ -650,8 +790,16 @@ public class AutoF extends LinearOpMode {
             throw new InterruptedException("The telemetry is missing.");
         }
 
+        // If stop is requested...
+        if(isStopRequested()) {
+
+            // Exit the method.
+            return;
+
+        }
+
         // Initialize the camera.
-        log("initializing camera");
+        log("Initializing camera...");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry);
@@ -659,25 +807,33 @@ public class AutoF extends LinearOpMode {
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
 
         // Open the camera.
-        log("opening camera");
+        log("Opening camera...");
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
                 camera.startStreaming(RobotHardwareA.CAMERA_WIDTH, RobotHardwareA.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
                 startedStreaming = true;
-                log("opened camera");
+                log("Opened camera");
             }
 
             @Override
             public void onError(int errorCode) {
-                log("error opening camera: " + errorCode);
+                log("Error opening camera: " + errorCode);
             }
         });
 
         // Wait for streaming to start.
         while (!isStopRequested() && !startedStreaming) {
-            log("waiting for camera to start streaming");
+            log("Waiting for camera to stream...");
             sleep(50);
+        }
+
+        // If stop is requested...
+        if(isStopRequested()) {
+
+            // Exit the method.
+            return;
+
         }
 
         // Show the camera stream in the FTC dashboard.
@@ -685,6 +841,7 @@ public class AutoF extends LinearOpMode {
 
     }
 
+    // Waits for team prop detection.
     private void waitForTeamPropDetection() throws InterruptedException {
 
         // Verify inputs exist.
@@ -695,15 +852,31 @@ public class AutoF extends LinearOpMode {
             throw new InterruptedException("The team prop detector is missing.");
         }
 
+        // If stop is requested...
+        if(isStopRequested()) {
+
+            // Exit the method.
+            return;
+
+        }
+
         // Wait for team prop detection.
         while (!isStopRequested() && location == null) {
-            log("waiting for location detection");
+            log("Waiting for location detection...");
             sleep(50);
             location = teamPropDetector.getLocation();
         }
 
+        // If stop is requested...
+        if(isStopRequested()) {
+
+            // Exit the method.
+            return;
+
+        }
+
         // Display the location.
-        log("location is " + location);
+        log("Location is " + location);
 
         // Stop streaming.
         camera.stopStreaming();
