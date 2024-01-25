@@ -99,9 +99,6 @@ public class TeleOpR extends LinearOpMode {
 
             }
 
-            // Update the robot hardware.
-            robotHardware.update();
-
             // If the pixel driver pressed dpad down...
             if(currentGamepad2.dpad_down) {
 
@@ -268,12 +265,17 @@ public class TeleOpR extends LinearOpMode {
             // Get the hex display.
             String output = getHexDisplay(leftColumn,leftRow,rightColumn,rightRow);
 
-            // Update the telemetry.
+            // Add telemetry.
+            telemetry.addData("Pixel Placement", output);
             telemetry.addData("Left Column", leftColumn);
             telemetry.addData("Left Row", leftRow);
             telemetry.addData("Right Column", rightColumn);
             telemetry.addData("Right Row", rightRow);
-            telemetry.addData("Output", output);
+
+            // Update the robot hardware.
+            robotHardware.update();
+
+            // Update the telemetry.
             telemetry.update();
 
         }
@@ -318,7 +320,9 @@ public class TeleOpR extends LinearOpMode {
                     output += WHITE_CIRCLE;
                 }
             }
-            output += "\n";
+            if(row > MINIMUM_ROW) {
+                output += "\n";
+            }
         }
         return output;
     }
