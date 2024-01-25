@@ -656,7 +656,7 @@ public class RobotHardwareB {
                 .build();
 
         // Execute the trajectory sequence.
-        drive.followTrajectorySequence(sequence);
+        drive.followTrajectorySequenceAsync(sequence);
     }
 
     // Toggles the claws.
