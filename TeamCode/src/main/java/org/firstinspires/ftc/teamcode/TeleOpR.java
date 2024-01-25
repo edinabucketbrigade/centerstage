@@ -110,8 +110,8 @@ public class TeleOpR extends LinearOpMode {
     public static double RIGHT_CLAW_CLOSED = 0.5;
     public static double LEFT_CLAW_OPEN = 0.71;
     public static double LEFT_CLAW_CLOSED = 0.5;
-    public static double CLAW_FLIP_SERVO_DOWN = 1;
-    public static double CLAW_FLIP_SERVO_UP = 0;
+    public static double CLAW_FLIP_SERVO_DOWN = 0.602;
+    public static double CLAW_FLIP_SERVO_UP = 0.47;
     public static int ARM_DELAY = 1000;
     public static double TRIGGER_THRESHOLD = 0.5;
     public static double ROLLER_POWER = 0.7;
@@ -135,7 +135,6 @@ public class TeleOpR extends LinearOpMode {
     private boolean leftGripOpen;
     private boolean rightClawOpen;
     private boolean leftClawOpen;
-    private boolean clawFlipServoUp;
     private boolean isTurtleMode = false;
     private DcMotor rollerMotor;
     private Servo leftGripServo;
