@@ -243,7 +243,7 @@ public class AutoF extends LinearOpMode {
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(32)
-                /*.setReversed(true)
+                .setReversed(true)
                 .splineTo(RED_MIDDLE,Math.toRadians(0))
                 .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
                 .splineTo(RED_BACKDROP, Math.toRadians(0))
@@ -262,7 +262,7 @@ public class AutoF extends LinearOpMode {
                 .setReversed(true)
                 .splineTo(RED_MIDDLE,Math.toRadians(0))
                 .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP,Math.toRadians(0))*/
+                .splineTo(RED_BACKDROP,Math.toRadians(0))
                 .build();
         return sequence;
     }
