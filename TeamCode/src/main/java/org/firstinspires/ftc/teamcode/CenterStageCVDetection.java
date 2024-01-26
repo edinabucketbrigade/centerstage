@@ -20,34 +20,49 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     public static double MAXIMUM_RED_LOW_HUE = 25;
     public static double MINIMUM_RED_HIGH_HUE = 160;
     public static double MAXIMUM_RED_HIGH_HUE = 255;
-
+    public static Rect LEFT_ROI = new Rect();
+    public static Rect MIDDLE_ROI = new Rect();
+    public static Rect RIGHT_ROI = new Rect();
     Telemetry telemetry;
     boolean redAlliance;
     boolean startLeft;
     boolean parkLeft;
+    boolean isNew;
     Mat mat = new Mat();
-    public enum Location{
+
+    public enum Location {
         Left,
         Right,
         Middle
     }
+
     private Location location;
     /*
-    *   ROI is an abbreviation of Region of Interest.
-    *   This creates a rectangle of areas in the camera where a game element may be placed
-    */
-    public static Rect LEFT_ROI = new Rect(30,160, 150,120);
-    public static Rect MIDDLE_ROI = new Rect(225,150, 150,120);
-    public static Rect RIGHT_ROI = new Rect(435,165, 150,120);
+     *   ROI is an abbreviation of Region of Interest.
+     *   This creates a rectangle of areas in the camera where a game element may be placed
+     */
 
-    public CenterStageCVDetection(boolean parkLeft, boolean redAlliance, boolean startLeft, Telemetry telemetry) {
+    public CenterStageCVDetection(boolean parkLeft, boolean redAlliance, boolean startLeft, Telemetry telemetry, boolean isNew) {
         this.parkLeft = parkLeft;
         this.redAlliance = redAlliance;
         this.startLeft = startLeft;
         this.telemetry = telemetry;
+        this.isNew = isNew;
     }
     @Override
     public Mat processFrame(Mat input) {
+        if (!isNew) {
+
+            LEFT_ROI = new Rect(30,160,150,120);
+            MIDDLE_ROI = new Rect(225,150,150,120);
+            RIGHT_ROI = new Rect(435,165,150,120);
+
+        } else {
+
+            LEFT_ROI = new Rect(30,135,150,120);
+            MIDDLE_ROI = new Rect(252,120,150,120);
+            RIGHT_ROI = new Rect(475,135,150,120);
+        }
 
         telemetry.addData("Alliance", redAlliance ? "Red" : "Blue");
         telemetry.addData("Start", startLeft ? "Left" : "Right");

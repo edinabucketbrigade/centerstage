@@ -736,7 +736,7 @@ public class AutoF extends LinearOpMode {
         log("Initializing camera...");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry);
+        teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry, true);
         camera.setPipeline(teamPropDetector);
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
 
