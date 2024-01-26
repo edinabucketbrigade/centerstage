@@ -87,7 +87,7 @@ public class RobotHardwareB {
     public static int LIFT_DOWN_POSITION = 0;
     public static double INTAKE_SERVO_UP_POSITION = 1;
     public static double INTAKE_SERVO_DOWN_POSITION = 0.38;
-    public static double INTAKE_SERVO_PLACEMENT_POSITION = 0.45;
+    public static double INTAKE_SERVO_OFFSET_POSITION = 0.45;
     public static final int MINIMUM_COLUMN = 1;
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
@@ -547,20 +547,17 @@ public class RobotHardwareB {
 
         // Initialize the robot.
         wristServo.setPosition(INITIALIZE_WRIST_POSITION);
-        leftClawServo.setPosition(LEFT_CLAW_CLOSED);
-        rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
-        intakeServo.setPosition(INTAKE_SERVO_PLACEMENT_POSITION);
+        closeClaw();
+        offsetIntake();
         opMode.sleep(2000);
         elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
         opMode.sleep(1000);
         wristServo.setPosition(NEUTRAL_WRIST_POSITION);
-        leftGripServo.setPosition(LEFT_GRIP_CLOSED);
-        rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
-        clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+        closeGrips();
+        lowerClaw();
         opMode.sleep(1000);
-        leftClawServo.setPosition(LEFT_CLAW_OPEN);
-        rightClawServo.setPosition(RIGHT_CLAW_OPEN);
-        intakeServo.setPosition(INTAKE_SERVO_DOWN_POSITION);
+        openClaw();
+        pointIntakeDown();
         fromNeutral = true;
 
         // Notify the user that the robot is initialized.
@@ -714,6 +711,94 @@ public class RobotHardwareB {
         // Start heat seeking.
         heatSeek.start(leftColumn, row, redAlliance);
 
+    }
+
+    public void offsetIntake() {
+        intakeServo.setPosition(INTAKE_SERVO_OFFSET_POSITION);
+    }
+
+    public void pointIntakeDown() {
+        intakeServo.setPosition(INTAKE_SERVO_DOWN_POSITION);
+    }
+
+    public void closeLeftClaw() {
+        leftClawServo.setPosition(LEFT_CLAW_CLOSED);
+    }
+
+    public void openLeftClaw() {
+        leftClawServo.setPosition(LEFT_CLAW_OPEN);
+    }
+
+    public void closeRightClaw() {
+        rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
+    }
+
+    public void openRightClaw() {
+        rightClawServo.setPosition(RIGHT_CLAW_OPEN);
+    }
+
+    public void lowerClaw() {
+        clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+    }
+
+    public void raiseClaw() {
+        clawFlipServo.setPosition(CLAW_FLIP_SERVO_UP);
+    }
+
+    public void closeLeftGrip() {
+        leftGripServo.setPosition(LEFT_GRIP_CLOSED);
+    }
+
+    public void openLeftGrip() {
+        leftGripServo.setPosition(LEFT_GRIP_OPEN);
+    }
+
+    public void closeClaw() {
+        closeLeftClaw();
+        closeRightClaw();
+    }
+
+    public void openClaw() {
+        openLeftClaw();
+        openRightClaw();
+    }
+
+    public void closeRightGrip() {
+        rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
+    }
+
+    public void openRightGrip() {
+        rightGripServo.setPosition(RIGHT_GRIP_OPEN);
+    }
+
+    public void openGrips() {
+        openLeftGrip();
+        openRightGrip();
+    }
+
+    public void closeGrips() {
+        closeLeftGrip();
+        closeRightGrip();
+    }
+
+    public void setBackdropArmPosition() {
+        elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
+        wristServo.setPosition(BACKDROP_WRIST_POSITION);
+    }
+
+    public void setPickupArmPosition() {
+        elbowServo.setPosition(PICKUP_ELBOW_POSITION);
+        wristServo.setPosition(PICKUP_WRIST_POSITION);
+    }
+
+    public void setTraversalArmPosition() {
+        elbowServo.setPosition(NEUTRAL_TRAVERSAL_ELBOW_POSITION);
+        wristServo.setPosition(NEUTRAL_TRAVERSAL_WRIST_POSITION);
+    }
+
+    public void setNeutralArmPosition() {
+        elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
+        wristServo.setPosition(NEUTRAL_WRIST_POSITION);
     }
 
 }

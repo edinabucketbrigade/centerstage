@@ -17,15 +17,15 @@ public class TeleOpR extends LinearOpMode {
 
     /*
     Gamepad 1: Robot Driver
-
+    
     - left stick = move robot
     - right stick = rotate robot
     - left trigger = roller intake
     - right trigger = roller eject
+    - right bumper = hold for turtle mode
     - x = toggle left claw
     - b = toggle right claw
     - a = toggle both claws
-    - y = hold for turtle mode
     - dpad up = raise lift
     - dpad down = lower lift
 
@@ -181,21 +181,8 @@ public class TeleOpR extends LinearOpMode {
 
             }
 
-            // If the robot driver is holding y...
-            if(currentGamepad1.y) {
-
-                // Enable turtle mode.
-                robotHardware.setTurtleMode(true);
-
-            }
-
-            // Otherwise (if the robot driver is not holding y)...
-            else {
-
-                // Disable turtle mode.
-                robotHardware.setTurtleMode(false);
-
-            }
+            // Set turtle mode.
+            robotHardware.setTurtleMode(currentGamepad1.right_bumper);
 
             // If the pixel driver pressed dpad right...
             if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {

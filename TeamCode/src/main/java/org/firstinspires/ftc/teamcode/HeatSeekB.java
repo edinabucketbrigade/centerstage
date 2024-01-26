@@ -1,15 +1,26 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_A;
 import static org.firstinspires.ftc.teamcode.HeatSeekB.State.IDLE;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_A;
 import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_B;
 import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_C;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_D;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_E;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_F;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_G;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_H;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_I;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_J;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_K;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_L;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_M;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.MINIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.getMaximumColumn;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.isEven;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,16 +28,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
+@Config
 public class HeatSeekB {
 
-    enum State {
-        IDLE,
-        STEP_A,
-        STEP_B,
-        STEP_C
-    }
+    enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M }
 
-    public static double TARGET_X = 40;
+    public static double TARGET_X = 46;
     public static double TILE_SIZE = 24;
     public static double TARGET_Y_OFFSET = 6;
     public static int LIFT_POSITION = 2000;
@@ -54,7 +61,7 @@ public class HeatSeekB {
         this.leftColumn = leftColumn;
         this.row = row;
         this.redAlliance = redAlliance;
-        state = STEP_A;
+        setState(STEP_A);
     }
 
     public void update() throws InterruptedException {
@@ -79,9 +86,6 @@ public class HeatSeekB {
                 //Pose2d offset = new Pose2d(0, 0.1);
                 //Pose2d targetPose = currentPose.minus(offset);
 
-                // Get a target lift position.
-                int liftPosition = getTargetLiftPosition(row);
-
                 // Construct a trajectory sequence.
                 TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
                         .lineToLinearHeading(targetPose)
@@ -90,31 +94,161 @@ public class HeatSeekB {
                 // Execute the trajectory sequence.
                 drive.followTrajectorySequenceAsync(sequence);
 
-                robotHardware.toggleClaws();
+                robotHardware.offsetIntake();
+                robotHardware.closeClaw();
 
-                state = STEP_B;
+                setState(STEP_B);
 
                 break;
 
             case STEP_B:
 
-                if (drive.isBusy()) {
+                if (timer.milliseconds() < 500) {
                     return;
                 }
 
-                timer.reset();
-                state = STEP_C;
+                robotHardware.raiseClaw();
+
+                setState(STEP_C);
 
                 break;
 
             case STEP_C:
 
-                if (timer.seconds() < 4) {
+                if (timer.milliseconds() < 1000) {
                     return;
                 }
 
-                robotHardware.toggleClaws();
-                state = IDLE;
+                robotHardware.setTraversalArmPosition();
+
+                setState(STEP_D);
+
+                break;
+
+            case STEP_D:
+
+                if (timer.milliseconds() < 1000) {
+                    return;
+                }
+
+                robotHardware.setPickupArmPosition();
+
+                setState(STEP_E);
+
+                break;
+
+            case STEP_E:
+
+                if (timer.milliseconds() < 1000) {
+                    return;
+                }
+
+                robotHardware.openClaw();
+
+                setState(STEP_F);
+
+                break;
+
+            case STEP_F:
+
+                if (timer.milliseconds() < 500) {
+                    return;
+                }
+
+                robotHardware.openGrips();
+
+                setState(STEP_G);
+
+                break;
+
+            case STEP_G:
+
+                if (timer.milliseconds() < 500) {
+                    return;
+                }
+
+                // Get a lift position.
+                int liftPosition = getTargetLiftPosition(row);
+
+                robotHardware.raiseLift(liftPosition);
+
+                setState(STEP_H);
+
+                break;
+
+            case STEP_H:
+
+                if (timer.milliseconds() < 2000) {
+                    return;
+                }
+
+                robotHardware.setBackdropArmPosition();
+
+                robotHardware.closeClaw();
+
+                setState(STEP_I);
+
+                break;
+
+            case STEP_I:
+
+                if (drive.isBusy()) {
+                    return;
+                }
+
+                setState(STEP_J);
+
+                break;
+
+            case STEP_J:
+
+                if (timer.milliseconds() < 1000) {
+                    return;
+                }
+
+                robotHardware.closeGrips();
+
+                robotHardware.lowerClaw();
+
+                setState(STEP_K);
+
+                break;
+
+            case STEP_K:
+
+                if (timer.milliseconds() < 1000) {
+                    return;
+                }
+
+                robotHardware.setNeutralArmPosition();
+
+                robotHardware.pointIntakeDown();
+
+                setState(STEP_L);
+
+                break;
+
+            case STEP_L:
+
+                if (timer.milliseconds() < 1000) {
+                    return;
+                }
+
+                robotHardware.lowerLift();
+
+                robotHardware.openClaw();
+
+                setState(STEP_M);
+
+                break;
+
+            case STEP_M:
+
+                if (timer.milliseconds() < 1000) {
+                    return;
+                }
+
+                setState(IDLE);
 
                 break;
 
@@ -127,6 +261,17 @@ public class HeatSeekB {
                 throw new InterruptedException("Unrecognized state");
 
         }
+
+    }
+
+    // Sets the state.
+    private void setState(State state) {
+
+        // Set the state.
+        this.state = state;
+
+        // Reset the timer.
+        timer.reset();
 
     }
 
