@@ -16,27 +16,24 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class TeleOpR extends LinearOpMode {
 
     /*
-    Gamepad 1: Robot Driver
+Gamepad 1: Robot Driver
 
-    - left stick = move robot
-    - right stick = rotate robot
-    - left trigger = roller intake
-    - right trigger = roller eject
-    - x = toggle left claw
-    - b = toggle right claw
-    - a = toggle both claws
-    - y = hold for turtle mode
-    - dpad up = raise lift
-    - dpad down = lower lift
+- left stick = move robot
+- right stick = rotate robot
+- left trigger = roller intake
+- right trigger = roller eject
+- x = toggle left claw
+- b = toggle right claw
+- a = toggle both claws
+- y = hold for turtle mode
+- dpad up = raise lift
+- dpad down = lower lift
 
-    Gamepad 2: Pixel Driver
+Gamepad 2: Pixel Driver
 
-    - x = move pixels left
-    - b = move pixels right
-    - a = move pixels down
-    - y = move pixels up
-    - dpad down = start heat seek
-    - dpad up = stop heat seek
+- dpad = move pixels
+- a = start heat seek
+- y = stop heat seek
      */
 
     public static double TRIGGER_THRESHOLD = 0.5;
@@ -107,16 +104,16 @@ public class TeleOpR extends LinearOpMode {
 
             }
 
-            // If the pixel driver pressed dpad down...
-            if(currentGamepad2.dpad_down) {
+            // If the pixel driver pressed a...
+            if(currentGamepad2.a) {
 
                 // Start heat seeking.
                 heatSeeking = true;
 
             }
 
-            // If the pixel drive pressed dpad up...
-            if (currentGamepad2.dpad_up) {
+            // If the pixel drive pressed y...
+            if (currentGamepad2.y) {
 
                 // Stop heat seeking.
                 heatSeeking = false;
@@ -221,8 +218,8 @@ public class TeleOpR extends LinearOpMode {
 
             }
 
-            // If the pixel driver pressed b...
-            if (currentGamepad2.b && !previousGamepad2.b) {
+            // If the pixel driver pressed dpad right...
+            if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
 
                 // Increment the left column.
                 int maximumColumn = getMaximumColumn(leftRow);
@@ -230,16 +227,16 @@ public class TeleOpR extends LinearOpMode {
 
             }
 
-            // If the pixel driver pressed x...
-            if (currentGamepad2.x && !previousGamepad2.x) {
+            // If the pixel driver pressed dpad left...
+            if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left) {
 
                 // Decrement the left column.
                 leftColumn = Math.max(leftColumn - 1, MINIMUM_COLUMN);
 
             }
 
-            // If the pixel driver pressed y...
-            if (currentGamepad2.y && !previousGamepad2.y){
+            // If the pixel driver pressed dpad up...
+            if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up){
 
                 // Increment the left row.
                 leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
@@ -252,8 +249,8 @@ public class TeleOpR extends LinearOpMode {
 
             }
 
-            // If the pixel driver pressed a...
-            if (currentGamepad2.a && !previousGamepad2.a){
+            // If the pixel driver pressed dpad down...
+            if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down){
 
                 // Decrement the left row.
                 leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
@@ -275,10 +272,7 @@ public class TeleOpR extends LinearOpMode {
 
             // Add telemetry.
             telemetry.addData("Pixel Placement", output);
-            telemetry.addData("Left Column", leftColumn);
-            telemetry.addData("Left Row", leftRow);
-            telemetry.addData("Right Column", rightColumn);
-            telemetry.addData("Right Row", rightRow);
+            telemetry.addData("Left Pixel", "(%d, %d)", leftColumn, leftRow);
 
             // Update the robot hardware.
             robotHardware.update();

@@ -248,11 +248,7 @@ public class RobotHardwareB {
         if(isLocalized) {
             telemetry.addData("Pose", poseString);
         }
-        telemetry.addData("Lift Down", isLiftDown);
-        telemetry.addData("Left Lift Position", leftLiftPosition);
-        telemetry.addData("Right Lift Position", rightLiftPosition);
-        telemetry.addData("Left Lift Power", leftLiftPower);
-        telemetry.addData("Right Lift Power", rightLiftPower);
+        telemetry.addData("Lift", "Down %b, Position (%d, %d), Power (%.2f, %.2f)", isLiftDown, leftLiftPosition, rightLiftPosition, leftLiftPower, rightLiftPower);
 
     }
 
@@ -624,7 +620,10 @@ public class RobotHardwareB {
 
         // Construct a trajectory sequence.
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
-                .addDisplacementMarker(0, () -> {
+                .addDisplacementMarker(3, () -> {
+                    raiseLift(liftPosition);
+                })
+                /*.addDisplacementMarker(0, () -> {
                     intakeServo.setPosition(INTAKE_SERVO_PLACEMENT_POSITION);
                     leftClawServo.setPosition(LEFT_CLAW_CLOSED);
                     rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
@@ -663,8 +662,8 @@ public class RobotHardwareB {
                     intakeServo.setPosition(INTAKE_SERVO_DOWN_POSITION);
 
                     fromBackdrop = true;
-                })
-                //lineToLinearHeading(targetPose)
+                })*/
+                .lineToLinearHeading(targetPose)
                 .build();
 
         // Execute the trajectory sequence.
