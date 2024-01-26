@@ -17,7 +17,7 @@ public class TeleOpR extends LinearOpMode {
 
     /*
     Gamepad 1: Robot Driver
-    
+
     - left stick = move robot
     - right stick = rotate robot
     - left trigger = roller intake
@@ -34,6 +34,15 @@ public class TeleOpR extends LinearOpMode {
     - dpad = move pixels
     - a = start heat seek
     - y = stop heat seek
+
+    On gamepad 2, hold right trigger to enter debug mode where:
+
+    - a = toggle grips
+    - y = raise/lower claw
+    - dpad down = arm neutral
+    - dpad right = arm traversal
+    - dpad up = arm backdrop
+    - dpad left = arm ground
      */
 
     public static double TRIGGER_THRESHOLD = 0.5;
@@ -95,6 +104,9 @@ public class TeleOpR extends LinearOpMode {
             previousGamepad2.copy(currentGamepad2);
             currentGamepad2.copy(gamepad2);
 
+            // Determine whether the user is debugging.
+            boolean debugging = currentGamepad2.right_trigger > TRIGGER_THRESHOLD;
+
             // Determine whether the robot is localized.
             boolean localized = robotHardware.isLocalized();
 
@@ -108,7 +120,7 @@ public class TeleOpR extends LinearOpMode {
                 robotHardware.moveRobot();
 
                 // If the robot is localized and the pixel driver pressed a...
-                if(localized && currentGamepad2.a && !previousGamepad2.a) {
+                if(localized && currentGamepad2.a && !previousGamepad2.a && !debugging) {
 
                     // Start heat seeking.
                     robotHardware.startHeatSeeking(leftColumn, leftRow, redAlliance);
@@ -184,47 +196,81 @@ public class TeleOpR extends LinearOpMode {
             // Set turtle mode.
             robotHardware.setTurtleMode(currentGamepad1.right_bumper);
 
-            // If the pixel driver pressed dpad right...
-            if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
+            // If the user is debugging...
+            if(debugging) {
 
-                // Increment the left column.
-                int maximumColumn = getMaximumColumn(leftRow);
-                leftColumn = Math.min(leftColumn + 1, maximumColumn - 1);
+                if (currentGamepad2.a && !previousGamepad2.a) {
+                    robotHardware.toggleGrips();
+                }
 
-            }
+                if (currentGamepad2.y && !previousGamepad2.y) {
+                    robotHardware.flipClaw();
+                }
 
-            // If the pixel driver pressed dpad left...
-            if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left) {
+                if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+                    robotHardware.setNeutralArmPosition();
+                }
 
-                // Decrement the left column.
-                leftColumn = Math.max(leftColumn - 1, MINIMUM_COLUMN);
+                if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
+                    robotHardware.setTraversalArmPosition();
+                }
 
-            }
+                if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+                    robotHardware.setBackdropArmPosition();
+                }
 
-            // If the pixel driver pressed dpad up...
-            if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up){
-
-                // Increment the left row.
-                leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
-
-                // Update the left column if needed.
-                int maximumColumn = getMaximumColumn(leftRow);
-                if(leftColumn >= maximumColumn) {
-                    leftColumn = maximumColumn - 1;
+                if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left) {
+                    robotHardware.setGroundArmPosition();
                 }
 
             }
 
-            // If the pixel driver pressed dpad down...
-            if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down){
+            // Otherwise (if the user is not debugging)...
+            else {
 
-                // Decrement the left row.
-                leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
+                // If the pixel driver pressed dpad right...
+                if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
 
-                // Update the left column if needed.
-                int maximumColumn = getMaximumColumn(leftRow);
-                if(leftColumn >= maximumColumn) {
-                    leftColumn = maximumColumn - 1;
+                    // Increment the left column.
+                    int maximumColumn = getMaximumColumn(leftRow);
+                    leftColumn = Math.min(leftColumn + 1, maximumColumn - 1);
+
+                }
+
+                // If the pixel driver pressed dpad left...
+                if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left) {
+
+                    // Decrement the left column.
+                    leftColumn = Math.max(leftColumn - 1, MINIMUM_COLUMN);
+
+                }
+
+                // If the pixel driver pressed dpad up...
+                if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+
+                    // Increment the left row.
+                    leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
+
+                    // Update the left column if needed.
+                    int maximumColumn = getMaximumColumn(leftRow);
+                    if (leftColumn >= maximumColumn) {
+                        leftColumn = maximumColumn - 1;
+                    }
+
+                }
+
+                // If the pixel driver pressed dpad down...
+                if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+
+                    // Decrement the left row.
+                    leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
+
+                    // Update the left column if needed.
+                    int maximumColumn = getMaximumColumn(leftRow);
+                    if (leftColumn >= maximumColumn) {
+                        leftColumn = maximumColumn - 1;
+                    }
+
                 }
 
             }

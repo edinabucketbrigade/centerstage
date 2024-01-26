@@ -59,7 +59,7 @@ public class RobotHardwareB {
     public static double BACKDROP_TRAVERSAL_WRIST_POSITION = 0.05;
     public static double PICKUP_TRAVERSAL_WRIST_POSITION = 0.1;
     public static double NEUTRAL_TRAVERSAL_WRIST_POSITION = 0.9;
-    public static double BACKDROP_WRIST_POSITION = 0.35;
+    public static double BACKDROP_WRIST_POSITION = 0.4;
     public static double PICKUP_WRIST_POSITION = 0.832;
     public static double NEUTRAL_WRIST_POSITION = 0.45;
     public static double GROUND_WRIST_POSITION = 0.35;
@@ -72,7 +72,7 @@ public class RobotHardwareB {
     public static double NEUTRAL_ELBOW_POSITION = 0.75;
     public static double GROUND_ELBOW_POSITION = 0.15;
     public static double RIGHT_GRIP_OPEN = 0.36;
-    public static double RIGHT_GRIP_CLOSED = 0.47;
+    public static double RIGHT_GRIP_CLOSED = 0.43;
     public static double LEFT_GRIP_OPEN = 0.25;
     public static double LEFT_GRIP_CLOSED = 0.38;
     public static double RIGHT_CLAW_OPEN = 0.32;
@@ -99,12 +99,6 @@ public class RobotHardwareB {
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
-    private boolean fromGround;
-    private boolean fromBackdrop;
-    private boolean fromPickup;
-    private boolean fromNeutral;
-    private boolean rightGripOpen;
-    private boolean leftGripOpen;
     private boolean rightClawOpen = true;
     private boolean leftClawOpen = true;
     private boolean isTurtleMode = false;
@@ -126,6 +120,9 @@ public class RobotHardwareB {
     private boolean isLocalized;
     private FtcDashboard ftcDashboard;
     private HeatSeekB heatSeek = new HeatSeekB(this);
+    private boolean isLeftGripOpen;
+    private boolean isRightGripOpen;
+    private boolean isClawDown;
 
     // Initializes this.
     public RobotHardwareB(LinearOpMode opMode) {
@@ -558,7 +555,6 @@ public class RobotHardwareB {
         opMode.sleep(1000);
         openClaw();
         pointIntakeDown();
-        fromNeutral = true;
 
         // Notify the user that the robot is initialized.
         log("Initialized robot");
@@ -739,18 +735,22 @@ public class RobotHardwareB {
 
     public void lowerClaw() {
         clawFlipServo.setPosition(CLAW_FLIP_SERVO_DOWN);
+        isClawDown = true;
     }
 
     public void raiseClaw() {
         clawFlipServo.setPosition(CLAW_FLIP_SERVO_UP);
+        isClawDown = false;
     }
 
     public void closeLeftGrip() {
         leftGripServo.setPosition(LEFT_GRIP_CLOSED);
+        isLeftGripOpen = false;
     }
 
     public void openLeftGrip() {
         leftGripServo.setPosition(LEFT_GRIP_OPEN);
+        isLeftGripOpen = true;
     }
 
     public void closeClaw() {
@@ -765,10 +765,12 @@ public class RobotHardwareB {
 
     public void closeRightGrip() {
         rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
+        isRightGripOpen = false;
     }
 
     public void openRightGrip() {
         rightGripServo.setPosition(RIGHT_GRIP_OPEN);
+        isRightGripOpen = true;
     }
 
     public void openGrips() {
@@ -799,6 +801,36 @@ public class RobotHardwareB {
     public void setNeutralArmPosition() {
         elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
         wristServo.setPosition(NEUTRAL_WRIST_POSITION);
+    }
+
+    public void setGroundArmPosition() {
+        elbowServo.setPosition(GROUND_ELBOW_POSITION);
+        wristServo.setPosition(GROUND_WRIST_POSITION);
+    }
+
+    public void toggleGrips() {
+        if(isLeftGripOpen) {
+            closeLeftGrip();
+        }
+        else {
+            openLeftGrip();
+        }
+
+        if(isRightGripOpen) {
+            closeRightGrip();
+        }
+        else {
+            openRightGrip();
+        }
+    }
+
+    public void flipClaw() {
+        if(isClawDown) {
+            raiseClaw();
+        }
+        else {
+            lowerClaw();
+        }
     }
 
 }
