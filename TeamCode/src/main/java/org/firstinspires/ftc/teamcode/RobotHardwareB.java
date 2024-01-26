@@ -624,8 +624,8 @@ public class RobotHardwareB {
 
         // Construct a trajectory sequence.
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
-                /*
                 .addDisplacementMarker(0, () -> {
+                    intakeServo.setPosition(INTAKE_SERVO_PLACEMENT_POSITION);
                     leftClawServo.setPosition(LEFT_CLAW_CLOSED);
                     rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
                 })
@@ -650,26 +650,21 @@ public class RobotHardwareB {
                     rightGripServo.setPosition(RIGHT_GRIP_OPEN);
 
                     raiseLift(liftPosition);
-
-                    elbowServo.setPosition(BACKDROP_TRAVERSAL_ELBOW_POSITION);
                 })
-                .addDisplacementMarker(4.5, () -> {
-                    wristServo.setPosition(BACKDROP_TRAVERSAL_WRIST_POSITION);
-                })
-                .addDisplacementMarker(5.5, () -> {
+                .addDisplacementMarker(7, () -> {
                     elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
-                })
-                .addDisplacementMarker(6.5, () -> {
                     wristServo.setPosition(BACKDROP_WRIST_POSITION);
                     fromPickup = false;
-
+                })
+                .addDisplacementMarker(8, () -> {
                     leftGripServo.setPosition(LEFT_GRIP_CLOSED);
                     rightGripServo.setPosition(RIGHT_GRIP_CLOSED);
 
+                    intakeServo.setPosition(INTAKE_SERVO_DOWN_POSITION);
+
                     fromBackdrop = true;
                 })
-                */
-                .lineToLinearHeading(targetPose)
+                //lineToLinearHeading(targetPose)
                 .build();
 
         // Execute the trajectory sequence.
