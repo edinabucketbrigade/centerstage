@@ -72,9 +72,9 @@ public class RobotHardwareB {
     public static double NEUTRAL_ELBOW_POSITION = 0.75;
     public static double GROUND_ELBOW_POSITION = 0.15;
     public static double RIGHT_GRIP_OPEN = 0.36;
-    public static double RIGHT_GRIP_CLOSED = 0.43;
+    public static double RIGHT_GRIP_CLOSED = 0.475;
     public static double LEFT_GRIP_OPEN = 0.25;
-    public static double LEFT_GRIP_CLOSED = 0.38;
+    public static double LEFT_GRIP_CLOSED = 0.39;
     public static double RIGHT_CLAW_OPEN = 0.32;
     public static double RIGHT_CLAW_CLOSED = 0.5;
     public static double LEFT_CLAW_OPEN = 0.71;

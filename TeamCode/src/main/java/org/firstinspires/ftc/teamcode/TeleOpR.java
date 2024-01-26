@@ -35,14 +35,15 @@ public class TeleOpR extends LinearOpMode {
     - a = start heat seek
     - y = stop heat seek
 
-    On gamepad 2, hold right trigger to enter debug mode where:
+    On gamepad 2, hold both right trigger to enter debug mode where:
 
     - a = toggle grips
     - y = raise/lower claw
     - dpad down = arm neutral
     - dpad right = arm traversal
+    - dpad up = arm pickup
     - dpad up = arm backdrop
-    - dpad left = arm ground
+    - left bumper = arm ground
      */
 
     public static double TRIGGER_THRESHOLD = 0.5;
@@ -216,10 +217,14 @@ public class TeleOpR extends LinearOpMode {
                 }
 
                 if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
-                    robotHardware.setBackdropArmPosition();
+                    robotHardware.setPickupArmPosition();
                 }
 
                 if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left) {
+                    robotHardware.setBackdropArmPosition();
+                }
+
+                if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
                     robotHardware.setGroundArmPosition();
                 }
 
