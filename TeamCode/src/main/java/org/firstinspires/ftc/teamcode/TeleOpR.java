@@ -16,24 +16,24 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class TeleOpR extends LinearOpMode {
 
     /*
-Gamepad 1: Robot Driver
+    Gamepad 1: Robot Driver
 
-- left stick = move robot
-- right stick = rotate robot
-- left trigger = roller intake
-- right trigger = roller eject
-- x = toggle left claw
-- b = toggle right claw
-- a = toggle both claws
-- y = hold for turtle mode
-- dpad up = raise lift
-- dpad down = lower lift
+    - left stick = move robot
+    - right stick = rotate robot
+    - left trigger = roller intake
+    - right trigger = roller eject
+    - x = toggle left claw
+    - b = toggle right claw
+    - a = toggle both claws
+    - y = hold for turtle mode
+    - dpad up = raise lift
+    - dpad down = lower lift
 
-Gamepad 2: Pixel Driver
+    Gamepad 2: Pixel Driver
 
-- dpad = move pixels
-- a = start heat seek
-- y = stop heat seek
+    - dpad = move pixels
+    - a = start heat seek
+    - y = stop heat seek
      */
 
     public static double TRIGGER_THRESHOLD = 0.5;
@@ -41,7 +41,6 @@ Gamepad 2: Pixel Driver
     public static String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
     public static int HANG_LIFT_POSITION = 3000;
 
-    private boolean heatSeeking = false;
     private RobotHardwareB robotHardware;
     // Initialize gamepads.
     private Gamepad currentGamepad1 = new Gamepad();
@@ -96,46 +95,26 @@ Gamepad 2: Pixel Driver
             previousGamepad2.copy(currentGamepad2);
             currentGamepad2.copy(gamepad2);
 
+            // Determine whether the robot is localized.
+            boolean localized = robotHardware.isLocalized();
+
+            // Determine whether we are heat seeking.
+            boolean isHeatSeeking = robotHardware.isHeatSeeking();
+
             // If we are not heat seeking...
-            if(!heatSeeking) {
+            if(!isHeatSeeking) {
 
                 // Move the robot.
                 robotHardware.moveRobot();
 
-            }
+                // If the robot is localized and the pixel driver pressed a...
+                if(localized && currentGamepad2.a && !previousGamepad2.a) {
 
-            // If the pixel driver pressed a...
-            if(currentGamepad2.a) {
+                    // Start heat seeking.
+                    robotHardware.startHeatSeeking(leftColumn, leftRow, redAlliance);
 
-                // Start heat seeking.
-                heatSeeking = true;
+                }
 
-            }
-
-            // If the pixel drive pressed y...
-            if (currentGamepad2.y) {
-
-                // Stop heat seeking.
-                heatSeeking = false;
-
-            }
-
-            // Determine whether the robot is localized.
-            boolean localized = robotHardware.isLocalized();
-
-            // If we are heat seeking and we know the robot's location...
-            if (heatSeeking && localized) {
-
-                // Heat seek.
-                robotHardware.heatSeek(leftColumn, leftRow, redAlliance);
-
-                // Remember that we are done heat seeking.
-                heatSeeking = false;
-
-            }
-
-            if (currentGamepad1.back && !previousGamepad1.back) {
-                robotHardware.placePixelsOnBackdrop(leftRow);
             }
 
             // If the robot driver pressed x...
