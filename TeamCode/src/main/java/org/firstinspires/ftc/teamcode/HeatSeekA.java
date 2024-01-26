@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Config
-public class HeatSeek {
+public class HeatSeekA {
 
     enum TargetMode {
         LEFT,
@@ -60,7 +60,7 @@ public class HeatSeek {
     private RobotHardwareA robotHardware;
     private boolean initialized;
 
-    public HeatSeek(RobotHardwareA robotHardware) {
+    public HeatSeekA(RobotHardwareA robotHardware) {
 
         this.robotHardware = robotHardware;
 

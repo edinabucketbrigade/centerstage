@@ -193,7 +193,7 @@ public class CenterStageAutoCV extends LinearOpMode {
     }
 
     private void placePixelOnBackdrop(CenterStageCVDetection.Location location) throws InterruptedException {
-        HeatSeek heatSeek = new HeatSeek(robotHardware);
+        HeatSeekA heatSeek = new HeatSeekA(robotHardware);
 
         if (redAlliance) {
             if (startLeft) {

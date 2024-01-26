@@ -13,7 +13,7 @@ public class TeleOpM extends LinearOpMode {
 
     private static final double TRIGGER_THRESHOLD = 0.5;
     private RobotHardwareA robotHardware;
-    private HeatSeek heatSeek;
+    private HeatSeekA heatSeek;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -21,7 +21,7 @@ public class TeleOpM extends LinearOpMode {
         Gamepad previousGamepad = new Gamepad();
 
         robotHardware = new RobotHardwareA(this);
-        heatSeek = new HeatSeek(robotHardware);
+        heatSeek = new HeatSeekA(robotHardware);
 
         robotHardware.isHighDrop = true;
 
