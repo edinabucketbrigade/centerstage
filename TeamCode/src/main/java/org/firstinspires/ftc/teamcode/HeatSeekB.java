@@ -65,6 +65,22 @@ public class HeatSeekB {
         setState(STEP_A);
     }
 
+    // Stops heat seeking.
+    public void stop() {
+
+        // Stop heat seeking.
+        setState(IDLE);
+
+        // TODO: Cancel the trajectory sequence.  See:
+        //
+        // Automatic Driving in Teleo
+        // https://learnroadrunner.com/advanced.html#interrupting-a-live-trajectory
+        //
+        // Update cancelable demos
+        // https://github.com/NoahBres/road-runner-quickstart/tree/advanced-examples/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/advanced
+
+    }
+
     public void update() throws InterruptedException {
 
         // Get the drive interface.

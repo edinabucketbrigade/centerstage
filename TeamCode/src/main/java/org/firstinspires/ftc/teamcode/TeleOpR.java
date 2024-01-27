@@ -283,6 +283,14 @@ public class TeleOpR extends LinearOpMode {
 
                 }
 
+                // If the pixel driver pressed y...
+                if(currentGamepad2.y && !previousGamepad2.y) {
+
+                    // Stop heat seeking.
+                    robotHardware.stopHeatSeeking();
+
+                }
+
             }
 
             // Compute the right column and row.

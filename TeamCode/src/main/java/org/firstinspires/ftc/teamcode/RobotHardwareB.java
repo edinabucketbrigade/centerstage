@@ -705,6 +705,14 @@ public class RobotHardwareB {
 
     }
 
+    // Stops heat seeking.
+    public void stopHeatSeeking() {
+
+        // Stop heat seeking.
+        heatSeek.stop();
+
+    }
+
     public void offsetIntake() {
         intakeServo.setPosition(INTAKE_SERVO_OFFSET_POSITION);
     }
