@@ -14,6 +14,7 @@ import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_J;
 import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_K;
 import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_L;
 import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_M;
+import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_N;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.MINIMUM_ROW;
@@ -31,7 +32,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Config
 public class HeatSeekB {
 
-    enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M }
+    enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
 
     public static double TARGET_X = 44;
     public static double TILE_SIZE = 24;
@@ -192,9 +193,11 @@ public class HeatSeekB {
 
             case STEP_I:
 
-                if (drive.isBusy()) {
+                if (timer.milliseconds() < 500) {
                     return;
                 }
+
+                robotHardware.setPlaceArmPosition();
 
                 setState(STEP_J);
 
@@ -202,13 +205,9 @@ public class HeatSeekB {
 
             case STEP_J:
 
-                if (timer.milliseconds() < 1000) {
+                if (drive.isBusy()) {
                     return;
                 }
-
-                robotHardware.closeGrips();
-
-                robotHardware.lowerClaw();
 
                 setState(STEP_K);
 
@@ -220,9 +219,9 @@ public class HeatSeekB {
                     return;
                 }
 
-                robotHardware.setNeutralArmPosition();
+                robotHardware.closeGrips();
 
-                robotHardware.pointIntakeDown();
+                robotHardware.lowerClaw();
 
                 setState(STEP_L);
 
@@ -234,15 +233,29 @@ public class HeatSeekB {
                     return;
                 }
 
-                robotHardware.lowerLift();
+                robotHardware.setNeutralArmPosition();
 
-                robotHardware.openClaw();
+                robotHardware.pointIntakeDown();
 
                 setState(STEP_M);
 
                 break;
 
             case STEP_M:
+
+                if (timer.milliseconds() < 1000) {
+                    return;
+                }
+
+                robotHardware.lowerLift();
+
+                robotHardware.openClaw();
+
+                setState(STEP_N);
+
+                break;
+
+            case STEP_N:
 
                 if (timer.milliseconds() < 1000) {
                     return;

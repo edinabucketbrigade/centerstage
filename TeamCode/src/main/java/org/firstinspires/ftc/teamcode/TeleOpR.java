@@ -43,7 +43,8 @@ public class TeleOpR extends LinearOpMode {
     - dpad right = arm traversal
     - dpad up = arm pickup
     - dpad left = arm backdrop
-    - left bumper = arm ground
+    - left bumper = arm place
+    - right bumper = arm ground
      */
 
     public static double TRIGGER_THRESHOLD = 0.5;
@@ -225,6 +226,10 @@ public class TeleOpR extends LinearOpMode {
                 }
 
                 if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
+                    robotHardware.setPlaceArmPosition();
+                }
+
+                if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
                     robotHardware.setGroundArmPosition();
                 }
 
