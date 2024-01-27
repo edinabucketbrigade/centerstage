@@ -81,7 +81,7 @@ public class TeleOpR extends LinearOpMode {
         robotHardware.waitForLiftDown();
 
         // Initialize the robot.
-        //robotHardware.initializeRobot();
+        robotHardware.initializeRobot();
 
         // If stop is requested...
         if(isStopRequested()) {

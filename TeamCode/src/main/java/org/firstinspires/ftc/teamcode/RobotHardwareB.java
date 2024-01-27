@@ -537,13 +537,10 @@ public class RobotHardwareB {
         log("Initializing robot...");
 
         // Initialize the robot.
-        wristServo.setPosition(INITIALIZE_WRIST_POSITION);
+        setNeutralArmPosition();
         closeClaw();
         offsetIntake();
         opMode.sleep(2000);
-        elbowServo.setPosition(NEUTRAL_ELBOW_POSITION);
-        opMode.sleep(1000);
-        wristServo.setPosition(NEUTRAL_WRIST_POSITION);
         closeGrips();
         lowerClaw();
         opMode.sleep(1000);
