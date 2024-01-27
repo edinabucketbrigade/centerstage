@@ -31,11 +31,13 @@ public class TeleOpR extends LinearOpMode {
 
     Gamepad 2: Pixel Driver
 
+    Normal Mode
+
     - dpad = move pixels
     - a = start heat seek
     - y = stop heat seek
 
-    On gamepad 2, hold right trigger to enter debug mode where:
+    Debug Mode (hold right trigger)
 
     - a = toggle grips
     - y = raise/lower claw
@@ -43,8 +45,7 @@ public class TeleOpR extends LinearOpMode {
     - dpad right = arm traversal
     - dpad up = arm pickup
     - dpad left = arm backdrop
-    - left bumper = arm place
-    - right bumper = arm ground
+    - left bumper = arm ground
      */
 
     public static double TRIGGER_THRESHOLD = 0.5;
