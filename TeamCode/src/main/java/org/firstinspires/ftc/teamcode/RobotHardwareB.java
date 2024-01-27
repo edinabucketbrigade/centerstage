@@ -55,18 +55,16 @@ public class RobotHardwareB {
     */
 
     public static double INITIALIZE_WRIST_POSITION = 0.1;
-    public static double TRAVERSAL_WRIST_POSITION = 0.95;
-    public static double BACKDROP_WRIST_POSITION = 0.2;
-    public static double PICKUP_WRIST_POSITION = 0.84;
-    public static double NEUTRAL_WRIST_POSITION = 0.44;
-    public static double GROUND_WRIST_POSITION = 0.32;
-    public static double TRAVERSAL_ELBOW_POSITION = 0.85;
-    public static double BACKDROP_ELBOW_POSITION = 0;
-    public static double PICKUP_ELBOW_POSITION = 0.72;
-    public static double NEUTRAL_ELBOW_POSITION = 0.75;
-    public static double GROUND_ELBOW_POSITION = 0.15;
-    public static double PLACE_ELBOW_POSITION = 0;
-    public static double PLACE_WRIST_POSITION = 0.4;
+    public static double TRAVERSAL_WRIST_POSITION = 0.94;
+    public static double BACKDROP_WRIST_POSITION = 0.25;
+    public static double PICKUP_WRIST_POSITION = 0.88;
+    public static double NEUTRAL_WRIST_POSITION = 0.55;
+    public static double GROUND_WRIST_POSITION = 0.35;
+    public static double TRAVERSAL_ELBOW_POSITION = 0.15;
+    public static double BACKDROP_ELBOW_POSITION = 0.6;
+    public static double PICKUP_ELBOW_POSITION = 0.045;
+    public static double NEUTRAL_ELBOW_POSITION = 0.15;
+    public static double GROUND_ELBOW_POSITION = 0.9;
     public static double RIGHT_GRIP_OPEN = 0.36;
     public static double RIGHT_GRIP_CLOSED = 0.475;
     public static double LEFT_GRIP_OPEN = 0.25;
@@ -790,11 +788,6 @@ public class RobotHardwareB {
     public void setBackdropArmPosition() {
         elbowServo.setPosition(BACKDROP_ELBOW_POSITION);
         wristServo.setPosition(BACKDROP_WRIST_POSITION);
-    }
-
-    public void setPlaceArmPosition() {
-        elbowServo.setPosition(PLACE_ELBOW_POSITION);
-        wristServo.setPosition(PLACE_WRIST_POSITION);
     }
 
     public void setPickupArmPosition() {

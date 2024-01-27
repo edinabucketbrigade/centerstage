@@ -58,7 +58,6 @@ public class TeleOpR extends LinearOpMode {
     private Gamepad previousGamepad1 = new Gamepad();
     private Gamepad currentGamepad2 = new Gamepad();
     private Gamepad previousGamepad2 = new Gamepad();
-    private Boolean redAlliance = null;
 
     // Runs the op mode.
     @Override
@@ -81,7 +80,7 @@ public class TeleOpR extends LinearOpMode {
         robotHardware.waitForLiftDown();
 
         // Initialize the robot.
-        robotHardware.initializeRobot();
+        //robotHardware.initializeRobot();
 
         // If stop is requested...
         if(isStopRequested()) {
@@ -125,7 +124,7 @@ public class TeleOpR extends LinearOpMode {
                 if(localized && currentGamepad2.a && !previousGamepad2.a && !debugging) {
 
                     // Start heat seeking.
-                    robotHardware.startHeatSeeking(leftColumn, leftRow, redAlliance);
+                    robotHardware.startHeatSeeking(leftColumn, leftRow, AutoF.redAlliance);
 
                 }
 
@@ -226,10 +225,6 @@ public class TeleOpR extends LinearOpMode {
                 }
 
                 if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
-                    robotHardware.setPlaceArmPosition();
-                }
-
-                if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper) {
                     robotHardware.setGroundArmPosition();
                 }
 
@@ -376,14 +371,14 @@ public class TeleOpR extends LinearOpMode {
             currentGamepad1.copy(gamepad1);
 
             // If the user has not selected an alliance...
-            if (redAlliance == null) {
+            if (AutoF.redAlliance == null) {
                 telemetry.addData("Alliance", "X = blue, B = red");
                 telemetry.update();
                 if (currentGamepad1.x && !previousGamepad1.x) {
-                    redAlliance = false;
+                    AutoF.redAlliance = false;
                 }
                 if (currentGamepad1.b && !previousGamepad1.b) {
-                    redAlliance = true;
+                    AutoF.redAlliance = true;
                 }
             }
 

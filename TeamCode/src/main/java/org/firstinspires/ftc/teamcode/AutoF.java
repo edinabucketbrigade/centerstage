@@ -16,8 +16,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @Config
-@Autonomous
-//@Autonomous(preselectTeleOp = "TeleOpR")
+//@Autonomous
+@Autonomous(preselectTeleOp = "TeleOpR")
 public class AutoF extends LinearOpMode {
     enum Route {
         RED_LEFT_DIRECT,
@@ -53,9 +53,9 @@ public class AutoF extends LinearOpMode {
     public static final Route ROUTE = Route.RED_LEFT_DIRECT;
     public static final double DELAY = 0.5;
     private static final String TAG = "Bucket Brigade";
-    private Boolean redAlliance = null;
-    private Boolean startLeft = null;
-    private Boolean parkLeft = null;
+    public static Boolean redAlliance;
+    private Boolean startLeft;
+    private Boolean parkLeft;
     private OpenCvWebcam camera;
     private boolean startedStreaming;
     private Gamepad previousGamepad = new Gamepad();
@@ -66,6 +66,9 @@ public class AutoF extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+
+        // Clear the red alliance value.
+        redAlliance = null;
 
         // Get the robot hardware.
         robotHardware = new RobotHardwareB(this);
@@ -167,8 +170,7 @@ public class AutoF extends LinearOpMode {
 //            throw new InterruptedException("The sequence is missing.");
 //        }
 
-        drive.followTrajectorySequenceAsync(sequence);
-        //drive.followTrajectorySequence(sequence);
+        //drive.followTrajectorySequenceAsync(sequence);
 
         // While the op mode is active...
         while (!isStopRequested()) {

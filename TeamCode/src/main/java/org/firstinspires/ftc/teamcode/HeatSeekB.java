@@ -14,7 +14,6 @@ import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_J;
 import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_K;
 import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_L;
 import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_M;
-import static org.firstinspires.ftc.teamcode.HeatSeekB.State.STEP_N;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.MINIMUM_ROW;
@@ -24,15 +23,20 @@ import static org.firstinspires.ftc.teamcode.RobotHardwareB.isEven;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Config
 public class HeatSeekB {
 
-    enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
+    enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M }
 
     public static double TARGET_X = 44;
     public static double TILE_SIZE = 24;
@@ -43,6 +47,9 @@ public class HeatSeekB {
     public static double PIXEL_WIDTH = 3;
     public static double TARGET_RED_Y = -TILE_SIZE - TARGET_Y_OFFSET;
     public static double TARGET_BLUE_Y = 2 * TILE_SIZE - TARGET_Y_OFFSET;
+    public static double VELOCITY_PERCENTAGE = 0.5;
+    public static double MAXIMUM_VELOCITY = DriveConstants.MAX_VEL * VELOCITY_PERCENTAGE;
+    public static double MAXIMUM_ACCELERATION = DriveConstants.MAX_ACCEL * VELOCITY_PERCENTAGE;
 
     private RobotHardwareB robotHardware;
     private State state = IDLE;
@@ -101,11 +108,16 @@ public class HeatSeekB {
 
                 // Construct a target pose.
                 Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
-                //Pose2d offset = new Pose2d(0, 0.1);
-                //Pose2d targetPose = currentPose.minus(offset);
+
+                // Construct a velocity constraint.
+                TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY, DriveConstants.TRACK_WIDTH);
+
+                // Construct an acceleration constraint.
+                TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
 
                 // Construct a trajectory sequence.
                 TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
+                        .setConstraints(velocityConstraint, accelerationConstraint)
                         .lineToLinearHeading(targetPose)
                         .build();
 
@@ -210,11 +222,9 @@ public class HeatSeekB {
 
             case STEP_I:
 
-                if (timer.milliseconds() < 500) {
+                if (drive.isBusy()) {
                     return;
                 }
-
-                robotHardware.setPlaceArmPosition();
 
                 setState(STEP_J);
 
@@ -222,9 +232,13 @@ public class HeatSeekB {
 
             case STEP_J:
 
-                if (drive.isBusy()) {
+                if (timer.milliseconds() < 1000) {
                     return;
                 }
+
+                robotHardware.closeGrips();
+
+                robotHardware.lowerClaw();
 
                 setState(STEP_K);
 
@@ -236,9 +250,9 @@ public class HeatSeekB {
                     return;
                 }
 
-                robotHardware.closeGrips();
+                robotHardware.setNeutralArmPosition();
 
-                robotHardware.lowerClaw();
+                robotHardware.pointIntakeDown();
 
                 setState(STEP_L);
 
@@ -250,29 +264,15 @@ public class HeatSeekB {
                     return;
                 }
 
-                robotHardware.setNeutralArmPosition();
+                robotHardware.lowerLift();
 
-                robotHardware.pointIntakeDown();
+                robotHardware.openClaw();
 
                 setState(STEP_M);
 
                 break;
 
             case STEP_M:
-
-                if (timer.milliseconds() < 1000) {
-                    return;
-                }
-
-                robotHardware.lowerLift();
-
-                robotHardware.openClaw();
-
-                setState(STEP_N);
-
-                break;
-
-            case STEP_N:
 
                 if (timer.milliseconds() < 1000) {
                     return;
