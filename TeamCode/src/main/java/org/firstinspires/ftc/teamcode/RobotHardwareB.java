@@ -55,7 +55,7 @@ public class RobotHardwareB {
     */
 
     public static double INITIALIZE_WRIST_POSITION = 0.1;
-    public static double TRAVERSAL_WRIST_POSITION = 0.94;
+    public static double TRAVERSAL_WRIST_POSITION = 0.965;
     public static double BACKDROP_WRIST_POSITION = 0.25;
     public static double PICKUP_WRIST_POSITION = 0.88;
     public static double NEUTRAL_WRIST_POSITION = 0.55;
