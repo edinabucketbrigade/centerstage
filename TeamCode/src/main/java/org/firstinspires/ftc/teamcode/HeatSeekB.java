@@ -79,6 +79,8 @@ public class HeatSeekB {
         // Stop heat seeking.
         setState(IDLE);
 
+        // TODO: Return the robot to a neutral position
+
         // TODO: Cancel the trajectory sequence.  See:
         //
         // Automatic Driving in Teleo

@@ -282,8 +282,11 @@ public class TeleOpR extends LinearOpMode {
                 // If the pixel driver pressed y...
                 if(currentGamepad2.y && !previousGamepad2.y) {
 
+                    // RM: I am disabling this for now because it does not a) cancel the trajectory
+                    // or b) return robot to a neutral position and
+
                     // Stop heat seeking.
-                    robotHardware.stopHeatSeeking();
+                    //robotHardware.stopHeatSeeking();
 
                 }
 
