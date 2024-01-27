@@ -37,8 +37,9 @@ public class HeatSeekB {
     public static double TARGET_X = 44;
     public static double TILE_SIZE = 24;
     public static double TARGET_Y_OFFSET = 6;
-    public static int LIFT_POSITION = 2000;
+    public static int FIRST_ROW_LIFT_POSITION = 2000;
     public static int LIFT_INCREMENT = 300;
+    public static int MAXIMUM_LIFT_POSITION = 4500;
     public static double PIXEL_WIDTH = 3;
     public static double TARGET_RED_Y = -TILE_SIZE - TARGET_Y_OFFSET;
     public static double TARGET_BLUE_Y = 2 * TILE_SIZE - TARGET_Y_OFFSET;
@@ -352,7 +353,7 @@ public class HeatSeekB {
     private static int getTargetLiftPosition(int row) {
 
         // Get a heat seek lift position.
-        int position =  LIFT_POSITION + (row - 1) * LIFT_INCREMENT;
+        int position =  Math.min(FIRST_ROW_LIFT_POSITION + (row - 1) * LIFT_INCREMENT, MAXIMUM_LIFT_POSITION);
 
         // Return the result.
         return position;
