@@ -8,7 +8,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.LED;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -23,6 +25,9 @@ public class TeleOpS extends LinearOpMode {
                 1 - GoBILDA 5201 series - front_encoder (is encoder)
                 2 - GoBILDA 5201 series - left_back_drive (encoder port returns 0 and -1)
                 3 - GoBILDA 5201 series - left_front_drive (left encoder)
+            Digital Devices
+                6 - Digital Device - green_left_led
+                7 - Digital Device - red_left_led
             Servos
                 0 - Servo - left_claw_servo
                 1 - Servo - right_claw_servo
@@ -52,6 +57,8 @@ public class TeleOpS extends LinearOpMode {
     private DcMotor armMotor;
     private DistanceSensor armUpDistance;
     private DistanceSensor armDownDistance;
+    private DigitalChannel greenLeftLed;
+    private DigitalChannel redLeftLed;
 
     @Override
     public void runOpMode() {
@@ -61,11 +68,17 @@ public class TeleOpS extends LinearOpMode {
         armUpDistance = hardwareMap.get(Rev2mDistanceSensor.class, "arm_up_distance");
         armDownDistance = hardwareMap.get(Rev2mDistanceSensor.class, "arm_down_distance");
 
+        greenLeftLed = hardwareMap.get(DigitalChannel.class, "green_left_led");
+        redLeftLed = hardwareMap.get(DigitalChannel.class, "red_left_led");
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         waitForStart();
 
@@ -73,7 +86,11 @@ public class TeleOpS extends LinearOpMode {
             telemetry.addData("Status", "Running");
             telemetry.addData("Arm Up Distance Sensor", String.format("%.01f mm", armUpDistance.getDistance(DistanceUnit.MM)));
             telemetry.addData("Arm Down Distance Sensor", String.format("%.01f mm", armDownDistance.getDistance(DistanceUnit.MM)));
+            telemetry.addData("Arm Motor Position", armMotor.getCurrentPosition());
             telemetry.update();
+
+            greenLeftLed.setMode(DigitalChannel.Mode.OUTPUT);
+            redLeftLed.setMode(DigitalChannel.Mode.OUTPUT);
 
             if (gamepad1.y) {
                 armMotor.setPower(0.1);
@@ -83,6 +100,16 @@ public class TeleOpS extends LinearOpMode {
             }
             else {
                 armMotor.setPower(0);
+            }
+
+            if (gamepad1.x) {
+                greenLeftLed.setState(true);
+                redLeftLed.setState(false);
+            }
+
+            if (gamepad1.b) {
+                greenLeftLed.setState(false);
+                redLeftLed.setState(true);
             }
 
         }
