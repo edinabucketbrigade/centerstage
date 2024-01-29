@@ -10,7 +10,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.LED;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -29,10 +30,6 @@ public class TeleOpS extends LinearOpMode {
                 6 - Digital Device - green_left_led
                 7 - Digital Device - red_left_led
             Servos
-                0 - Servo - left_claw_servo
-                1 - Servo - right_claw_servo
-                2 - Servo - claw_flip_servo
-                3 - Servo - intake_servo
         Expansion Hub 2
             Motors
                 0 - GoBILDA 5201 series - arm_motor (has encoder) **Adapter was taken from left lift motor**
@@ -45,20 +42,37 @@ public class TeleOpS extends LinearOpMode {
                 1 - REV 2m Distance Sensor - arm_up_distance
                 2 - REV 2m Distance Sensor - arm_down_distance
             Servos
-                0 - Servo - right_grip_servo
-                1 - Servo - elbow_servo
-                2 - Servo - left_grip_servo
-                3 - Servo - wrist_servo
-    Webcam 1
+                0
+                1 - Servo - wrist_servo
+                2 - Servo - right_claw_servo
+                3 - Servo - left_claw_servo
+       Webcam 1
     */
 
     public static double ARM_POWER = 0.1;
+    public static double WRIST_SERVO_DOWN_POSITION = 0.4;
+    public static double WRIST_SERVO_UP_POSITION = 0.6;
+    public static double LEFT_CLAW_SERVO_CLOSED_POSITION = 0.4;
+    public static double LEFT_CLAW_SERVO_OPEN_POSITION = 0.6;
+    public static double RIGHT_CLAW_SERVO_CLOSED_POSITION = 0.4;
+    public static double RIGHT_CLAW_SERVO_OPEN_POSITION = 0.6;
 
     private DcMotor armMotor;
     private DistanceSensor armUpDistance;
     private DistanceSensor armDownDistance;
     private DigitalChannel greenLeftLed;
     private DigitalChannel redLeftLed;
+
+    private boolean wristServoUp;
+    private boolean leftClawServoOpen;
+    private boolean rightClawServoOpen;
+
+    private Servo wristServo;
+    private Servo rightClawServo;
+    private Servo leftClawServo;
+
+    private Gamepad currentGamepad = new Gamepad();
+    private Gamepad previousGamepad = new Gamepad();
 
     @Override
     public void runOpMode() {
@@ -70,6 +84,10 @@ public class TeleOpS extends LinearOpMode {
 
         greenLeftLed = hardwareMap.get(DigitalChannel.class, "green_left_led");
         redLeftLed = hardwareMap.get(DigitalChannel.class, "red_left_led");
+
+        wristServo = hardwareMap.get(Servo.class, "wrist_servo");
+        leftClawServo = hardwareMap.get(Servo.class, "left_claw_servo");
+        rightClawServo = hardwareMap.get(Servo.class, "right_claw_servo");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -83,6 +101,9 @@ public class TeleOpS extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            previousGamepad.copy(currentGamepad);
+            currentGamepad.copy(gamepad1);
+
             telemetry.addData("Status", "Running");
             telemetry.addData("Arm Up Distance Sensor", String.format("%.01f mm", armUpDistance.getDistance(DistanceUnit.MM)));
             telemetry.addData("Arm Down Distance Sensor", String.format("%.01f mm", armDownDistance.getDistance(DistanceUnit.MM)));
@@ -92,24 +113,57 @@ public class TeleOpS extends LinearOpMode {
             greenLeftLed.setMode(DigitalChannel.Mode.OUTPUT);
             redLeftLed.setMode(DigitalChannel.Mode.OUTPUT);
 
-            if (gamepad1.y) {
+            if (currentGamepad.y) {
                 armMotor.setPower(0.1);
             }
-            else if (gamepad1.a) {
+            else if (currentGamepad.a) {
                 armMotor.setPower(-0.1);
             }
             else {
                 armMotor.setPower(0);
             }
 
-            if (gamepad1.x) {
+            if (currentGamepad.x && !previousGamepad.x) {
                 greenLeftLed.setState(true);
                 redLeftLed.setState(false);
             }
 
-            if (gamepad1.b) {
+            if (currentGamepad.b && !previousGamepad.b) {
                 greenLeftLed.setState(false);
                 redLeftLed.setState(true);
+            }
+
+            if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+                if (wristServoUp) {
+                    wristServoUp = false;
+                    wristServo.setPosition(WRIST_SERVO_DOWN_POSITION);
+                }
+                else {
+                    wristServoUp = true;
+                    wristServo.setPosition(WRIST_SERVO_UP_POSITION);
+                }
+            }
+
+            if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
+                if (leftClawServoOpen) {
+                    leftClawServoOpen = false;
+                    leftClawServo.setPosition(LEFT_CLAW_SERVO_CLOSED_POSITION);
+                }
+                else {
+                    leftClawServoOpen = true;
+                    leftClawServo.setPosition(LEFT_CLAW_SERVO_OPEN_POSITION);
+                }
+            }
+
+            if (currentGamepad.dpad_right && !previousGamepad.dpad_right) {
+                if (rightClawServoOpen) {
+                    rightClawServoOpen = false;
+                    rightClawServo.setPosition(RIGHT_CLAW_SERVO_CLOSED_POSITION);
+                }
+                else {
+                    rightClawServoOpen = true;
+                    rightClawServo.setPosition(RIGHT_CLAW_SERVO_OPEN_POSITION);
+                }
             }
 
         }
