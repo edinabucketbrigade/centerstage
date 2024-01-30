@@ -26,9 +26,6 @@ public class ColorSensorTest extends LinearOpMode {
 
         NormalizedColorSensor colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color_sensor");
 
-        SwitchableLight switchableLight = (SwitchableLight)colorSensor;
-        switchableLight.enableLight(true);
-
         DistanceSensor distanceSensor = (DistanceSensor)colorSensor;
 
         telemetry.addData("Message", "Waiting for start...");
