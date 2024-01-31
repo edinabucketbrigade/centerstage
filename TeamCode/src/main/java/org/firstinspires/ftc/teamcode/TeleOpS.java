@@ -49,7 +49,9 @@ public class TeleOpS extends LinearOpMode {
        Webcam 1
     */
 
-    public static double ARM_POWER = 0.1;
+    public static double ARM_POWER = 0.2;
+    public static int ARM_UP_POSITION = 300;
+    public static int ARM_DOWN_POSITION = 0;
     public static double WRIST_SERVO_DOWN_POSITION = 0.4;
     public static double WRIST_SERVO_UP_POSITION = 0.6;
     public static double LEFT_CLAW_SERVO_CLOSED_POSITION = 0.4;
@@ -108,19 +110,23 @@ public class TeleOpS extends LinearOpMode {
             telemetry.addData("Arm Up Distance Sensor", String.format("%.01f mm", armUpDistance.getDistance(DistanceUnit.MM)));
             telemetry.addData("Arm Down Distance Sensor", String.format("%.01f mm", armDownDistance.getDistance(DistanceUnit.MM)));
             telemetry.addData("Arm Motor Position", armMotor.getCurrentPosition());
+            telemetry.addData("Arm Motor Power", armMotor.getPower());
             telemetry.update();
 
             greenLeftLed.setMode(DigitalChannel.Mode.OUTPUT);
             redLeftLed.setMode(DigitalChannel.Mode.OUTPUT);
 
-            if (currentGamepad.y) {
-                armMotor.setPower(0.1);
+            if (currentGamepad.y && !previousGamepad.y) {
+                //armMotor.setPower(ARM_POWER);
+                armMotor.setTargetPosition(ARM_UP_POSITION);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(ARM_POWER);
             }
-            else if (currentGamepad.a) {
-                armMotor.setPower(-0.1);
-            }
-            else {
-                armMotor.setPower(0);
+            else if (currentGamepad.a && !previousGamepad.a) {
+                //armMotor.setPower(-ARM_POWER);
+                armMotor.setTargetPosition(ARM_DOWN_POSITION);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(ARM_POWER);
             }
 
             if (currentGamepad.x && !previousGamepad.x) {
