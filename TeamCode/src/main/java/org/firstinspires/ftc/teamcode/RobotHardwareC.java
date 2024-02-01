@@ -29,30 +29,28 @@ public class RobotHardwareC {
     Control Hub Portal
         Control Hub
             Motors
-                0 - GoBILDA 5201 series - left_lift_motor (has encoder) **Adapter was taken for arm**
-                1 - GoBILDA 5201 series - front_encoder (is encoder)
+                0 - GoBILDA 5201 series - left_lift_motor (has left lift encoder)
+                1 - GoBILDA 5201 series - front_encoder (is front odometry encoder)
                 2 - GoBILDA 5201 series - left_back_drive (encoder port returns 0 and -1)
-                3 - GoBILDA 5201 series - left_front_drive (left encoder)
+                3 - GoBILDA 5201 series - left_front_drive (has left odometry encoder)
             Digital Devices
                 6 - Digital Device - green_left_led
                 7 - Digital Device - red_left_led
-            Servos
         Expansion Hub 2
             Motors
-                0 - GoBILDA 5201 series - arm_motor (has encoder) **Adapter was taken from left lift motor**
-                1 - GoBILDA 5201 series - right_lift_motor (has encoder)
+                0 - GoBILDA 5201 series - arm_motor (has arm encoder)
+                1 - GoBILDA 5201 series - right_lift_motor (has right lift encoder)
                 2 - GoBILDA 5201 series - right_front_drive (encoder port has bent pin)
-                3 - GoBILDA 5201 series - right_back_drive (right encoder)
+                3 - GoBILDA 5201 series - right_back_drive (has right odometry encoder)
+            Servos
+                1 - Servo - wrist_servo
+                2 - Servo - right_claw_servo
+                3 - Servo - left_claw_servo
             Digital Devices
                 3 - REV Touch Sensor - lift_touch
             I2C
                 1 - REV 2m Distance Sensor - arm_up_distance
                 2 - REV 2m Distance Sensor - arm_down_distance
-            Servos
-                0
-                1 - Servo - wrist_servo
-                2 - Servo - right_claw_servo
-                3 - Servo - left_claw_servo
        Webcam 1
     */
     public static double RIGHT_CLAW_OPEN = 0.32;
