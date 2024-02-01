@@ -21,14 +21,10 @@ public class TeleOpT extends LinearOpMode {
 
     - left stick = move robot
     - right stick = rotate robot
-    - left trigger = roller intake
-    - right trigger = roller eject
     - right bumper = hold for turtle mode
     - x = toggle left claw
     - b = toggle right claw
     - a = toggle both claws
-    - dpad up = raise lift
-    - dpad down = lower lift
 
     Gamepad 2: Pixel Driver
 
@@ -40,13 +36,12 @@ public class TeleOpT extends LinearOpMode {
 
     Debug Mode (hold right trigger)
 
-    - a = toggle grips
-    - y = raise/lower claw
-    - dpad down = arm neutral
-    - dpad right = arm traversal
-    - dpad up = arm pickup
-    - dpad left = arm backdrop
-    - left bumper = arm ground
+    - x = lower wrist
+    - b = raise wrist
+    - a = lower arm
+    - y = raise arm
+    - dpad down = lower lift
+    - dpad up = raise lift
      */
 
     public static double TRIGGER_THRESHOLD = 0.5;
@@ -163,6 +158,9 @@ public class TeleOpT extends LinearOpMode {
                 // If the pixel driver pressed dpad down...
                 if(currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
 
+                    // Close the claw so it does not catch when lowering the lift.
+                    robotHardware.closeClaw();
+
                     // Lower the lift.
                     robotHardware.lowerLift();
 
@@ -171,13 +169,35 @@ public class TeleOpT extends LinearOpMode {
                 // If the pixel driver pressed dpad up...
                 if(currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
 
+                    // Close the claw so it does not catch when raising the lift.
+                    robotHardware.closeClaw();
+
                     // Raise the lift.
                     robotHardware.raiseLift(MAXIMUM_LIFT_POSITION);
 
                 }
 
+                // If the pixel driver pressed x...
+                if(currentGamepad2.x && !previousGamepad2.x) {
+
+                    // Lower the wrist.
+                    robotHardware.lowerWrist();
+
+                }
+
+                // If the pixel driver pressed b...
+                if(currentGamepad2.b && !previousGamepad2.b) {
+
+                    // Toggle the wrist.
+                    robotHardware.raiseWrist();
+
+                }
+
                 // If the pixel driver pressed a...
                 if(currentGamepad2.a && !previousGamepad2.a) {
+
+                    // Close the claw so it does not catch when lowering the arm.
+                    robotHardware.closeClaw();
 
                     // Lower the arm.
                     robotHardware.lowerArm();
@@ -187,16 +207,11 @@ public class TeleOpT extends LinearOpMode {
                 // If the pixel driver pressed y...
                 if(currentGamepad2.y && !previousGamepad2.y) {
 
+                    // Close the claw so it does not catch when raising the arm.
+                    robotHardware.closeClaw();
+
                     // Raise the arm.
                     robotHardware.raiseArm();
-
-                }
-
-                // If the pixel driver pressed b...
-                if(currentGamepad2.b && !previousGamepad2.b) {
-
-                    // Toggle the wrist.
-                    robotHardware.toggleWrist();
 
                 }
 
@@ -272,7 +287,7 @@ public class TeleOpT extends LinearOpMode {
 
             // Add telemetry.
             telemetry.addData("Pixel Placement", output);
-            telemetry.addData("Left Pixel", "(%d, %d)", leftColumn, leftRow);
+            telemetry.addData("Left Pixel", "Column = %d, Row = %d", leftColumn, leftRow);
             telemetry.addData("Debugging", debugging);
 
             // Update the robot hardware.

@@ -214,12 +214,12 @@ public class RobotHardwareC {
         Telemetry telemetry = opMode.telemetry;
 
         // Update the telemetry.
-        telemetry.addData("Localized", isLocalized);
+        telemetry.addData("Status", "Localized = %b, Heat Seeking = %b, TurtleMode = %b, Left Claw Open = %b, Right Claw Open = %b, Lowering Lift = %b, Wrist Down = %b", isLocalized, heatSeek.isActive(), isTurtleMode, isLeftClawOpen, isRightClawOpen, isLoweringLift, isWristDown);
         if(isLocalized) {
             telemetry.addData("Pose", poseString);
         }
-        telemetry.addData("Lift", "Down %b, Position (%d, %d), Power (%.2f, %.2f)", isLiftDown, leftLiftPosition, rightLiftPosition, leftLiftPower, rightLiftPower);
-        telemetry.addData("Arm", "Position %d, Power %.2f", armPosition, armPower);
+        telemetry.addData("Lift", "Down = %b, Position = %d/%d, Power = %.2f/%.2f", isLiftDown, leftLiftPosition, rightLiftPosition, leftLiftPower, rightLiftPower);
+        telemetry.addData("Arm", "Position = %d, Power = %.2f", armPosition, armPower);
 
     }
 
