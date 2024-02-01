@@ -67,20 +67,21 @@ public class RobotHardwareC {
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     public static final int MINIMUM_ROW = 1;
     public static final int MAXIMUM_ROW = 11;
-
     public static double RAISE_ARM_POWER = 0.6;
     public static double LOWER_ARM_POWER = 0.2;
     public static int ARM_UP_POSITION = 750;
     public static int ARM_DOWN_POSITION = 0;
     public static int MAXIMUM_LIFT_POSITION = 1650;
+    public static double WRIST_UP_POSITION = 0.92;
+    public static double WRIST_DOWN_POSITION = 0.27;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
-    public boolean rightClawOpen = true;
-    public boolean leftClawOpen = true;
+    public boolean isRightClawOpen = true;
+    public boolean isLeftClawOpen = true;
     private boolean isTurtleMode = false;
     private Servo leftClawServo;
     private Servo rightClawServo;
@@ -95,7 +96,7 @@ public class RobotHardwareC {
     private boolean isLocalized;
     private FtcDashboard ftcDashboard;
     private HeatSeekC heatSeek = new HeatSeekC(this);
-    private boolean isClawDown;
+    private boolean isWristDown;
 
     // Initializes this.
     public RobotHardwareC(LinearOpMode opMode) {
@@ -519,7 +520,7 @@ public class RobotHardwareC {
         log("Initializing robot...");
 
         // Open the claw.
-        closeClaw();
+        openClaw();
 
         // Lower the wrist.
         lowerWrist();
@@ -531,8 +532,13 @@ public class RobotHardwareC {
 
     // Toggles the claws.
     public void toggleClaws() throws InterruptedException {
+
+        // Toggle the left claw.
         toggleLeftClaw();
+
+        // Toggle the right claw.
         toggleRightClaw();
+
     }
 
     // Toggles the left claw.
@@ -544,12 +550,10 @@ public class RobotHardwareC {
         }
 
         // Toggle the left claw.
-        if (leftClawOpen) {
-            leftClawServo.setPosition(LEFT_CLAW_CLOSED);
-            leftClawOpen = false;
+        if (isLeftClawOpen) {
+            closeLeftClaw();
         } else {
-            leftClawServo.setPosition(LEFT_CLAW_OPEN);
-            leftClawOpen = true;
+            openLeftClaw();
         }
 
     }
@@ -563,12 +567,10 @@ public class RobotHardwareC {
         }
 
         // Toggle the right claw.
-        if (rightClawOpen) {
-            rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
-            rightClawOpen = false;
+        if (isRightClawOpen) {
+            closeRightClaw();
         } else {
-            rightClawServo.setPosition(RIGHT_CLAW_OPEN);
-            rightClawOpen = true;
+            openRightClaw();
         }
 
     }
@@ -646,39 +648,104 @@ public class RobotHardwareC {
 
     }
 
-
+    // Closes the left claw.
     public void closeLeftClaw() {
+
+        // Close the left claw.
         leftClawServo.setPosition(LEFT_CLAW_CLOSED);
+
+        // Remember that the left claw is closed.
+        isLeftClawOpen = false;
+
     }
 
+    // Opens the left claw.
     public void openLeftClaw() {
+
+        // Open the left claw.
         leftClawServo.setPosition(LEFT_CLAW_OPEN);
+
+        // Remember that the left claw is open.
+        isLeftClawOpen = true;
+
     }
 
+    // Closes the right claw.
     public void closeRightClaw() {
+
+        // Close the right claw.
         rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
+
+        // Remember that the right claw is closed.
+        isRightClawOpen = false;
+
     }
 
+    // Opens the right claw.
     public void openRightClaw() {
+
+        // Open the right claw.
         rightClawServo.setPosition(RIGHT_CLAW_OPEN);
+
+        // Remember that the right claw is open.
+        isRightClawOpen = true;
+
     }
 
+    // Closes the claw.
     public void closeClaw() {
+
+        // Close the left claw.
         closeLeftClaw();
+
+        // Close the right claw.
         closeRightClaw();
+
     }
 
+    // Opens the claw.
     public void openClaw() {
+
+        // Open the left claw.
         openLeftClaw();
+
+        // Open the right claw.
         openRightClaw();
+
     }
 
-    public void lowerWrist() {
-        // TODO
+    // Toggles the wrist.
+    public void toggleWrist() {
+
+        // Toggle the wrist.
+        if (isWristDown) {
+            raiseWrist();
+        } else {
+            lowerWrist();
+        }
+
     }
 
+    // Raises the wrist.
     public void raiseWrist() {
-        // TODO
+
+        // Raise the wrist.
+        wristServo.setPosition(WRIST_UP_POSITION);
+
+        // Remember that the wrist is up.
+        isWristDown = false;
+
+    }
+
+    // Lowers the wrist.
+    public void lowerWrist() {
+
+        // Lowers the wrist.
+        wristServo.setPosition(WRIST_DOWN_POSITION);
+
+        // Remember that the wrist is down.
+        isWristDown = true;
+
     }
 
 }

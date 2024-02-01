@@ -192,6 +192,14 @@ public class TeleOpT extends LinearOpMode {
 
                 }
 
+                // If the pixel driver pressed b...
+                if(currentGamepad2.b && !previousGamepad2.b) {
+
+                    // Toggle the wrist.
+                    robotHardware.toggleWrist();
+
+                }
+
             }
 
             // Otherwise (if the user is not debugging)...
