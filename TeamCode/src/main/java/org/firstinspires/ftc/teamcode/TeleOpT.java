@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_LIFT_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -51,7 +52,6 @@ public class TeleOpT extends LinearOpMode {
     public static double TRIGGER_THRESHOLD = 0.5;
     public static String WHITE_CIRCLE = "⚪"; // See https://unicode-explorer.com/list/geometric-shapes
     public static String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
-    public static int LIFT_UP_POSITION = 1500;
 
     private RobotHardwareC robotHardware;
     // Initialize gamepads.
@@ -149,7 +149,23 @@ public class TeleOpT extends LinearOpMode {
                 if(currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
 
                     // Raise the lift.
-                    robotHardware.raiseLift(LIFT_UP_POSITION);
+                    robotHardware.raiseLift(MAXIMUM_LIFT_POSITION);
+
+                }
+
+                // If the pixel driver pressed a...
+                if(currentGamepad2.a && !previousGamepad2.a) {
+
+                    // Lower the arm.
+                    robotHardware.lowerArm();
+
+                }
+
+                // If the pixel driver pressed y...
+                if(currentGamepad2.y && !previousGamepad2.y) {
+
+                    // Raise the arm.
+                    robotHardware.raiseArm();
 
                 }
 

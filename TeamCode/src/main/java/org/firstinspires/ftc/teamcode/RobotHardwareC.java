@@ -68,9 +68,11 @@ public class RobotHardwareC {
     public static final int MINIMUM_ROW = 1;
     public static final int MAXIMUM_ROW = 11;
 
-    public static double ARM_POWER = 0.2;
-    public static int ARM_UP_POSITION = 300;
+    public static double RAISE_ARM_POWER = 0.6;
+    public static double LOWER_ARM_POWER = 0.2;
+    public static int ARM_UP_POSITION = 750;
     public static int ARM_DOWN_POSITION = 0;
+    public static int MAXIMUM_LIFT_POSITION = 1650;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -86,6 +88,7 @@ public class RobotHardwareC {
     private DcMotor leftLiftMotor;
     private DcMotor rightLiftMotor;
     private TouchSensor liftTouch;
+    private DcMotor armMotor;
     private boolean isLoweringLift;
     private SampleMecanumDrive drive;
     private AprilTagProcessor aprilTagProcessor;
@@ -117,12 +120,17 @@ public class RobotHardwareC {
         leftLiftMotor = hardwareMap.get(DcMotor.class,"left_lift_motor");
         rightLiftMotor = hardwareMap.get(DcMotor.class,"right_lift_motor");
         liftTouch = hardwareMap.get(TouchSensor.class, "lift_touch");
+        armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
 
         // Initialize hardware.
         leftLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         leftLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Initialize the drive interface.
         drive = new SampleMecanumDrive(hardwareMap);
@@ -195,6 +203,12 @@ public class RobotHardwareC {
         double leftLiftPower = leftLiftMotor.getPower();
         double rightLiftPower = rightLiftMotor.getPower();
 
+        // Get the arm's position.
+        int armPosition = armMotor.getCurrentPosition();
+
+        // Get the arm's power.
+        double armPower = armMotor.getPower();
+
         // Get the telemetry.
         Telemetry telemetry = opMode.telemetry;
 
@@ -204,6 +218,7 @@ public class RobotHardwareC {
             telemetry.addData("Pose", poseString);
         }
         telemetry.addData("Lift", "Down %b, Position (%d, %d), Power (%.2f, %.2f)", isLiftDown, leftLiftPosition, rightLiftPosition, leftLiftPower, rightLiftPower);
+        telemetry.addData("Arm", "Position %d, Power %.2f", armPosition, armPower);
 
     }
 
@@ -347,6 +362,18 @@ public class RobotHardwareC {
     // Sets the turtle mode value.
     public void setTurtleMode(boolean isTurtleMode){
         this.isTurtleMode = isTurtleMode;
+    }
+
+    public void raiseArm() {
+        armMotor.setTargetPosition(ARM_UP_POSITION);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(RAISE_ARM_POWER);
+    }
+
+    public void lowerArm() {
+        armMotor.setTargetPosition(ARM_DOWN_POSITION);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(LOWER_ARM_POWER);
     }
 
     // Raises the lift.
@@ -632,7 +659,7 @@ public class RobotHardwareC {
     public void openRightClaw() {
         rightClawServo.setPosition(RIGHT_CLAW_OPEN);
     }
-    
+
     public void closeClaw() {
         closeLeftClaw();
         closeRightClaw();

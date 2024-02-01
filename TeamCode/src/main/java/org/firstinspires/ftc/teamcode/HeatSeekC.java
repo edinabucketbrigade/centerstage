@@ -15,6 +15,7 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_K;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_L;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_M;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_N;
+import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_LIFT_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -44,7 +45,6 @@ public class HeatSeekC {
     public static double TARGET_Y_OFFSET = 7;
     public static int FIRST_ROW_LIFT_POSITION = 300;
     public static int LIFT_INCREMENT = 750;
-    public static int MAXIMUM_LIFT_POSITION = 4500;
     public static double PIXEL_WIDTH = 3;
     public static double TARGET_RED_Y = -TILE_SIZE - TARGET_Y_OFFSET;
     public static double TARGET_BLUE_Y = 2 * TILE_SIZE - TARGET_Y_OFFSET;
