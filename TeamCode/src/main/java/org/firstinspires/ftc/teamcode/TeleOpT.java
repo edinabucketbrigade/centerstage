@@ -288,6 +288,7 @@ public class TeleOpT extends LinearOpMode {
             // Add telemetry.
             telemetry.addData("Pixel Placement", output);
             telemetry.addData("Left Pixel", "Column = %d, Row = %d", leftColumn, leftRow);
+            telemetry.addData("Red Alliance", AutoF.redAlliance);
             telemetry.addData("Debugging", debugging);
 
             // Update the robot hardware.

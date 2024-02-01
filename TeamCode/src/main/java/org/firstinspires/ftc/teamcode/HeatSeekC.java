@@ -97,7 +97,7 @@ public class HeatSeekC {
         // Get the drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
-        /*switch (state) {
+        switch (state) {
             case STEP_A:
 
                 // Get the robot's current pose.
@@ -127,8 +127,8 @@ public class HeatSeekC {
                 // Execute the trajectory sequence.
                 drive.followTrajectorySequenceAsync(sequence);
 
-                robotHardware.offsetIntake();
-                robotHardware.closeClaw();
+                //robotHardware.offsetIntake();
+                //robotHardware.closeClaw();
 
                 setState(STEP_B);
 
@@ -136,17 +136,17 @@ public class HeatSeekC {
 
             case STEP_B:
 
-                if (timer.milliseconds() < 500) {
+                if (drive.isBusy()) {
                     return;
                 }
 
-                robotHardware.raiseClaw();
+                //robotHardware.raiseClaw();
 
-                setState(STEP_C);
+                setState(IDLE);
 
                 break;
 
-            case STEP_C:
+            /*case STEP_C:
 
                 if (timer.milliseconds() < 1000) {
                     return;
@@ -298,6 +298,7 @@ public class HeatSeekC {
                 setState(IDLE);
 
                 break;
+             */
 
             case IDLE:
 
@@ -308,7 +309,7 @@ public class HeatSeekC {
                 throw new InterruptedException("Unrecognized state");
 
         }
-*/
+
     }
 
     // Sets the state.
