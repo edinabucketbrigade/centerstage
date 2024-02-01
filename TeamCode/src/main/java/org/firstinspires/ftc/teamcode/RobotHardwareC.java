@@ -59,7 +59,8 @@ public class RobotHardwareC {
     public static double RIGHT_CLAW_CLOSED = 0.5;
     public static double LEFT_CLAW_OPEN = 0.71;
     public static double LEFT_CLAW_CLOSED = 0.5;
-    public static double LIFT_POWER = 0.2;
+    public static double RAISE_LIFT_POWER = 1;
+    public static double LOWER_LIFT_POWER = 0.6;
     public static int LIFT_DOWN_POSITION = 0;
     public static final int MINIMUM_COLUMN = 1;
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
@@ -352,8 +353,8 @@ public class RobotHardwareC {
     public void raiseLift(int position) {
 
         // Raise the lift.
-        setLiftPosition(leftLiftMotor, position);
-        setLiftPosition(rightLiftMotor, position);
+        setLiftPosition(leftLiftMotor, position, RAISE_LIFT_POWER);
+        setLiftPosition(rightLiftMotor, position, RAISE_LIFT_POWER);
         isLoweringLift = false;
 
     }
@@ -370,19 +371,19 @@ public class RobotHardwareC {
         }
 
         // Lower the lift.
-        setLiftPosition(leftLiftMotor, LIFT_DOWN_POSITION);
-        setLiftPosition(rightLiftMotor, LIFT_DOWN_POSITION);
+        setLiftPosition(leftLiftMotor, LIFT_DOWN_POSITION, LOWER_LIFT_POWER);
+        setLiftPosition(rightLiftMotor, LIFT_DOWN_POSITION, LOWER_LIFT_POWER);
         isLoweringLift = true;
 
     }
 
     // Sets the lift position.
-    private void setLiftPosition(DcMotor liftMotor, int position) {
+    private void setLiftPosition(DcMotor liftMotor, int position, double power) {
 
         // Set the lift position.
         liftMotor.setTargetPosition(position);
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        liftMotor.setPower(LIFT_POWER);
+        liftMotor.setPower(power);
 
     }
 
@@ -407,14 +408,14 @@ public class RobotHardwareC {
         while (!opMode.isStopRequested() && !liftTouch.isPressed()) {
 
             // Instruct the user to lower the lift.
-            log("Raise arm manually and hold gamepad 1 back to lower lift...");
+            log("Hold gamepad 1 back to lower lift...");
 
             // If the user is pressing back...
             if (gamepad1.back) {
 
                 // Lower the lift.
-                leftLiftMotor.setPower(-LIFT_POWER);
-                rightLiftMotor.setPower(-LIFT_POWER);
+                leftLiftMotor.setPower(-LOWER_LIFT_POWER);
+                rightLiftMotor.setPower(-LOWER_LIFT_POWER);
 
             }
 
@@ -631,8 +632,7 @@ public class RobotHardwareC {
     public void openRightClaw() {
         rightClawServo.setPosition(RIGHT_CLAW_OPEN);
     }
-
-
+    
     public void closeClaw() {
         closeLeftClaw();
         closeRightClaw();
@@ -641,21 +641,6 @@ public class RobotHardwareC {
     public void openClaw() {
         openLeftClaw();
         openRightClaw();
-    }
-
-    public void powerLiftUp() {
-        leftLiftMotor.setPower(LIFT_POWER);
-        rightLiftMotor.setPower(LIFT_POWER);
-    }
-
-    public void powerLiftDown() {
-        leftLiftMotor.setPower(-LIFT_POWER);
-        rightLiftMotor.setPower(-LIFT_POWER);
-    }
-
-    public void stopLift() {
-        leftLiftMotor.setPower(0);
-        rightLiftMotor.setPower(0);
     }
 
 }

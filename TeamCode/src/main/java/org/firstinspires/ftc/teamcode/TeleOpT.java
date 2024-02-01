@@ -51,7 +51,7 @@ public class TeleOpT extends LinearOpMode {
     public static double TRIGGER_THRESHOLD = 0.5;
     public static String WHITE_CIRCLE = "⚪"; // See https://unicode-explorer.com/list/geometric-shapes
     public static String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
-    public static int HANG_LIFT_POSITION = 3000;
+    public static int LIFT_UP_POSITION = 1500;
 
     private RobotHardwareC robotHardware;
     // Initialize gamepads.
@@ -78,7 +78,7 @@ public class TeleOpT extends LinearOpMode {
         waitForMenuSelection();
 
         // Wait for the user to lower the lift.
-        //robotHardware.waitForLiftDown();
+        robotHardware.waitForLiftDown();
 
         // Initialize the robot.
         robotHardware.initializeRobot();
@@ -137,30 +137,6 @@ public class TeleOpT extends LinearOpMode {
             // If the user is debugging...
             if(debugging) {
 
-                // If the pixel driver is holding y...
-                if(currentGamepad2.y) {
-
-                    // Power the lift up.
-                    robotHardware.powerLiftUp();
-
-                }
-
-                // Otherwise, if the pixel driver is holding a...
-                else if(currentGamepad2.a) {
-
-                    // Power the lift down.
-                    robotHardware.powerLiftDown();
-
-                }
-
-                // Otherwise (if the pixel driver is not holding y or a)...
-                else {
-
-                    // Stop powering the lift.
-                    robotHardware.stopLift();
-
-                }
-                /*
                 // If the pixel driver pressed dpad down...
                 if(currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
 
@@ -173,10 +149,10 @@ public class TeleOpT extends LinearOpMode {
                 if(currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
 
                     // Raise the lift.
-                    robotHardware.raiseLift(HANG_LIFT_POSITION);
+                    robotHardware.raiseLift(LIFT_UP_POSITION);
 
                 }
-                */
+
             }
 
             // Otherwise (if the user is not debugging)...
