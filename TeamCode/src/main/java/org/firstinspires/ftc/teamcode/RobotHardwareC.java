@@ -518,8 +518,11 @@ public class RobotHardwareC {
         // Notify the user that we are initializing the robot.
         log("Initializing robot...");
 
-        // Initialize the robot.
-        openClaw();
+        // Open the claw.
+        closeClaw();
+
+        // Lower the wrist.
+        lowerWrist();
 
         // Notify the user that the robot is initialized.
         log("Initialized robot");
@@ -668,6 +671,14 @@ public class RobotHardwareC {
     public void openClaw() {
         openLeftClaw();
         openRightClaw();
+    }
+
+    public void lowerWrist() {
+        // TODO
+    }
+
+    public void raiseWrist() {
+        // TODO
     }
 
 }

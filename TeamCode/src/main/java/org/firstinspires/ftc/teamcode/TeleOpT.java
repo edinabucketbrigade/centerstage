@@ -54,7 +54,6 @@ public class TeleOpT extends LinearOpMode {
     public static String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
 
     private RobotHardwareC robotHardware;
-    // Initialize gamepads.
     private Gamepad currentGamepad1 = new Gamepad();
     private Gamepad previousGamepad1 = new Gamepad();
     private Gamepad currentGamepad2 = new Gamepad();
@@ -128,6 +127,30 @@ public class TeleOpT extends LinearOpMode {
                     robotHardware.startHeatSeeking(leftColumn, leftRow, AutoF.redAlliance);
 
                 }
+
+            }
+
+            // If the robot driver pressed x...
+            if(currentGamepad1.x && !previousGamepad1.x) {
+
+                // Toggle the left claw.
+                robotHardware.toggleLeftClaw();
+
+            }
+
+            // If the robot driver pressed b...
+            if(currentGamepad1.b && !previousGamepad1.b) {
+
+                // Toggle the right claw.
+                robotHardware.toggleRightClaw();
+
+            }
+
+            // If the robot driver pressed a...
+            if(currentGamepad1.a && !previousGamepad1.a) {
+
+                // Toggle the claws.
+                robotHardware.toggleClaws();
 
             }
 
