@@ -73,12 +73,23 @@ public class TeleOpS extends LinearOpMode {
     private Servo rightClawServo;
     private Servo leftClawServo;
 
+    private DcMotor leftFrontDrive;
+    private DcMotor leftBackDrive;
+    private DcMotor rightFrontDrive;
+    private DcMotor rightBackDrive;
+
     private Gamepad currentGamepad = new Gamepad();
     private Gamepad previousGamepad = new Gamepad();
 
     @Override
     public void runOpMode() {
         FtcDashboard.getInstance();
+
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+
 
         armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
         armUpDistance = hardwareMap.get(Rev2mDistanceSensor.class, "arm_up_distance");
