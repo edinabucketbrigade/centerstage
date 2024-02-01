@@ -5,17 +5,21 @@ import android.util.Size;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -36,6 +40,9 @@ public class RobotHardwareC {
             Digital Devices
                 6 - Digital Device - green_left_led
                 7 - Digital Device - red_left_led
+            I2C
+                2 - REV Color Sensor V3 - right_claw_color
+                3 - REV Color Sensor V3 - left_claw_color
         Expansion Hub 2
             Motors
                 0 - GoBILDA 5201 series - arm_motor (has arm encoder)
@@ -48,9 +55,11 @@ public class RobotHardwareC {
                 3 - Servo - left_claw_servo
             Digital Devices
                 3 - REV Touch Sensor - lift_touch
+                5 - REV Touch Sensor - arm_up_touch
+                7 - REV Touch Sensor - arm_down_touch
             I2C
-                1 - REV 2m Distance Sensor - arm_up_distance
-                2 - REV 2m Distance Sensor - arm_down_distance
+                2 - REV 2m Distance Sensor - right_back_distance
+                3 - REV 2m Distance Sensor - left_back_distance
        Webcam 1
     */
     public static double RIGHT_CLAW_OPEN = 0.32;
@@ -88,6 +97,12 @@ public class RobotHardwareC {
     private DcMotor rightLiftMotor;
     private TouchSensor liftTouch;
     private DcMotor armMotor;
+    private NormalizedColorSensor leftClawColor;
+    private NormalizedColorSensor rightClawColor;
+    private DistanceSensor leftBackDistance;
+    private DistanceSensor rightBackDistance;
+    private TouchSensor armUpTouch;
+    private TouchSensor armDownTouch;
     private boolean isLoweringLift;
     private SampleMecanumDrive drive;
     private AprilTagProcessor aprilTagProcessor;
@@ -120,6 +135,12 @@ public class RobotHardwareC {
         rightLiftMotor = hardwareMap.get(DcMotor.class,"right_lift_motor");
         liftTouch = hardwareMap.get(TouchSensor.class, "lift_touch");
         armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
+        leftClawColor = hardwareMap.get(NormalizedColorSensor.class, "left_claw_color");
+        rightClawColor = hardwareMap.get(NormalizedColorSensor.class, "right_claw_color");
+        leftBackDistance = hardwareMap.get(Rev2mDistanceSensor.class, "left_back_distance");
+        rightBackDistance = hardwareMap.get(Rev2mDistanceSensor.class, "right_back_distance");
+        armUpTouch = hardwareMap.get(TouchSensor.class, "arm_up_touch");
+        armDownTouch = hardwareMap.get(TouchSensor.class, "arm_down_touch");
 
         // Initialize hardware.
         leftLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -211,13 +232,31 @@ public class RobotHardwareC {
         // Get the telemetry.
         Telemetry telemetry = opMode.telemetry;
 
+        // Get the back distances.
+        double leftBackMillimeters = leftBackDistance.getDistance(DistanceUnit.MM);
+        double rightBackMillimeters = rightBackDistance.getDistance(DistanceUnit.MM);
+
+        // Get the claw distance sensors.
+        DistanceSensor leftClawDistance = (DistanceSensor)leftClawColor;
+        DistanceSensor rightClawDistance = (DistanceSensor)rightClawColor;
+
+        // Get the claw distances.
+        double leftClawMillimeters = leftClawDistance.getDistance(DistanceUnit.MM);
+        double rightClawMillimeters = rightClawDistance.getDistance(DistanceUnit.MM);
+
+        // Get the arm touch sensor values.
+        boolean armDownPressed = armDownTouch.isPressed();
+        boolean armUpPressed = armUpTouch.isPressed();
+
         // Update the telemetry.
-        telemetry.addData("Status", "Localized = %b, Heat Seeking = %b, TurtleMode = %b, Left Claw Open = %b, Right Claw Open = %b, Lowering Lift = %b, Wrist Down = %b", isLocalized, heatSeek.isActive(), isTurtleMode, isLeftClawOpen, isRightClawOpen, isLoweringLift, isWristDown);
+        telemetry.addData("Status", "Localized = %b, Heat Seeking = %b, Turtle Mode = %b, Left Claw Open = %b, Right Claw Open = %b, Lowering Lift = %b, Wrist Down = %b", isLocalized, heatSeek.isActive(), isTurtleMode, isLeftClawOpen, isRightClawOpen, isLoweringLift, isWristDown);
         if(isLocalized) {
             telemetry.addData("Pose", poseString);
         }
         telemetry.addData("Lift", "Down = %b, Position = %d/%d, Power = %.2f/%.2f", isLiftDown, leftLiftPosition, rightLiftPosition, leftLiftPower, rightLiftPower);
-        telemetry.addData("Arm", "Position = %d, Power = %.2f", armPosition, armPower);
+        telemetry.addData("Arm", "Position = %d, Power = %.2f, Down Pressed = %b, Up Pressed = %b", armPosition, armPower, armDownPressed, armUpPressed);
+        telemetry.addData("Back Distance", "Left = %.0f mm, Right = %.0f mm", leftBackMillimeters, rightBackMillimeters);
+        telemetry.addData("Claw Distance", "Left = %.0f mm, Right = %.0f mm", leftClawMillimeters, rightClawMillimeters);
 
     }
 
