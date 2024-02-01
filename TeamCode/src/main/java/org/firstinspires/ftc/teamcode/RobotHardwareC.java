@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -54,6 +55,8 @@ public class RobotHardwareC {
                 2 - Servo - right_claw_servo
                 3 - Servo - left_claw_servo
             Digital Devices
+                0 - Digital Device - green_right_led
+                1 - Digital Device - red_right_led
                 3 - REV Touch Sensor - lift_touch
                 5 - REV Touch Sensor - arm_up_touch
                 7 - REV Touch Sensor - arm_down_touch
@@ -110,6 +113,10 @@ public class RobotHardwareC {
     private FtcDashboard ftcDashboard;
     private HeatSeekC heatSeek = new HeatSeekC(this);
     private boolean isWristDown;
+    private DigitalChannel greenLeftLed;
+    private DigitalChannel redLeftLed;
+    private DigitalChannel greenRightLed;
+    private DigitalChannel redRightLed;
 
     // Initializes this.
     public RobotHardwareC(LinearOpMode opMode) {
@@ -141,6 +148,10 @@ public class RobotHardwareC {
         rightBackDistance = hardwareMap.get(Rev2mDistanceSensor.class, "right_back_distance");
         armUpTouch = hardwareMap.get(TouchSensor.class, "arm_up_touch");
         armDownTouch = hardwareMap.get(TouchSensor.class, "arm_down_touch");
+        greenLeftLed = hardwareMap.get(DigitalChannel.class, "green_left_led");
+        redLeftLed = hardwareMap.get(DigitalChannel.class, "red_left_led");
+        greenRightLed = hardwareMap.get(DigitalChannel.class, "green_right_led");
+        redRightLed = hardwareMap.get(DigitalChannel.class, "red_right_led");
 
         // Initialize hardware.
         leftLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -151,6 +162,10 @@ public class RobotHardwareC {
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        greenLeftLed.setMode(DigitalChannel.Mode.OUTPUT);
+        redLeftLed.setMode(DigitalChannel.Mode.OUTPUT);
+        greenRightLed.setMode(DigitalChannel.Mode.OUTPUT);
+        redRightLed.setMode(DigitalChannel.Mode.OUTPUT);
 
         // Initialize the drive interface.
         drive = new SampleMecanumDrive(hardwareMap);
@@ -685,8 +700,31 @@ public class RobotHardwareC {
 
     }
 
+    private void setLedGreen(DigitalChannel greenLed, DigitalChannel redLed) {
+        greenLed.setState(true);
+        redLed.setState(false);
+    }
+
+    private void setLedRed(DigitalChannel greenLed, DigitalChannel redLed) {
+        greenLed.setState(false);
+        redLed.setState(true);
+    }
+
+    private void setLedYellow(DigitalChannel greenLed, DigitalChannel redLed) {
+        greenLed.setState(false);
+        redLed.setState(false);
+    }
+
+    private void setLedOff(DigitalChannel greenLed, DigitalChannel redLed) {
+        greenLed.setState(true);
+        redLed.setState(true);
+    }
+
     // Closes the left claw.
     public void closeLeftClaw() {
+
+        // Make the left LED green.
+        setLedGreen(greenLeftLed, redLeftLed);
 
         // Close the left claw.
         leftClawServo.setPosition(LEFT_CLAW_CLOSED);
@@ -699,6 +737,9 @@ public class RobotHardwareC {
     // Opens the left claw.
     public void openLeftClaw() {
 
+        // Make the left LED red.
+        setLedRed(greenLeftLed, redLeftLed);
+
         // Open the left claw.
         leftClawServo.setPosition(LEFT_CLAW_OPEN);
 
@@ -710,6 +751,9 @@ public class RobotHardwareC {
     // Closes the right claw.
     public void closeRightClaw() {
 
+        // Make the right LED green.
+        setLedGreen(greenRightLed, redRightLed);
+
         // Close the right claw.
         rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
 
@@ -720,6 +764,9 @@ public class RobotHardwareC {
 
     // Opens the right claw.
     public void openRightClaw() {
+
+        // Make the right LED red.
+        setLedRed(greenRightLed, redRightLed);
 
         // Open the right claw.
         rightClawServo.setPosition(RIGHT_CLAW_OPEN);
