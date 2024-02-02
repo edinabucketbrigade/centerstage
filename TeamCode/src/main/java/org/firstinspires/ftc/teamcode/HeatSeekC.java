@@ -324,7 +324,7 @@ public class HeatSeekC {
     }
 
     // Get a target y coordinate.
-    public double getTargetY(int leftColumn, int row, boolean redAlliance) throws InterruptedException {
+    public static double getTargetY(int leftColumn, int row, boolean redAlliance) throws InterruptedException {
 
         // If the row is invalid...
         if(row < MINIMUM_ROW || row > MAXIMUM_ROW) {
@@ -368,7 +368,7 @@ public class HeatSeekC {
     }
 
     // Gets a target lift position.
-    private static int getTargetLiftPosition(int row) {
+    public static int getTargetLiftPosition(int row) {
 
         // Get a heat seek lift position.
         int position =  Math.min(FIRST_ROW_LIFT_POSITION + (row - 1) * LIFT_INCREMENT, MAXIMUM_LIFT_POSITION);

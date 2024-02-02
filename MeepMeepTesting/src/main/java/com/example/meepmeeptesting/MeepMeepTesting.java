@@ -126,11 +126,11 @@ public class MeepMeepTesting {
 
                         // Red left
                                 // Left
-                                .lineToLinearHeading(new Pose2d(-34,-34,Math.toRadians(0)))
-                                .strafeLeft(20)
-                                .turn(Math.toRadians(-90))
+//                                .lineToLinearHeading(new Pose2d(-34,-34,Math.toRadians(0)))
+//                                .strafeLeft(20)
+//                                .turn(Math.toRadians(-90))
                                 // Middle
-                                //.back(32)
+                                .back(42)
                                 // Right
 //                                .back(18)
 //                                .setReversed(true)

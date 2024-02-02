@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.IDLE;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_B;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -53,6 +57,8 @@ public class AutoF extends LinearOpMode {
     public static final Route ROUTE = Route.RED_LEFT_DIRECT;
     public static final double DELAY = 0.5;
     private static final String TAG = "Bucket Brigade";
+    public static final int FIRST_ROW = 1;
+    public static double PURPLE_PIXEL_DELAY = 1;
     public static Boolean redAlliance;
     private Boolean startLeft;
     private Boolean parkLeft;
@@ -62,7 +68,7 @@ public class AutoF extends LinearOpMode {
     private Gamepad currentGamepad = new Gamepad();
     private CenterStageCVDetection.Location location;
     private CenterStageCVDetection teamPropDetector;
-    private RobotHardwareB robotHardware;
+    private RobotHardwareC robotHardware;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -71,7 +77,7 @@ public class AutoF extends LinearOpMode {
         redAlliance = null;
 
         // Get the robot hardware.
-        robotHardware = new RobotHardwareB(this);
+        robotHardware = new RobotHardwareC(this);
 
         // Wait for menu selection.
         waitForMenuSelection();
@@ -92,6 +98,8 @@ public class AutoF extends LinearOpMode {
 
         // Notify the user that we are waiting for start.
         log("Waiting for start...");
+
+        robotHardware.closeClaw();
 
         // Wait for start.
         waitForStart();
@@ -117,60 +125,60 @@ public class AutoF extends LinearOpMode {
 
         TrajectorySequence sequence = getRedLeftMiddleTrajectorySequence(drive);
 
-//        if (redAlliance) {
-//            if (startLeft) {
-//                if (location == location.Left) {
-//                    sequence = getRedLeftLeftTrajectorySequence(drive);
-//                }
-//                if (location == location.Middle) {
-//                    sequence = getRedLeftMiddleTrajectorySequence(drive);
-//                }
-//                if (location == location.Right) {
-//                    sequence = getRedLeftRightTrajectorySequence(drive);
-//                }
-//            }
-//            else {
-//                if (location == location.Left) {
-//                    sequence = getRedRightLeftTrajectorySequence(drive);
-//                }
-//                if (location == location.Middle) {
-//                    sequence = getRedRightMiddleTrajectorySequence(drive);
-//                }
-//                if (location == location.Right) {
-//                    sequence = getRedRightRightTrajectorySequence(drive);
-//                }
-//            }
-//        }
-//        else {
-//            if (startLeft) {
-//                if (location == location.Left) {
-//                    sequence = getBlueLeftLeftTrajectorySequence(drive);
-//                }
-//                if (location == location.Middle) {
-//                    sequence = getBlueLeftMiddleTrajectorySequence(drive);
-//                }
-//                if (location == location.Right) {
-//                    sequence = getBlueLeftRightTrajectorySequence(drive);
-//                }
-//            }
-//            else {
-//                if (location == location.Left) {
-//                    sequence = getBlueRightLeftTrajectorySequence(drive);
-//                }
-//                if (location == location.Middle) {
-//                    sequence = getBlueRightMiddleTrajectorySequence(drive);
-//                }
-//                if (location == location.Right) {
-//                    sequence = getBlueRightRightTrajectorySequence(drive);
-//                }
-//            }
-//        }
-//
-//        if (sequence == null) {
-//            throw new InterruptedException("The sequence is missing.");
-//        }
+        if (redAlliance) {
+            if (startLeft) {
+                if (location == location.Left) {
+                    sequence = getRedLeftLeftTrajectorySequence(drive);
+                }
+                if (location == location.Middle) {
+                    sequence = getRedLeftMiddleTrajectorySequence(drive);
+                }
+                if (location == location.Right) {
+                    sequence = getRedLeftRightTrajectorySequence(drive);
+                }
+            }
+            else {
+                if (location == location.Left) {
+                    sequence = getRedRightLeftTrajectorySequence(drive);
+                }
+                if (location == location.Middle) {
+                    sequence = getRedRightMiddleTrajectorySequence(drive);
+                }
+                if (location == location.Right) {
+                    sequence = getRedRightRightTrajectorySequence(drive);
+                }
+            }
+        }
+        else {
+            if (startLeft) {
+                if (location == location.Left) {
+                    sequence = getBlueLeftLeftTrajectorySequence(drive);
+                }
+                if (location == location.Middle) {
+                    sequence = getBlueLeftMiddleTrajectorySequence(drive);
+                }
+                if (location == location.Right) {
+                    sequence = getBlueLeftRightTrajectorySequence(drive);
+                }
+            }
+            else {
+                if (location == location.Left) {
+                    sequence = getBlueRightLeftTrajectorySequence(drive);
+                }
+                if (location == location.Middle) {
+                    sequence = getBlueRightMiddleTrajectorySequence(drive);
+                }
+                if (location == location.Right) {
+                    sequence = getBlueRightRightTrajectorySequence(drive);
+                }
+            }
+        }
 
-        //drive.followTrajectorySequenceAsync(sequence);
+        if (sequence == null) {
+            throw new InterruptedException("The sequence is missing.");
+        }
+
+        drive.followTrajectorySequenceAsync(sequence);
 
         // While the op mode is active...
         while (!isStopRequested()) {
@@ -213,22 +221,22 @@ public class AutoF extends LinearOpMode {
                 .splineTo(RED_MIDDLE, Math.toRadians(0))
                 .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
                 .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_MIDDLE, Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_MIDDLE, Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_MIDDLE, Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE, Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_MIDDLE, Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE, Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -244,27 +252,40 @@ public class AutoF extends LinearOpMode {
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .back(32)
+                .addTemporalMarker(PURPLE_PIXEL_DELAY, () -> {
+                    robotHardware.openLeftClaw();
+                })
+                .back(42)
                 .setReversed(true)
+//                .UNSTABLE_addDisplacementMarkerOffset(4, () -> {
+//                    robotHardware.openLeftClaw();
+//                })
                 .splineTo(RED_MIDDLE,Math.toRadians(0))
                 .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
                 .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_MIDDLE,Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE,Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP,Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_MIDDLE,Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE,Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP,Math.toRadians(0))
+//                .UNSTABLE_addDisplacementMarkerOffset(0, () -> {
+//                    robotHardware.raiseArm();
+//
+//                    int targetLiftPosition = HeatSeekC.getTargetLiftPosition(FIRST_ROW);
+//                    robotHardware.raiseLift(targetLiftPosition);
+//                    robotHardware.openRightClaw();
+//                })
+//                .setReversed(false)
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_MIDDLE,Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE,Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP,Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_MIDDLE,Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE,Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP,Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -288,22 +309,22 @@ public class AutoF extends LinearOpMode {
                 .splineTo(RED_MIDDLE, Math.toRadians(0))
                 .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
                 .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_MIDDLE, Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_MIDDLE, Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_MIDDLE, Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE, Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_MIDDLE, Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE, Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -324,22 +345,22 @@ public class AutoF extends LinearOpMode {
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(RED_RIGHT_LEFT_POSITION, Math.toRadians(0)))
                 .lineToLinearHeading(new Pose2d(RED_BACKDROP, Math.toRadians(180)))
-                .setReversed(false)
-                .splineTo(RED_MIDDLE, Math.toRadians(180))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(RED_MIDDLE, Math.toRadians(180))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_MIDDLE, Math.toRadians(180))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE, Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_MIDDLE, Math.toRadians(180))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE, Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -358,22 +379,22 @@ public class AutoF extends LinearOpMode {
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(26)
                 .lineToLinearHeading(new Pose2d(RED_BACKDROP, Math.toRadians(180)))
-                .setReversed(false)
-                .splineTo(RED_MIDDLE, Math.toRadians(180))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(RED_MIDDLE, Math.toRadians(180))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_MIDDLE, Math.toRadians(180))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE, Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_MIDDLE, Math.toRadians(180))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE, Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -393,22 +414,22 @@ public class AutoF extends LinearOpMode {
                 .setReversed(true)
                 .splineTo((RED_RIGHT_RIGHT_POSITION), Math.toRadians(0))
                 .lineToLinearHeading(new Pose2d(RED_BACKDROP, Math.toRadians(180)))
-                .setReversed(false)
-                .splineTo(RED_MIDDLE, Math.toRadians(180))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(RED_MIDDLE, Math.toRadians(180))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(RED_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_MIDDLE, Math.toRadians(180))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE, Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(RED_MIDDLE, Math.toRadians(180))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(RED_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(RED_MIDDLE, Math.toRadians(0))
+//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(RED_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -431,22 +452,22 @@ public class AutoF extends LinearOpMode {
                 .splineTo(BLUE_MIDDLE, Math.toRadians(0))
                 .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
                 .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -463,27 +484,27 @@ public class AutoF extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .back(32)
+                .back(42)
                 .setReversed(true)
                 .splineTo(BLUE_MIDDLE, Math.toRadians(0))
                 .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
                 .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -507,22 +528,22 @@ public class AutoF extends LinearOpMode {
                 .splineTo(BLUE_MIDDLE, Math.toRadians(0))
                 .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
                 .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -544,22 +565,22 @@ public class AutoF extends LinearOpMode {
                 .setReversed(true)
                 .splineTo((BLUE_RIGHT_LEFT_POSITION), Math.toRadians(0))
                 .lineToLinearHeading(new Pose2d(BLUE_BACKDROP, Math.toRadians(180)))
-                .setReversed(false)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -578,22 +599,22 @@ public class AutoF extends LinearOpMode {
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(26)
                 .lineToLinearHeading(new Pose2d(BLUE_BACKDROP, Math.toRadians(180)))
-                .setReversed(false)
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
@@ -612,22 +633,22 @@ public class AutoF extends LinearOpMode {
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(BLUE_RIGHT_RIGHT_POSITION, Math.toRadians(0)))
                 .lineToLinearHeading(new Pose2d(BLUE_BACKDROP, Math.toRadians(180)))
-                .setReversed(false)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .setReversed(false)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
+//                .setReversed(false)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
+//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
+//                .setReversed(true)
+//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
+//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
+//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
                 .build();
         return sequence;
     }
