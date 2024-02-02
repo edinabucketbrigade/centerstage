@@ -7,15 +7,7 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_C;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_D;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_E;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_F;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_G;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_H;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_I;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_J;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_K;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_L;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_M;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_N;
-import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_LIFT_POSITION;
+import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -275,7 +267,7 @@ public class HeatSeekC {
     public static int getTargetLiftPosition(int row) {
 
         // Get a heat seek lift position.
-        int position =  Math.min(FIRST_ROW_LIFT_POSITION + (row - 1) * LIFT_INCREMENT, MAXIMUM_LIFT_POSITION);
+        int position =  Math.min(FIRST_ROW_LIFT_POSITION + (row - 1) * LIFT_INCREMENT, MAXIMUM_POSITION);
 
         // Return the result.
         return position;

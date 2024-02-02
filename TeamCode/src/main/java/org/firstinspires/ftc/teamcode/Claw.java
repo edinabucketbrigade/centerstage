@@ -2,15 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -18,20 +14,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Config
 public class Claw {
 
-    public static double RIGHT_CLAW_OPEN = 0.32;
-    public static double RIGHT_CLAW_CLOSED = 0.5;
-    public static double LEFT_CLAW_OPEN = 0.71;
-    public static double LEFT_CLAW_CLOSED = 0.5;
+    public static double RIGHT_OPEN = 0.32;
+    public static double RIGHT_CLOSED = 0.5;
+    public static double LEFT_OPEN = 0.71;
+    public static double LEFT_CLOSED = 0.5;
     public static double PIXEL_MILLIMETERS_THRESHOLD = 10;
     public static double WRIST_UP_POSITION = 0.92;
     public static double WRIST_DOWN_POSITION = 0.27;
 
     private LinearOpMode opMode;
-    private Servo leftClawServo;
-    private Servo rightClawServo;
+    private Servo leftServo;
+    private Servo rightServo;
     private Servo wristServo;
-    private NormalizedColorSensor leftClawColor;
-    private NormalizedColorSensor rightClawColor;
+    private NormalizedColorSensor leftColor;
+    private NormalizedColorSensor rightColor;
     public boolean isRightOpen = true;
     public boolean isLeftOpen = true;
     private boolean isWristDown;
@@ -50,11 +46,11 @@ public class Claw {
         HardwareMap hardwareMap = opMode.hardwareMap;
 
         // Get the hardware.
-        leftClawServo = hardwareMap.get(Servo.class,"left_claw_servo");
-        rightClawServo = hardwareMap.get(Servo.class,"right_claw_servo");
+        leftServo = hardwareMap.get(Servo.class,"left_claw_servo");
+        rightServo = hardwareMap.get(Servo.class,"right_claw_servo");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
-        leftClawColor = hardwareMap.get(NormalizedColorSensor.class, "left_claw_color");
-        rightClawColor = hardwareMap.get(NormalizedColorSensor.class, "right_claw_color");
+        leftColor = hardwareMap.get(NormalizedColorSensor.class, "left_claw_color");
+        rightColor = hardwareMap.get(NormalizedColorSensor.class, "right_claw_color");
         greenLeftLed = hardwareMap.get(DigitalChannel.class, "green_left_led");
         redLeftLed = hardwareMap.get(DigitalChannel.class, "red_left_led");
         greenRightLed = hardwareMap.get(DigitalChannel.class, "green_right_led");
@@ -72,15 +68,15 @@ public class Claw {
     public void update() {
 
         // Get the claw distance sensors.
-        DistanceSensor leftClawDistance = (DistanceSensor)leftClawColor;
-        DistanceSensor rightClawDistance = (DistanceSensor)rightClawColor;
+        DistanceSensor leftDistance = (DistanceSensor) leftColor;
+        DistanceSensor rightDistance = (DistanceSensor) rightColor;
 
         // Get the claw distances.
-        double leftClawMillimeters = leftClawDistance.getDistance(DistanceUnit.MM);
-        double rightClawMillimeters = rightClawDistance.getDistance(DistanceUnit.MM);
+        double leftMillimeters = leftDistance.getDistance(DistanceUnit.MM);
+        double rightMillimeters = rightDistance.getDistance(DistanceUnit.MM);
 
         // If there is a pixel in the left claw...
-        if(leftClawMillimeters < PIXEL_MILLIMETERS_THRESHOLD) {
+        if(leftMillimeters < PIXEL_MILLIMETERS_THRESHOLD) {
 
             // Close the left claw.
             closeLeft();
@@ -88,7 +84,7 @@ public class Claw {
         }
 
         // If there is a pixel in the right claw...
-        if(rightClawMillimeters < PIXEL_MILLIMETERS_THRESHOLD) {
+        if(rightMillimeters < PIXEL_MILLIMETERS_THRESHOLD) {
 
             // Close the right claw.
             closeRight();
@@ -99,7 +95,7 @@ public class Claw {
         Telemetry telemetry = opMode.telemetry;
 
         // Add claw information to the telemetry.
-        telemetry.addData("Claw", "Left Open = %b, Right Open = %b, Wrist Down = %b, Left Distance = %.0f mm, Right Distance = %.0f mm", isLeftOpen, isRightOpen, isWristDown, leftClawMillimeters, rightClawMillimeters);
+        telemetry.addData("Claw", "Left Open = %b, Right Open = %b, Wrist Down = %b, Left Distance = %.0f mm, Right Distance = %.0f mm", isLeftOpen, isRightOpen, isWristDown, leftMillimeters, rightMillimeters);
 
     }
 
@@ -145,7 +141,7 @@ public class Claw {
         setLedGreen(greenLeftLed, redLeftLed);
 
         // Close the left claw.
-        leftClawServo.setPosition(LEFT_CLAW_CLOSED);
+        leftServo.setPosition(LEFT_CLOSED);
 
         // Remember that the left claw is closed.
         isLeftOpen = false;
@@ -159,7 +155,7 @@ public class Claw {
         setLedRed(greenLeftLed, redLeftLed);
 
         // Open the left claw.
-        leftClawServo.setPosition(LEFT_CLAW_OPEN);
+        leftServo.setPosition(LEFT_OPEN);
 
         // Remember that the left claw is open.
         isLeftOpen = true;
@@ -173,7 +169,7 @@ public class Claw {
         setLedGreen(greenRightLed, redRightLed);
 
         // Close the right claw.
-        rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
+        rightServo.setPosition(RIGHT_CLOSED);
 
         // Remember that the right claw is closed.
         isRightOpen = false;
@@ -187,7 +183,7 @@ public class Claw {
         setLedRed(greenRightLed, redRightLed);
 
         // Open the right claw.
-        rightClawServo.setPosition(RIGHT_CLAW_OPEN);
+        rightServo.setPosition(RIGHT_OPEN);
 
         // Remember that the right claw is open.
         isRightOpen = true;

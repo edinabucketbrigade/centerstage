@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_LIFT_POSITION;
+import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -11,8 +11,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
 @TeleOp
@@ -78,6 +76,9 @@ public class TeleOpT extends LinearOpMode {
 
         // Wait for the user to lower the lift.
         robotHardware.waitForLiftDown();
+
+        // Wait for the user to lower the arm.
+        robotHardware.waitForArmDown();
 
         // Initialize the robot.
         robotHardware.initializeRobot();
@@ -178,7 +179,7 @@ public class TeleOpT extends LinearOpMode {
                     robotHardware.closeClaw();
 
                     // Raise the lift.
-                    robotHardware.raiseLift(MAXIMUM_LIFT_POSITION);
+                    robotHardware.raiseLift(MAXIMUM_POSITION);
 
                 }
 

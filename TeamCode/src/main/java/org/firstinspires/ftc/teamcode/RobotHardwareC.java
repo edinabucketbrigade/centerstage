@@ -544,4 +544,12 @@ public class RobotHardwareC {
 
     }
 
+    // Waits for the user to lower the arm.
+    public void waitForArmDown() throws InterruptedException {
+
+        // Wait for the user to lower the arm.
+        arm.waitForDown();
+
+    }
+
 }

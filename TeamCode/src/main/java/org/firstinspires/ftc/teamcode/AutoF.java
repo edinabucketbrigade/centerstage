@@ -89,6 +89,9 @@ public class AutoF extends LinearOpMode {
         // Wait for the user to lower the lift.
         robotHardware.waitForLiftDown();
 
+        // Wait for the user to lower the arm.
+        robotHardware.waitForArmDown();
+
         // Wait for the camera to open.
         waitForCameraOpen();
 
