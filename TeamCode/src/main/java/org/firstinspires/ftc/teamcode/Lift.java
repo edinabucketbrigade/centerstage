@@ -14,10 +14,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class Lift {
 
-    public static double RAISE_POWER = 1;
-    public static double LOWER_POWER = 0.6;
     public static int DOWN_POSITION = 0;
+    public static double LOWER_POWER = 0.6;
     public static int MAXIMUM_POSITION = 1650;
+    public static double RAISE_POWER = 1;
 
     private LinearOpMode opMode;
     private DcMotor leftMotor;

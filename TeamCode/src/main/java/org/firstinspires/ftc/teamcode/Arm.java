@@ -13,10 +13,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class Arm {
 
-    public static double RAISE_POWER = 0.6;
-    public static double LOWER_POWER = 0.2;
-    public static int UP_POSITION = 750;
     public static int DOWN_POSITION = 0;
+    public static double LOWER_POWER = 0.2;
+    public static double RAISE_POWER = 0.6;
+    public static int UP_POSITION = 750;
 
     private LinearOpMode opMode;
     private DcMotor armMotor;

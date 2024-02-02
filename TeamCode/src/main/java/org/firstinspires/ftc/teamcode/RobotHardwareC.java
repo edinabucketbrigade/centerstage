@@ -65,11 +65,12 @@ public class RobotHardwareC {
                 3 - REV 2m Distance Sensor - left_back_distance
        Webcam 1
     */
-    public static final int MINIMUM_COLUMN = 1;
-    private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
+
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
-    public static final int MINIMUM_ROW = 1;
+    private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     public static final int MAXIMUM_ROW = 11;
+    public static final int MINIMUM_COLUMN = 1;
+    public static final int MINIMUM_ROW = 1;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
