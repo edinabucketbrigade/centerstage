@@ -68,6 +68,9 @@ public class TeleOpT extends LinearOpMode {
         int leftColumn = MINIMUM_COLUMN;
         int leftRow = MINIMUM_ROW;
 
+        // DEBUG
+        AutoF.redAlliance = null;
+
         // Wait for menu selection.
         waitForMenuSelection();
 
