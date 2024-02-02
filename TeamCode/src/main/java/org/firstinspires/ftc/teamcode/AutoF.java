@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.IDLE;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_A;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_B;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -69,6 +70,9 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection.Location location;
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
+    enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
+    private HeatSeekC.State state = IDLE;
+    private ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -125,7 +129,7 @@ public class AutoF extends LinearOpMode {
 
         TrajectorySequence sequence = getRedLeftMiddleTrajectorySequence(drive);
 
-        if (redAlliance) {
+        /*if (redAlliance) {
             if (startLeft) {
                 if (location == location.Left) {
                     sequence = getRedLeftLeftTrajectorySequence(drive);
@@ -172,10 +176,33 @@ public class AutoF extends LinearOpMode {
                     sequence = getBlueRightRightTrajectorySequence(drive);
                 }
             }
-        }
+        }*/
 
         if (sequence == null) {
             throw new InterruptedException("The sequence is missing.");
+        }
+
+        setState(STEP_A);
+
+        switch (state) {
+            case STEP_A:
+                drive.followTrajectorySequenceAsync(getRedLeftMiddleSpikeMarkTrajectorySequence(drive));
+                setState(STEP_B);
+                break;
+            case STEP_B:
+                if (drive.isBusy()) {
+                    return;
+                }
+                robotHardware.openLeftClaw();
+                setState(IDLE);
+                break;
+            case IDLE:
+
+                break;
+
+            default:
+
+                throw new InterruptedException("Unrecognized state");
         }
 
         drive.followTrajectorySequenceAsync(sequence);
@@ -201,6 +228,21 @@ public class AutoF extends LinearOpMode {
         double degrees = Math.toDegrees(radians);
         String output = String.format("x %.2f, y %.2f, heading %.2f", x, y, degrees);
         return output;
+    }
+
+    private TrajectorySequence getRedLeftMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
+
+        // Verify inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+
+        Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
+        drive.setPoseEstimate(startPose);
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .back(42)
+                .build();
+        return sequence;
     }
 
     private TrajectorySequence getRedLeftLeftTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
@@ -252,9 +294,9 @@ public class AutoF extends LinearOpMode {
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .addTemporalMarker(PURPLE_PIXEL_DELAY, () -> {
-                    robotHardware.openLeftClaw();
-                })
+//                .addTemporalMarker(PURPLE_PIXEL_DELAY, () -> {
+//                    robotHardware.openLeftClaw();
+//                })
                 .back(42)
                 .setReversed(true)
 //                .UNSTABLE_addDisplacementMarkerOffset(4, () -> {
@@ -840,6 +882,17 @@ public class AutoF extends LinearOpMode {
 
         // Close the camera.
         camera.closeCameraDevice();
+
+    }
+
+    // Sets the state.
+    private void setState(HeatSeekC.State state) {
+
+        // Set the state.
+        this.state = state;
+
+        // Reset the timer.
+        timer.reset();
 
     }
 }
