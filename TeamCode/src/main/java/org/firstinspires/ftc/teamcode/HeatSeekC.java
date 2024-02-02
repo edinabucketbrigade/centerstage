@@ -40,7 +40,7 @@ public class HeatSeekC {
 
     enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
 
-    public static double TARGET_X = 49;
+    public static double TARGET_X = 43;
     public static double TILE_SIZE = 24;
     public static double TARGET_Y_OFFSET = 7;
     public static int FIRST_ROW_LIFT_POSITION = 300;
@@ -141,18 +141,23 @@ public class HeatSeekC {
                 }
 
                 //robotHardware.raiseClaw();
+                // Close the claw so it does not catch when raising the arm.
+                robotHardware.closeClaw();
 
-                setState(IDLE);
+                setState(STEP_C);
 
                 break;
 
-            /*case STEP_C:
+            case STEP_C:
 
                 if (timer.milliseconds() < 1000) {
                     return;
                 }
+                // Get a lift position.
+                int liftPosition = getTargetLiftPosition(row);
 
-                robotHardware.setTraversalArmPosition();
+                robotHardware.raiseLift(liftPosition);
+                robotHardware.raiseWrist();
 
                 setState(STEP_D);
 
@@ -164,7 +169,8 @@ public class HeatSeekC {
                     return;
                 }
 
-                robotHardware.setPickupArmPosition();
+                // Raise the arm.
+                robotHardware.raiseArm();
 
                 setState(STEP_E);
 
@@ -176,7 +182,8 @@ public class HeatSeekC {
                     return;
                 }
 
-                robotHardware.openGrips();
+//                robotHardware.openGrips();
+                robotHardware.openClaw();
 
                 setState(STEP_F);
 
@@ -188,7 +195,7 @@ public class HeatSeekC {
                     return;
                 }
 
-                robotHardware.openClaw();
+                robotHardware.closeClaw();
 
                 setState(STEP_G);
 
@@ -200,105 +207,9 @@ public class HeatSeekC {
                     return;
                 }
 
-                // Get a lift position.
-                int liftPosition = getTargetLiftPosition(row);
-
-                robotHardware.raiseLift(liftPosition);
-
-                setState(STEP_H);
+                robotHardware.lowerArm();
 
                 break;
-
-            case STEP_H:
-
-                if (timer.milliseconds() < (300 * row)) {
-                    return;
-                }
-
-                robotHardware.setBackdropArmPosition();
-
-                robotHardware.closeClaw();
-
-                setState(STEP_I);
-
-                break;
-
-            case STEP_I:
-
-                if (drive.isBusy()) {
-                    return;
-                }
-
-                setState(STEP_J);
-
-                break;
-
-            case STEP_J:
-
-                if (timer.milliseconds() < 1000) {
-                    return;
-                }
-
-                robotHardware.closeGrips();
-
-                robotHardware.lowerClaw();
-
-                setState(STEP_K);
-
-                break;
-
-            case STEP_K:
-
-                if (timer.milliseconds() < 1000) {
-                    return;
-                }
-
-                robotHardware.setPullOutArmPosition();
-
-                robotHardware.pointIntakeDown();
-
-                setState(STEP_L);
-
-                break;
-
-            case STEP_L:
-
-                if (timer.milliseconds() < 500) {
-                    return;
-                }
-
-                robotHardware.setNeutralArmPosition();
-
-                setState(STEP_M);
-
-                break;
-
-            case STEP_M:
-
-                if (timer.milliseconds() < 1000) {
-                    return;
-                }
-
-                robotHardware.lowerLift();
-
-                robotHardware.openClaw();
-                robotHardware.leftClawOpen = false;
-                robotHardware.rightClawOpen = false;
-
-                setState(STEP_N);
-
-                break;
-
-            case STEP_N:
-
-                if (timer.milliseconds() < 1000) {
-                    return;
-                }
-
-                setState(IDLE);
-
-                break;
-             */
 
             case IDLE:
 
