@@ -40,7 +40,7 @@ public class HeatSeekC {
 
     enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
 
-    public static double TARGET_X = 43;
+    public static double TARGET_X = 40;
     public static double TILE_SIZE = 24;
     public static double TARGET_Y_OFFSET = 7;
     public static int FIRST_ROW_LIFT_POSITION = 300;
@@ -158,6 +158,8 @@ public class HeatSeekC {
 
                 robotHardware.raiseLift(liftPosition);
                 robotHardware.raiseWrist();
+                // Raise the arm.
+                robotHardware.raiseArm();
 
                 setState(STEP_D);
 
@@ -169,8 +171,8 @@ public class HeatSeekC {
                     return;
                 }
 
-                // Raise the arm.
-                robotHardware.raiseArm();
+//                robotHardware.openGrips();
+                robotHardware.openClaw();
 
                 setState(STEP_E);
 
@@ -178,12 +180,11 @@ public class HeatSeekC {
 
             case STEP_E:
 
-                if (timer.milliseconds() < 1000) {
+                if (timer.milliseconds() < 500) {
                     return;
                 }
 
-//                robotHardware.openGrips();
-                robotHardware.openClaw();
+                robotHardware.closeClaw();
 
                 setState(STEP_F);
 
@@ -195,19 +196,11 @@ public class HeatSeekC {
                     return;
                 }
 
-                robotHardware.closeClaw();
-
-                setState(STEP_G);
-
-                break;
-
-            case STEP_G:
-
-                if (timer.milliseconds() < 500) {
-                    return;
-                }
-
                 robotHardware.lowerArm();
+                robotHardware.lowerLift();
+                robotHardware.lowerWrist();
+
+                setState(IDLE);
 
                 break;
 
