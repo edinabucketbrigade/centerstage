@@ -14,8 +14,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Arm {
 
     public static int DOWN_POSITION = 0;
-    public static double LOWER_POWER = 0.2;
-    public static double RAISE_POWER = 0.6;
+    public static double LOWER_GAIN = 0.0012;
+    public static double MAXIMUM_LOWER_POWER = 0.2;
+    public static double MAXIMUM_RAISE_POWER = 0.2;
+    public static double RAISE_GAIN = 0.0012;
     public static int UP_POSITION = 750;
 
     private LinearOpMode opMode;
@@ -40,7 +42,7 @@ public class Arm {
         downTouch = hardwareMap.get(TouchSensor.class, "arm_down_touch");
 
         // Initialize the hardware.
-        armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -50,8 +52,8 @@ public class Arm {
     // Update this.
     public void update() {
 
-        // Get the arm's position.
-        int position = armMotor.getCurrentPosition();
+        // Get the arm's current position.
+        int currentPosition = armMotor.getCurrentPosition();
 
         // Get the arm's power.
         double power = armMotor.getPower();
@@ -60,25 +62,63 @@ public class Arm {
         boolean isDown = downTouch.isPressed();
         boolean isUp = upTouch.isPressed();
 
-        // If we finished lowering the arm...
-        if (isLowering && isDown) {
+        // If we are lowering the arm...
+        if (isLowering) {
 
-            // Reset the arm.
-            reset();
+            // If the arm is down...
+            if(isDown) {
 
-            // Remember that we finished lowering the arm.
-            isLowering = false;
+                // Reset the arm.
+                reset();
+
+                // Remember that we finished lowering the arm.
+                isLowering = false;
+
+            }
+
+            // Otherwise (if the arm is not down)...
+            else {
+
+                // Lower the arm.
+                double positionError = Math.abs(DOWN_POSITION - currentPosition);
+                double armPower = Math.min(positionError * LOWER_GAIN, MAXIMUM_LOWER_POWER);
+                armMotor.setPower(-armPower);
+
+            }
 
         }
 
-        // If we finished raising the arm...
-        if(isRaising && isUp) {
+        // Otherwise, if we are raising the arm...
+        else if(isRaising) {
+
+            // If the arm is up...
+            if(isUp) {
+
+                // Stop the arm motor.
+                armMotor.setPower(0);
+
+                // Remember that we finished raising the arm.
+                isRaising = false;
+
+            }
+
+            // Otherwise (if the arm is not down)...
+            else {
+
+                // Raise the arm.
+                double positionError = Math.abs(UP_POSITION - currentPosition);
+                double armPower = Math.min(positionError * RAISE_GAIN, MAXIMUM_RAISE_POWER);
+                armMotor.setPower(armPower);
+
+            }
+
+        }
+
+        // Otherwise (if we are not moving the arm)...
+        else {
 
             // Stop the arm motor.
             armMotor.setPower(0);
-
-            // Remember that we finished raising the arm.
-            isRaising = false;
 
         }
 
@@ -86,7 +126,7 @@ public class Arm {
         Telemetry telemetry = opMode.telemetry;
 
         // Add arm information to the telemetry.
-        telemetry.addData("Arm", "Down = %b, Up = %b, Lowering = %b, Raising = %b, Position = %d, Power = %.2f", isDown, isUp, isLowering, isRaising, position, power);
+        telemetry.addData("Arm", "Down = %b, Up = %b, Lowering = %b, Raising = %b, Position = %d, Power = %.2f", isDown, isUp, isLowering, isRaising, currentPosition, power);
 
     }
 
@@ -94,9 +134,6 @@ public class Arm {
     public void raise() {
 
         // Raise the arm.
-        armMotor.setTargetPosition(UP_POSITION);
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(RAISE_POWER);
         isLowering = false;
         isRaising = true;
 
@@ -106,9 +143,6 @@ public class Arm {
     public void lower() {
 
         // Lower the arm.
-        armMotor.setTargetPosition(DOWN_POSITION);
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(LOWER_POWER);
         isLowering = true;
         isRaising = false;
 
@@ -137,7 +171,8 @@ public class Arm {
         log("Arm is down");
 
         // Reset the arm.
-        reset();
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
