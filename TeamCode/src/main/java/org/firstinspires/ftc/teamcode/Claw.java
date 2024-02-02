@@ -14,11 +14,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Config
 public class Claw {
 
-    public static double RIGHT_OPEN = 0.32;
+    public static double RIGHT_OPEN = 0.24;
     public static double RIGHT_CLOSED = 0.5;
     public static double LEFT_OPEN = 0.71;
     public static double LEFT_CLOSED = 0.5;
-    public static double PIXEL_MILLIMETERS_THRESHOLD = 10;
+    public static double PIXEL_CAPTURE_THRESHOLD = 30;
     public static double WRIST_UP_POSITION = 0.92;
     public static double WRIST_DOWN_POSITION = 0.27;
 
@@ -35,6 +35,8 @@ public class Claw {
     private DigitalChannel redLeftLed;
     private DigitalChannel greenRightLed;
     private DigitalChannel redRightLed;
+    private boolean automaticallyCaptureLeft = true;
+    private boolean automaticallyCaptureRight = true;
 
     // Initializes this.
     public Claw(LinearOpMode opMode) {
@@ -76,18 +78,50 @@ public class Claw {
         double rightMillimeters = rightDistance.getDistance(DistanceUnit.MM);
 
         // If there is a pixel in the left claw...
-        if(leftMillimeters < PIXEL_MILLIMETERS_THRESHOLD) {
+        if(leftMillimeters < PIXEL_CAPTURE_THRESHOLD) {
 
-            // Close the left claw.
-            closeLeft();
+            // If we are automatically capturing left pixels...
+            if(automaticallyCaptureLeft) {
+
+                // Close the left claw.
+                closeLeft();
+
+                // Disable automatically capturing left pixels for now.
+                automaticallyCaptureLeft = false;
+
+            }
+
+        }
+
+        // Otherwise (if there is no pixel in the left claw)...
+        else {
+
+            // Enable automatically capturing left pixels.
+            automaticallyCaptureLeft = true;
 
         }
 
         // If there is a pixel in the right claw...
-        if(rightMillimeters < PIXEL_MILLIMETERS_THRESHOLD) {
+        if(rightMillimeters < PIXEL_CAPTURE_THRESHOLD) {
 
-            // Close the right claw.
-            closeRight();
+            // If we are automatically capturing right pixels...
+            if(automaticallyCaptureRight) {
+
+                // Close the right claw.
+                closeRight();
+
+                // Disable automatically capturing right pixels for now.
+                automaticallyCaptureRight = false;
+
+            }
+
+        }
+
+        // Otherwise (if there is no pixel in the right claw)...
+        else {
+
+            // Enable automatically capturing right pixels.
+            automaticallyCaptureRight = true;
 
         }
 
@@ -95,7 +129,7 @@ public class Claw {
         Telemetry telemetry = opMode.telemetry;
 
         // Add claw information to the telemetry.
-        telemetry.addData("Claw", "Left Open = %b, Right Open = %b, Wrist Down = %b, Left Distance = %.0f mm, Right Distance = %.0f mm", isLeftOpen, isRightOpen, isWristDown, leftMillimeters, rightMillimeters);
+        telemetry.addData("Claw", "Left Open = %b, Right Open = %b, Wrist Down = %b, Left Distance = %.0f mm, Right Distance = %.0f mm, Capture Left = %b, Capture Right = %b", isLeftOpen, isRightOpen, isWristDown, leftMillimeters, rightMillimeters, automaticallyCaptureLeft, automaticallyCaptureRight);
 
     }
 
