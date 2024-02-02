@@ -15,7 +15,7 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_K;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_L;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_M;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_N;
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_LIFT_POSITION;
+import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_LIFT_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;

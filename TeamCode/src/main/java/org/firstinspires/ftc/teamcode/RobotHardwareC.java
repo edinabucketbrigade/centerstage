@@ -65,59 +65,28 @@ public class RobotHardwareC {
                 3 - REV 2m Distance Sensor - left_back_distance
        Webcam 1
     */
-    public static double RIGHT_CLAW_OPEN = 0.32;
-    public static double RIGHT_CLAW_CLOSED = 0.5;
-    public static double LEFT_CLAW_OPEN = 0.71;
-    public static double LEFT_CLAW_CLOSED = 0.5;
-    public static double RAISE_LIFT_POWER = 1;
-    public static double LOWER_LIFT_POWER = 0.6;
-    public static int LIFT_DOWN_POSITION = 0;
     public static final int MINIMUM_COLUMN = 1;
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     public static final int MINIMUM_ROW = 1;
     public static final int MAXIMUM_ROW = 11;
-    public static double RAISE_ARM_POWER = 0.6;
-    public static double LOWER_ARM_POWER = 0.2;
-    public static int ARM_UP_POSITION = 750;
-    public static int ARM_DOWN_POSITION = 0;
-    public static int MAXIMUM_LIFT_POSITION = 1650;
-    public static double WRIST_UP_POSITION = 0.92;
-    public static double WRIST_DOWN_POSITION = 0.27;
-    public static double PIXEL_MILLIMETERS_THRESHOLD = 10;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
-    public boolean isRightClawOpen = true;
-    public boolean isLeftClawOpen = true;
     private boolean isTurtleMode = false;
-    private Servo leftClawServo;
-    private Servo rightClawServo;
-    private Servo wristServo;
-    private DcMotor leftLiftMotor;
-    private DcMotor rightLiftMotor;
-    private TouchSensor liftTouch;
-    private DcMotor armMotor;
-    private NormalizedColorSensor leftClawColor;
-    private NormalizedColorSensor rightClawColor;
     private DistanceSensor leftBackDistance;
     private DistanceSensor rightBackDistance;
-    private TouchSensor armUpTouch;
-    private TouchSensor armDownTouch;
-    private boolean isLoweringLift;
     private SampleMecanumDrive drive;
     private AprilTagProcessor aprilTagProcessor;
     private boolean isLocalized;
     private FtcDashboard ftcDashboard;
     private HeatSeekC heatSeek = new HeatSeekC(this);
-    private boolean isWristDown;
-    private DigitalChannel greenLeftLed;
-    private DigitalChannel redLeftLed;
-    private DigitalChannel greenRightLed;
-    private DigitalChannel redRightLed;
+    private Lift lift;
+    private Arm arm;
+    private Claw claw;
 
     // Initializes this.
     public RobotHardwareC(LinearOpMode opMode) {
@@ -136,37 +105,11 @@ public class RobotHardwareC {
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        leftClawServo = hardwareMap.get(Servo.class,"left_claw_servo");
-        rightClawServo = hardwareMap.get(Servo.class,"right_claw_servo");
-        wristServo = hardwareMap.get(Servo.class, "wrist_servo");
-        leftLiftMotor = hardwareMap.get(DcMotor.class,"left_lift_motor");
-        rightLiftMotor = hardwareMap.get(DcMotor.class,"right_lift_motor");
-        liftTouch = hardwareMap.get(TouchSensor.class, "lift_touch");
-        armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
-        leftClawColor = hardwareMap.get(NormalizedColorSensor.class, "left_claw_color");
-        rightClawColor = hardwareMap.get(NormalizedColorSensor.class, "right_claw_color");
         leftBackDistance = hardwareMap.get(Rev2mDistanceSensor.class, "left_back_distance");
         rightBackDistance = hardwareMap.get(Rev2mDistanceSensor.class, "right_back_distance");
-        armUpTouch = hardwareMap.get(TouchSensor.class, "arm_up_touch");
-        armDownTouch = hardwareMap.get(TouchSensor.class, "arm_down_touch");
-        greenLeftLed = hardwareMap.get(DigitalChannel.class, "green_left_led");
-        redLeftLed = hardwareMap.get(DigitalChannel.class, "red_left_led");
-        greenRightLed = hardwareMap.get(DigitalChannel.class, "green_right_led");
-        redRightLed = hardwareMap.get(DigitalChannel.class, "red_right_led");
-
-        // Initialize hardware.
-        leftLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        leftLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightLiftMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        rightLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        armMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        greenLeftLed.setMode(DigitalChannel.Mode.OUTPUT);
-        redLeftLed.setMode(DigitalChannel.Mode.OUTPUT);
-        greenRightLed.setMode(DigitalChannel.Mode.OUTPUT);
-        redRightLed.setMode(DigitalChannel.Mode.OUTPUT);
+        arm = new Arm(opMode);
+        claw = new Claw(opMode);
+        lift = new Lift(opMode);
 
         // Initialize the drive interface.
         drive = new SampleMecanumDrive(hardwareMap);
@@ -190,6 +133,11 @@ public class RobotHardwareC {
 
         // Update heat seek.
         heatSeek.update();
+
+        // Update the hardware.
+        arm.update();
+        claw.update();
+        lift.update();
 
         // Get a detection.
         AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
@@ -217,34 +165,6 @@ public class RobotHardwareC {
         // Convert the pose to a string.
         String poseString = AutoF.toString(pose);
 
-        // Determine whether the lift is down.
-        boolean isLiftDown = liftTouch.isPressed();
-
-        // Get the lift's position.
-        int leftLiftPosition = leftLiftMotor.getCurrentPosition();
-        int rightLiftPosition = rightLiftMotor.getCurrentPosition();
-
-        // If we finished lowering the lift...
-        if (isLoweringLift && isLiftDown) {
-
-            // Reset the lift.
-            resetLift();
-
-            // Remember that we finished lowering the lift.
-            isLoweringLift = false;
-
-        }
-
-        // Get the lift's power.
-        double leftLiftPower = leftLiftMotor.getPower();
-        double rightLiftPower = rightLiftMotor.getPower();
-
-        // Get the arm's position.
-        int armPosition = armMotor.getCurrentPosition();
-
-        // Get the arm's power.
-        double armPower = armMotor.getPower();
-
         // Get the telemetry.
         Telemetry telemetry = opMode.telemetry;
 
@@ -252,35 +172,12 @@ public class RobotHardwareC {
         double leftBackMillimeters = leftBackDistance.getDistance(DistanceUnit.MM);
         double rightBackMillimeters = rightBackDistance.getDistance(DistanceUnit.MM);
 
-        // Get the claw distance sensors.
-        DistanceSensor leftClawDistance = (DistanceSensor)leftClawColor;
-        DistanceSensor rightClawDistance = (DistanceSensor)rightClawColor;
-
-        // Get the claw distances.
-        double leftClawMillimeters = leftClawDistance.getDistance(DistanceUnit.MM);
-        double rightClawMillimeters = rightClawDistance.getDistance(DistanceUnit.MM);
-
-        if(leftClawMillimeters < PIXEL_MILLIMETERS_THRESHOLD) {
-            closeLeftClaw();
-        }
-        if(rightClawMillimeters < PIXEL_MILLIMETERS_THRESHOLD) {
-            closeRightClaw();
-        }
-
-
-        // Get the arm touch sensor values.
-        boolean armDownPressed = armDownTouch.isPressed();
-        boolean armUpPressed = armUpTouch.isPressed();
-
         // Update the telemetry.
-        telemetry.addData("Status", "Localized = %b, Heat Seeking = %b, Turtle Mode = %b, Left Claw Open = %b, Right Claw Open = %b, Lowering Lift = %b, Wrist Down = %b", isLocalized, heatSeek.isActive(), isTurtleMode, isLeftClawOpen, isRightClawOpen, isLoweringLift, isWristDown);
+        telemetry.addData("Status", "Localized = %b, Heat Seeking = %b, Turtle Mode = %b", isLocalized, heatSeek.isActive(), isTurtleMode);
         if(isLocalized) {
             telemetry.addData("Pose", poseString);
         }
-        telemetry.addData("Lift", "Down = %b, Position = %d/%d, Power = %.2f/%.2f", isLiftDown, leftLiftPosition, rightLiftPosition, leftLiftPower, rightLiftPower);
-        telemetry.addData("Arm", "Position = %d, Power = %.2f, Down Pressed = %b, Up Pressed = %b", armPosition, armPower, armDownPressed, armUpPressed);
         telemetry.addData("Back Distance", "Left = %.0f mm, Right = %.0f mm", leftBackMillimeters, rightBackMillimeters);
-        telemetry.addData("Claw Distance", "Left = %.0f mm, Right = %.0f mm", leftClawMillimeters, rightClawMillimeters);
 
     }
 
@@ -289,38 +186,6 @@ public class RobotHardwareC {
 
         // Return the localized value.
         return isLocalized;
-
-    }
-
-    // Resets the lift.
-    private void resetLift() throws InterruptedException {
-
-        // Verify inputs exist.
-        if(leftLiftMotor == null) {
-            throw new InterruptedException("The left lift motor is missing.");
-        }
-        if(rightLiftMotor == null) {
-            throw new InterruptedException("The right lift motor is missing.");
-        }
-
-        // Reset the lift.
-        resetLift(leftLiftMotor);
-        resetLift(rightLiftMotor);
-
-    }
-
-    // Resets a lift motor.
-    private static void resetLift(DcMotor liftMotor) throws InterruptedException {
-
-        // Verify inputs exist.
-        if(liftMotor == null) {
-            throw new InterruptedException("The lift motor is missing.");
-        }
-
-        // Reset the lift motor.
-        liftMotor.setPower(0);
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
@@ -426,117 +291,24 @@ public class RobotHardwareC {
         this.isTurtleMode = isTurtleMode;
     }
 
+    // Raises the arm.
     public void raiseArm() {
-        armMotor.setTargetPosition(ARM_UP_POSITION);
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(RAISE_ARM_POWER);
+
+        // Raise the arm.
+        arm.raise();
+
     }
 
+    // Lowers the arm.
     public void lowerArm() {
-        armMotor.setTargetPosition(ARM_DOWN_POSITION);
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(LOWER_ARM_POWER);
-    }
 
-    // Raises the lift.
-    public void raiseLift(int position) {
-
-        // Raise the lift.
-        setLiftPosition(leftLiftMotor, position, RAISE_LIFT_POWER);
-        setLiftPosition(rightLiftMotor, position, RAISE_LIFT_POWER);
-        isLoweringLift = false;
-
-    }
-
-    // Lowers the lift.
-    public void lowerLift() throws InterruptedException {
-
-        // Verify inputs exist.
-        if(leftLiftMotor == null) {
-            throw new InterruptedException("The left lift motor is missing.");
-        }
-        if(rightLiftMotor == null) {
-            throw new InterruptedException("The right lift motor is missing.");
-        }
-
-        // Lower the lift.
-        setLiftPosition(leftLiftMotor, LIFT_DOWN_POSITION, LOWER_LIFT_POWER);
-        setLiftPosition(rightLiftMotor, LIFT_DOWN_POSITION, LOWER_LIFT_POWER);
-        isLoweringLift = true;
-
-    }
-
-    // Sets the lift position.
-    private void setLiftPosition(DcMotor liftMotor, int position, double power) {
-
-        // Set the lift position.
-        liftMotor.setTargetPosition(position);
-        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        liftMotor.setPower(power);
-
-    }
-
-    // Waits for the user to lower the lift.
-    public void waitForLiftDown() throws InterruptedException {
-
-        // Verify inputs exist.
-        if(leftLiftMotor == null) {
-            throw new InterruptedException("The left lift motor is missing.");
-        }
-        if(opMode == null) {
-            throw new InterruptedException("The op mode is missing.");
-        }
-        if(rightLiftMotor == null) {
-            throw new InterruptedException("The right lift motor is missing.");
-        }
-
-        // Get gamepad 1.
-        Gamepad gamepad1 = opMode.gamepad1;
-
-        // While the lift is up...
-        while (!opMode.isStopRequested() && !liftTouch.isPressed()) {
-
-            // Instruct the user to lower the lift.
-            log("Hold gamepad 1 back to lower lift...");
-
-            // If the user is pressing back...
-            if (gamepad1.back) {
-
-                // Lower the lift.
-                leftLiftMotor.setPower(-LOWER_LIFT_POWER);
-                rightLiftMotor.setPower(-LOWER_LIFT_POWER);
-
-            }
-
-            // Otherwise (if the user is not pressing back)...
-            else {
-
-                // Stop the lift.
-                leftLiftMotor.setPower(0);
-                rightLiftMotor.setPower(0);
-
-            }
-
-        }
-
-        // If stop is requested...
-        if(opMode.isStopRequested()) {
-
-            // Exit the method.
-            return;
-
-        }
-
-        // Notify the user that the lift is down.
-        log("Lift is down");
-
-        // Reset the lift.
-        resetLift();
+        // Lower the arm.
+        arm.lower();
 
     }
 
     // Logs a message.
-    public void log(String message) {
+    private void log(String message) {
 
         // If the op mode is missing...
         if (opMode == null) {
@@ -550,24 +322,12 @@ public class RobotHardwareC {
         Telemetry telemetry = opMode.telemetry;
 
         // Show the message.
-        telemetry.addData("Message", message);
-        telemetry.update();
+        Utilities.log(message, telemetry);
 
     }
 
     // Initializes the robot.
-    public void initializeRobot() throws InterruptedException {
-
-        // Verify inputs exist.
-        if(leftClawServo == null) {
-            throw new InterruptedException("The left claw servo is missing.");
-        }
-        if(rightClawServo == null) {
-            throw new InterruptedException("The right claw servo is missing.");
-        }
-        if(wristServo == null) {
-            throw new InterruptedException("The wrist servo is missing.");
-        }
+    public void initializeRobot() {
 
         // If stop is requested...
         if(opMode.isStopRequested()) {
@@ -592,47 +352,26 @@ public class RobotHardwareC {
     }
 
     // Toggles the claws.
-    public void toggleClaws() throws InterruptedException {
+    public void toggleClaws() {
 
-        // Toggle the left claw.
-        toggleLeftClaw();
-
-        // Toggle the right claw.
-        toggleRightClaw();
+        // Toggle the claws.
+        claw.toggle();
 
     }
 
     // Toggles the left claw.
-    public void toggleLeftClaw() throws InterruptedException {
-
-        // Verify inputs exist.
-        if(leftClawServo == null) {
-            throw new InterruptedException("The left claw servo is missing.");
-        }
+    public void toggleLeftClaw() {
 
         // Toggle the left claw.
-        if (isLeftClawOpen) {
-            closeLeftClaw();
-        } else {
-            openLeftClaw();
-        }
+        claw.toggleLeft();
 
     }
 
     // Toggles the right claw.
     public void toggleRightClaw() throws InterruptedException {
 
-        // Verify inputs exist.
-        if(rightClawServo == null) {
-            throw new InterruptedException("The right claw servo is missing.");
-        }
-
         // Toggle the right claw.
-        if (isRightClawOpen) {
-            closeRightClaw();
-        } else {
-            openRightClaw();
-        }
+        claw.toggleRight();
 
     }
 
@@ -709,101 +448,51 @@ public class RobotHardwareC {
 
     }
 
-    private void setLedGreen(DigitalChannel greenLed, DigitalChannel redLed) {
-        greenLed.setState(true);
-        redLed.setState(false);
-    }
-
-    private void setLedRed(DigitalChannel greenLed, DigitalChannel redLed) {
-        greenLed.setState(false);
-        redLed.setState(true);
-    }
-
-    private void setLedYellow(DigitalChannel greenLed, DigitalChannel redLed) {
-        greenLed.setState(false);
-        redLed.setState(false);
-    }
-
-    private void setLedOff(DigitalChannel greenLed, DigitalChannel redLed) {
-        greenLed.setState(true);
-        redLed.setState(true);
-    }
-
     // Closes the left claw.
     public void closeLeftClaw() {
 
-        // Make the left LED green.
-        setLedGreen(greenLeftLed, redLeftLed);
-
         // Close the left claw.
-        leftClawServo.setPosition(LEFT_CLAW_CLOSED);
-
-        // Remember that the left claw is closed.
-        isLeftClawOpen = false;
+        claw.closeLeft();
 
     }
 
     // Opens the left claw.
     public void openLeftClaw() {
 
-        // Make the left LED red.
-        setLedRed(greenLeftLed, redLeftLed);
-
         // Open the left claw.
-        leftClawServo.setPosition(LEFT_CLAW_OPEN);
-
-        // Remember that the left claw is open.
-        isLeftClawOpen = true;
+        claw.openLeft();
 
     }
 
     // Closes the right claw.
     public void closeRightClaw() {
 
-        // Make the right LED green.
-        setLedGreen(greenRightLed, redRightLed);
-
         // Close the right claw.
-        rightClawServo.setPosition(RIGHT_CLAW_CLOSED);
-
-        // Remember that the right claw is closed.
-        isRightClawOpen = false;
+        claw.closeRight();
 
     }
 
     // Opens the right claw.
     public void openRightClaw() {
 
-        // Make the right LED red.
-        setLedRed(greenRightLed, redRightLed);
-
         // Open the right claw.
-        rightClawServo.setPosition(RIGHT_CLAW_OPEN);
-
-        // Remember that the right claw is open.
-        isRightClawOpen = true;
+        claw.openRight();
 
     }
 
     // Closes the claw.
     public void closeClaw() {
 
-        // Close the left claw.
-        closeLeftClaw();
-
-        // Close the right claw.
-        closeRightClaw();
+        // Close the claw.
+        claw.close();
 
     }
 
     // Opens the claw.
     public void openClaw() {
 
-        // Open the left claw.
-        openLeftClaw();
-
-        // Open the right claw.
-        openRightClaw();
+        // Open the claw.
+        claw.open();
 
     }
 
@@ -811,11 +500,7 @@ public class RobotHardwareC {
     public void toggleWrist() {
 
         // Toggle the wrist.
-        if (isWristDown) {
-            raiseWrist();
-        } else {
-            lowerWrist();
-        }
+        claw.toggleWrist();
 
     }
 
@@ -823,21 +508,39 @@ public class RobotHardwareC {
     public void raiseWrist() {
 
         // Raise the wrist.
-        wristServo.setPosition(WRIST_UP_POSITION);
-
-        // Remember that the wrist is up.
-        isWristDown = false;
+        claw.raiseWrist();
 
     }
 
     // Lowers the wrist.
     public void lowerWrist() {
 
-        // Lowers the wrist.
-        wristServo.setPosition(WRIST_DOWN_POSITION);
+        // Lower the wrist.
+        claw.lowerWrist();
 
-        // Remember that the wrist is down.
-        isWristDown = true;
+    }
+
+    // Raises the lift.
+    public void raiseLift(int position) {
+
+        // Raise the lift.
+        lift.raise(position);
+
+    }
+
+    // Lowers the lift.
+    public void lowerLift() throws InterruptedException {
+
+        // Lower the lift.
+        lift.lower();
+
+    }
+
+    // Waits for the user to lower the lift.
+    public void waitForLiftDown() throws InterruptedException {
+
+        // Wait for the user to lower the lift.
+        lift.waitForDown();
 
     }
 

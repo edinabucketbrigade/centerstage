@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_LIFT_POSITION;
+import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_LIFT_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -11,6 +11,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
 @TeleOp
@@ -89,7 +91,7 @@ public class TeleOpT extends LinearOpMode {
         }
 
         // Notify the user that we are waiting for start.
-        robotHardware.log("Waiting for start...");
+        log("Waiting for start...");
 
         // Wait for start.
         waitForStart();
@@ -386,6 +388,14 @@ public class TeleOpT extends LinearOpMode {
             }
 
         }
+
+    }
+
+    // Logs a message.
+    private void log(String message) {
+
+        // Show the message.
+        Utilities.log(message, telemetry);
 
     }
 
