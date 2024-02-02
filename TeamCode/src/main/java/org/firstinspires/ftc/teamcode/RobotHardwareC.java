@@ -84,6 +84,7 @@ public class RobotHardwareC {
     public static int MAXIMUM_LIFT_POSITION = 1650;
     public static double WRIST_UP_POSITION = 0.92;
     public static double WRIST_DOWN_POSITION = 0.27;
+    public static double PIXEL_MILLIMETERS_THRESHOLD = 10;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -258,6 +259,14 @@ public class RobotHardwareC {
         // Get the claw distances.
         double leftClawMillimeters = leftClawDistance.getDistance(DistanceUnit.MM);
         double rightClawMillimeters = rightClawDistance.getDistance(DistanceUnit.MM);
+
+        if(leftClawMillimeters < PIXEL_MILLIMETERS_THRESHOLD) {
+            closeLeftClaw();
+        }
+        if(rightClawMillimeters < PIXEL_MILLIMETERS_THRESHOLD) {
+            closeRightClaw();
+        }
+
 
         // Get the arm touch sensor values.
         boolean armDownPressed = armDownTouch.isPressed();
