@@ -94,6 +94,58 @@ public class HeatSeekC {
         switch (state) {
             case STEP_A:
 
+                // Close the claw so it does not catch when raising the lift.
+                robotHardware.closeClaw();
+
+                // Advance to the next step.
+                setState(STEP_B);
+
+                break;
+
+            case STEP_B:
+
+                // If we are waiting...
+                if (timer.milliseconds() < 1000) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Get a lift position.
+                int liftPosition = getTargetLiftPosition(row);
+
+                // Raise the lift.
+                //robotHardware.raiseLift(liftPosition);
+
+                // Raise the wrist.
+                robotHardware.raiseWrist();
+
+                // Raise the arm.
+                robotHardware.raiseArm();
+
+                // Advance to the next step.
+                setState(STEP_C);
+
+                break;
+
+            case STEP_C:
+
+                // If we are waiting...
+                if (timer.milliseconds() < 2000) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Advance to the next step.
+                setState(STEP_D);
+
+                break;
+
+            case STEP_D:
+
                 // Get the robot's current pose.
                 Pose2d currentPose = drive.getPoseEstimate();
 
@@ -122,69 +174,10 @@ public class HeatSeekC {
                 drive.followTrajectorySequenceAsync(sequence);
 
                 // Advance to the next step.
-                setState(STEP_B);
-
-                break;
-
-            case STEP_B:
-
-                // If the robot is driving...
-                if (drive.isBusy()) {
-
-                    // Exit the method.
-                    return;
-
-                }
-
-                // Close the claw so it does not catch when raising the lift.
-                robotHardware.closeClaw();
-
-                // Advance to the next step.
-                setState(STEP_C);
-
-                break;
-
-            case STEP_C:
-
-                // If we are waiting...
-                if (timer.milliseconds() < 1000) {
-
-                    // Exit the method.
-                    return;
-
-                }
-
-                // Get a lift position.
-                int liftPosition = getTargetLiftPosition(row);
-
-                // Raise the lift.
-                //robotHardware.raiseLift(liftPosition);
-
-                // Raise the wrist.
-                robotHardware.raiseWrist();
-
-                // Raise the arm.
-                robotHardware.raiseArm();
-
-                // Advance to the next step.
-                setState(STEP_D);
-
-                break;
-
-            case STEP_D:
-
-                // If we are waiting...
-                if (timer.milliseconds() < 2000) {
-
-                    // Exit the method.
-                    return;
-
-                }
-
-                // Advance to the next step.
                 setState(STEP_E);
 
                 break;
+
 
             case STEP_E:
 
