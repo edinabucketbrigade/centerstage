@@ -130,28 +130,38 @@ public class MeepMeepTesting {
 //                                .strafeLeft(20)
 //                                .turn(Math.toRadians(-90))
                                 // Middle
-                                .back(42)
+                                //.back(42)
                                 // Right
 //                                .back(18)
 //                                .setReversed(true)
 //                                .splineTo(new Vector2d(-9.5, -35),Math.toRadians(0))
 //                                .turn(Math.toRadians(90))
                                 // Other thing
-                                .setReversed(true)
-                                .splineTo(new Vector2d(0,-8),Math.toRadians(0))
-                                .splineTo(new Vector2d(28,-8), Math.toRadians(0))
-                                .setReversed(true)
-                                .splineTo(new Vector2d(44,-36), Math.toRadians(0))
+//                                .setReversed(true)
+//                                .splineTo(new Vector2d(0,-8),Math.toRadians(0))
+//                                .splineTo(new Vector2d(28,-8), Math.toRadians(0))
+//                                .setReversed(true)
+//                                .splineTo(new Vector2d(44,-36), Math.toRadians(0))
 
                         // Rest of the route (shortened version for meep meep)
-                                .setReversed(false)
-                                .splineTo(new Vector2d(28,-8), Math.toRadians(180))
-                                .splineTo(new Vector2d(0, -8),Math.toRadians(180))
-                                .splineTo(new Vector2d(-52, -12), Math.toRadians(180))
+//                                .setReversed(false)
+//                                .splineTo(new Vector2d(28,-8), Math.toRadians(180))
+//                                .splineTo(new Vector2d(0, -8),Math.toRadians(180))
+//                                .splineTo(new Vector2d(-52, -12), Math.toRadians(180))
+//                                .setReversed(true)
+//                                .splineTo(new Vector2d(0, -8), Math.toRadians(0))
+//                                .splineTo(new Vector2d(28,-8), Math.toRadians(0))
+//                                .splineTo(new Vector2d(44, -36), Math.toRadians(0))
+
+
+                                //.lineToLinearHeading(new Pose2d(-36,-10, Math.toRadians(-90)))
+
                                 .setReversed(true)
-                                .splineTo(new Vector2d(0, -8), Math.toRadians(0))
-                                .splineTo(new Vector2d(28,-8), Math.toRadians(0))
-                                .splineTo(new Vector2d(44, -36), Math.toRadians(0))
+
+                                .splineToLinearHeading(new Pose2d(-37,-30),Math.toRadians(0))
+
+                                //.lineToLinearHeading(new Pose2d(-34,-30,Math.toRadians(180)))
+
                                 .build()
                 );
         return myBot;
