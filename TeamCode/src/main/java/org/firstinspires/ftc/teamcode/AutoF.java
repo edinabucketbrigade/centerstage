@@ -350,7 +350,7 @@ public class AutoF extends LinearOpMode {
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-36,-10, Math.toRadians(-90)))
+                .lineToLinearHeading(new Pose2d(-36,-14, Math.toRadians(-90)))
                 .build();
         return sequence;
     }
@@ -378,7 +378,7 @@ public class AutoF extends LinearOpMode {
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(12,-10, Math.toRadians(-90)))
+                .lineToLinearHeading(new Pose2d(12,-14, Math.toRadians(-90)))
                 .build();
         return sequence;
     }
@@ -406,7 +406,7 @@ public class AutoF extends LinearOpMode {
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-36,10, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-36,14, Math.toRadians(90)))
                 .build();
         return sequence;
     }
@@ -434,7 +434,7 @@ public class AutoF extends LinearOpMode {
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(12,10, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)))
                 .build();
         return sequence;
     }

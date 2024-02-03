@@ -159,7 +159,7 @@ public class MeepMeepTesting {
 //                                .lineToLinearHeading(new Pose2d(-35,-10,Math.toRadians(180)))
 
 
-//                                .lineToLinearHeading(new Pose2d(-36,-10, Math.toRadians(-90)))
+                                .lineToLinearHeading(new Pose2d(-36,-14, Math.toRadians(-90)))
 //                                .turn(Math.toRadians(-90))
 
 
@@ -168,10 +168,10 @@ public class MeepMeepTesting {
 //                                .splineTo(new Vector2d(-30,-10), Math.toRadians(0))
 
 
-                                .setReversed(true)
-                                .splineTo(new Vector2d(0,-8),Math.toRadians(0))
-                                .splineTo(new Vector2d(28,-8), Math.toRadians(0))
-                                .splineTo(new Vector2d(44,-36), Math.toRadians(0))
+//                                .setReversed(true)
+//                                .splineTo(new Vector2d(0,-8),Math.toRadians(0))
+//                                .splineTo(new Vector2d(28,-8), Math.toRadians(0))
+//                                .splineTo(new Vector2d(44,-36), Math.toRadians(0))
 
 
                                 //.splineToLinearHeading(new Pose2d(13,-30), Math.toRadians(180))
