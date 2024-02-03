@@ -21,9 +21,9 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @Config
-//@Autonomous
-@Autonomous(preselectTeleOp = "TeleOpR")
+@Autonomous(preselectTeleOp = "TeleOpT")
 public class AutoF extends LinearOpMode {
+
     enum Route {
         RED_LEFT_DIRECT,
         RED_LEFT_INDIRECT,
@@ -127,13 +127,6 @@ public class AutoF extends LinearOpMode {
         // Start looking for AprilTags.
         robotHardware.startLookingForAprilTags();
 
-        //TrajectorySequence sequence = null;
-
-        // Get the drive interface.
-        //SampleMecanumDrive drive = robotHardware.getDrive();
-
-        //TrajectorySequence sequence = getRedLeftMiddleTrajectorySequence(drive);
-
         /*if (redAlliance) {
             if (startLeft) {
                 if (location == location.Left) {
@@ -182,14 +175,14 @@ public class AutoF extends LinearOpMode {
                 }
             }
         }*/
-/*
+
+        // Start the state machine.
         setState(STEP_A);
 
-        //drive.followTrajectorySequenceAsync(sequence);
-
         // While the op mode is active...
-        while (opModeIsActive() && !isStopRequested()) {
+        while (!isStopRequested()) {
 
+            // Update this.
             update();
 
             // Update the robot hardware.
@@ -199,35 +192,46 @@ public class AutoF extends LinearOpMode {
             telemetry.update();
 
         }
-*/
-
-        SampleMecanumDrive drive = robotHardware.getDrive();
-        TrajectorySequence trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
-        drive.followTrajectorySequence(trajectorySequence);
-
-        robotHardware.lowerWrist();
-        sleep(1000);
-        robotHardware.openLeftClaw();
 
     }
 
+    // Updates the state machine.
     public void update() throws InterruptedException {
 
+        // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
+        // Update the state machine.
         switch (state) {
+
             case STEP_A:
+
+                // Follow the trajectory sequence.
                 drive.followTrajectorySequenceAsync(getRedLeftMiddleSpikeMarkTrajectorySequence(drive));
+
+                // Advance to step B.
                 setState(STEP_B);
+
                 break;
+
             case STEP_B:
+
+                // If the robot is driving...
                 if (drive.isBusy()) {
+
+                    // Exit the method.
                     return;
+
                 }
-                robotHardware.stopDriveMotors();
+
+                // Open the left claw.
                 robotHardware.openLeftClaw();
+
+                // Advance to the idle step.
                 setState(IDLE);
+
                 break;
+
             case IDLE:
 
                 break;
@@ -235,6 +239,7 @@ public class AutoF extends LinearOpMode {
             default:
 
                 throw new InterruptedException("Unrecognized state");
+
         }
 
     }

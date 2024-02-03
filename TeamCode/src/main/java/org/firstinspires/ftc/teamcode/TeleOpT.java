@@ -69,7 +69,7 @@ public class TeleOpT extends LinearOpMode {
         int leftRow = MINIMUM_ROW;
 
         // DEBUG
-        AutoF.redAlliance = null;
+        //AutoF.redAlliance = null;
 
         // Wait for menu selection.
         waitForMenuSelection();
@@ -78,7 +78,7 @@ public class TeleOpT extends LinearOpMode {
         robotHardware.waitForLiftDown();
 
         // Wait for the user to lower the arm.
-        robotHardware.waitForArmDown();
+        //robotHardware.waitForArmDown();
 
         // Initialize the robot.
         robotHardware.initializeRobot();

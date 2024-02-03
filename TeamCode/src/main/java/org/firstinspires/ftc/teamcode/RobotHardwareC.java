@@ -8,15 +8,9 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -108,9 +102,9 @@ public class RobotHardwareC {
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         leftBackDistance = hardwareMap.get(Rev2mDistanceSensor.class, "left_back_distance");
         rightBackDistance = hardwareMap.get(Rev2mDistanceSensor.class, "right_back_distance");
-        arm = new Arm(opMode);
-        claw = new Claw(opMode);
-        lift = new Lift(opMode);
+        arm = new Arm(this);
+        claw = new Claw(this);
+        lift = new Lift(this);
 
         // Initialize the drive interface.
         drive = new SampleMecanumDrive(hardwareMap);
@@ -550,6 +544,22 @@ public class RobotHardwareC {
 
         // Wait for the user to lower the arm.
         arm.waitForDown();
+
+    }
+
+    // Gets the op mode.
+    public LinearOpMode getOpMode() {
+
+        // Return the op mode.
+        return opMode;
+
+    }
+
+    // Determines whether the robot is automatically driving.
+    public boolean isAutomaticallyDriving() {
+
+        // Return indicating whether the robot is automatically driving.
+        return drive.isBusy();
 
     }
 

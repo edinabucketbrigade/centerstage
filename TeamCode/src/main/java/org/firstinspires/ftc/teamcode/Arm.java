@@ -20,7 +20,7 @@ public class Arm {
     public static double RAISE_GAIN = 0.0007;
     public static int UP_POSITION = 750;
 
-    private LinearOpMode opMode;
+    private RobotHardwareC robotHardware;
     private DcMotor armMotor;
     private TouchSensor upTouch;
     private TouchSensor downTouch;
@@ -28,10 +28,13 @@ public class Arm {
     private boolean isRaising;
 
     // Initializes this.
-    public Arm(LinearOpMode opMode) {
+    public Arm(RobotHardwareC robotHardware) {
 
-        // Remember the op mode.
-        this.opMode = opMode;
+        // Remember the robot hardware.
+        this.robotHardware = robotHardware;
+
+        // Get the op mode.
+        LinearOpMode opMode = robotHardware.getOpMode();
 
         // Get the hardware map.
         HardwareMap hardwareMap = opMode.hardwareMap;
@@ -51,6 +54,14 @@ public class Arm {
 
     // Update this.
     public void update() {
+
+        // If the robot is automatically driving...
+        if(robotHardware.isAutomaticallyDriving()) {
+
+            // Exit the method.
+            return;
+
+        }
 
         // Get the arm's current position.
         int currentPosition = armMotor.getCurrentPosition();
@@ -122,6 +133,9 @@ public class Arm {
 
         }
 
+        // Get the op mode.
+        LinearOpMode opMode = robotHardware.getOpMode();
+
         // Get the telemetry.
         Telemetry telemetry = opMode.telemetry;
 
@@ -151,6 +165,9 @@ public class Arm {
     // Waits for the user to lower the arm.
     public void waitForDown() {
 
+        // Get the op mode.
+        LinearOpMode opMode = robotHardware.getOpMode();
+
         // While the arm is up...
         while (!opMode.isStopRequested() && !downTouch.isPressed()) {
 
@@ -179,13 +196,8 @@ public class Arm {
     // Logs a message.
     private void log(String message) {
 
-        // If the op mode is missing...
-        if (opMode == null) {
-
-            // Exit the method.
-            return;
-
-        }
+        // Get the op mode.
+        LinearOpMode opMode = robotHardware.getOpMode();
 
         // Get the telemetry.
         Telemetry telemetry = opMode.telemetry;

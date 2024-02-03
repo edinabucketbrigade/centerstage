@@ -22,7 +22,7 @@ public class Claw {
     public static double WRIST_DOWN_POSITION = 0.27;
     public static double WRIST_UP_POSITION = 0.92;
 
-    private LinearOpMode opMode;
+    private RobotHardwareC robotHardware;
     private Servo leftServo;
     private Servo rightServo;
     private Servo wristServo;
@@ -39,10 +39,13 @@ public class Claw {
     private boolean automaticallyCaptureRight = true;
 
     // Initializes this.
-    public Claw(LinearOpMode opMode) {
+    public Claw(RobotHardwareC robotHardware) {
 
-        // Remember the op mode.
-        this.opMode = opMode;
+        // Remember the robot hardware.
+        this.robotHardware = robotHardware;
+
+        // Get the op mode.
+        LinearOpMode opMode = robotHardware.getOpMode();
 
         // Get the hardware map.
         HardwareMap hardwareMap = opMode.hardwareMap;
@@ -68,6 +71,14 @@ public class Claw {
 
     // Update this.
     public void update() {
+
+        // If the robot is automatically driving...
+        if(robotHardware.isAutomaticallyDriving()) {
+
+            // Exit the method.
+            return;
+
+        }
 
         // Get the claw distance sensors.
         DistanceSensor leftDistance = (DistanceSensor) leftColor;
@@ -124,6 +135,9 @@ public class Claw {
             automaticallyCaptureRight = true;
 
         }
+
+        // Get the op mode.
+        LinearOpMode opMode = robotHardware.getOpMode();
 
         // Get the telemetry.
         Telemetry telemetry = opMode.telemetry;
