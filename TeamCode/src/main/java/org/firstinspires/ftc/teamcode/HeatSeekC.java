@@ -9,6 +9,9 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_E;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_F;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_G;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_H;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_I;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_J;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_K;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
@@ -34,11 +37,11 @@ public class HeatSeekC {
 
     enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
 
-    public static double TARGET_X = 43;
+    public static double TARGET_X = 42;
     public static double TILE_SIZE = 24;
-    public static double TARGET_Y_OFFSET = 7;
-    public static int FIRST_ROW_LIFT_POSITION = 300;
-    public static int LIFT_INCREMENT = 750;
+    public static double TARGET_Y_OFFSET = 4;
+    public static int FIRST_ROW_LIFT_POSITION = 0;
+    public static int LIFT_INCREMENT = 200;
     public static double PIXEL_WIDTH = 3;
     public static double TARGET_RED_Y = -TILE_SIZE - TARGET_Y_OFFSET;
     public static double TARGET_BLUE_Y = 2 * TILE_SIZE - TARGET_Y_OFFSET;
@@ -91,6 +94,12 @@ public class HeatSeekC {
         // Get the drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
+        // Construct a velocity constraint.
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY, DriveConstants.TRACK_WIDTH);
+
+        // Construct an acceleration constraint.
+        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
+
         switch (state) {
             case STEP_A:
 
@@ -105,7 +114,7 @@ public class HeatSeekC {
             case STEP_B:
 
                 // If we are waiting...
-                if (timer.milliseconds() < 1000) {
+                if (timer.milliseconds() < 500) {
 
                     // Exit the method.
                     return;
@@ -116,7 +125,7 @@ public class HeatSeekC {
                 int liftPosition = getTargetLiftPosition(row);
 
                 // Raise the lift.
-                //robotHardware.raiseLift(liftPosition);
+                robotHardware.raiseLift(liftPosition);
 
                 // Raise the wrist.
                 robotHardware.raiseWrist();
@@ -158,12 +167,6 @@ public class HeatSeekC {
                 // Construct a target pose.
                 Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
 
-                // Construct a velocity constraint.
-                TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY, DriveConstants.TRACK_WIDTH);
-
-                // Construct an acceleration constraint.
-                TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
-
                 // Construct a trajectory sequence.
                 TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
                         .setConstraints(velocityConstraint, accelerationConstraint)
@@ -178,11 +181,20 @@ public class HeatSeekC {
 
                 break;
 
-
             case STEP_E:
 
+                if (drive.isBusy()) {
+                    return;
+                }
+
+                setState(STEP_F);
+
+                break;
+
+            case STEP_F:
+
                 // If we are waiting...
-                if (timer.milliseconds() < 1000) {
+                if (timer.milliseconds() < 500) {
 
                     // Exit the method.
                     return;
@@ -193,11 +205,11 @@ public class HeatSeekC {
                 robotHardware.openClawPartially();
 
                 // Advance to the next step.
-                setState(STEP_F);
+                setState(STEP_G);
 
                 break;
 
-            case STEP_F:
+            case STEP_G:
 
                 // If we are waiting...
                 if (timer.milliseconds() < 1000) {
@@ -207,15 +219,47 @@ public class HeatSeekC {
 
                 }
 
-                // Lower the arm.
-                robotHardware.lowerArm();
+                currentPose = drive.getPoseEstimate();
+
+                TrajectorySequence backUpSequence = drive.trajectorySequenceBuilder(currentPose)
+                        .setConstraints(velocityConstraint, accelerationConstraint)
+                        .forward(4)
+                        .build();
+
+                drive.followTrajectorySequenceAsync(backUpSequence);
 
                 // Advance to the next step.
-                setState(STEP_G);
+                setState(STEP_H);
 
                 break;
 
-            case STEP_G:
+            case STEP_H:
+
+                if (drive.isBusy()) {
+                    return;
+                }
+
+                // Lower the lift.
+                robotHardware.lowerLift();
+
+                // Advance to the next step.
+                setState(STEP_I);
+
+                break;
+
+            case STEP_I:
+                if (timer.milliseconds() < 1000) {
+                    return;
+                }
+
+                // Lower the arm.
+                robotHardware.lowerArm();
+
+                setState(STEP_J);
+
+                break;
+
+            case STEP_J:
 
                 // If we are waiting...
                 if (timer.milliseconds() < 500) {
@@ -229,9 +273,9 @@ public class HeatSeekC {
                 robotHardware.closeClaw();
 
                 // Advance to the next step.
-                setState(STEP_H);
+                setState(STEP_K);
 
-            case STEP_H:
+            case STEP_K:
 
                 // If we are waiting...
                 if (timer.milliseconds() < 1000) {
