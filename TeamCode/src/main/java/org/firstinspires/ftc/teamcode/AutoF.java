@@ -107,6 +107,8 @@ public class AutoF extends LinearOpMode {
         log("Waiting for start...");
 
         robotHardware.closeClaw();
+        sleep(1000);
+        robotHardware.raiseWrist();
 
         // Wait for start.
         waitForStart();
@@ -128,9 +130,9 @@ public class AutoF extends LinearOpMode {
         //TrajectorySequence sequence = null;
 
         // Get the drive interface.
-        SampleMecanumDrive drive = robotHardware.getDrive();
+        //SampleMecanumDrive drive = robotHardware.getDrive();
 
-        TrajectorySequence sequence = getRedLeftMiddleTrajectorySequence(drive);
+        //TrajectorySequence sequence = getRedLeftMiddleTrajectorySequence(drive);
 
         /*if (redAlliance) {
             if (startLeft) {
@@ -180,12 +182,38 @@ public class AutoF extends LinearOpMode {
                 }
             }
         }*/
-
-        if (sequence == null) {
-            throw new InterruptedException("The sequence is missing.");
-        }
-
+/*
         setState(STEP_A);
+
+        //drive.followTrajectorySequenceAsync(sequence);
+
+        // While the op mode is active...
+        while (opModeIsActive() && !isStopRequested()) {
+
+            update();
+
+            // Update the robot hardware.
+            robotHardware.update();
+
+            // Update the telemetry.
+            telemetry.update();
+
+        }
+*/
+
+        SampleMecanumDrive drive = robotHardware.getDrive();
+        TrajectorySequence trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
+        drive.followTrajectorySequence(trajectorySequence);
+
+        robotHardware.lowerWrist();
+        sleep(1000);
+        robotHardware.openLeftClaw();
+
+    }
+
+    public void update() throws InterruptedException {
+
+        SampleMecanumDrive drive = robotHardware.getDrive();
 
         switch (state) {
             case STEP_A:
@@ -196,6 +224,7 @@ public class AutoF extends LinearOpMode {
                 if (drive.isBusy()) {
                     return;
                 }
+                robotHardware.stopDriveMotors();
                 robotHardware.openLeftClaw();
                 setState(IDLE);
                 break;
@@ -206,19 +235,6 @@ public class AutoF extends LinearOpMode {
             default:
 
                 throw new InterruptedException("Unrecognized state");
-        }
-
-        drive.followTrajectorySequenceAsync(sequence);
-
-        // While the op mode is active...
-        while (!isStopRequested()) {
-
-            // Update the robot hardware.
-            robotHardware.update();
-
-            // Update the telemetry.
-            telemetry.update();
-
         }
 
     }
@@ -233,13 +249,7 @@ public class AutoF extends LinearOpMode {
         return output;
     }
 
-    private TrajectorySequence getRedLeftMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
-
+    private TrajectorySequence getRedLeftMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
@@ -248,12 +258,7 @@ public class AutoF extends LinearOpMode {
         return sequence;
     }
 
-    private TrajectorySequence getRedLeftLeftTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getRedLeftLeftTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
@@ -287,12 +292,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Middle
-    private TrajectorySequence getRedLeftMiddleTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getRedLeftMiddleTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
@@ -336,12 +336,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Right
-    private TrajectorySequence getRedLeftRightTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getRedLeftRightTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
@@ -377,12 +372,7 @@ public class AutoF extends LinearOpMode {
     // Right
 
     // Left
-    private TrajectorySequence getRedRightLeftTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getRedRightLeftTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
@@ -411,12 +401,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Middle
-    private TrajectorySequence getRedRightMiddleTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getRedRightMiddleTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
@@ -445,12 +430,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Right
-    private TrajectorySequence getRedRightRightTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getRedRightRightTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
@@ -479,12 +459,7 @@ public class AutoF extends LinearOpMode {
         return sequence;
     }
 
-    private TrajectorySequence getBlueLeftLeftTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getBlueLeftLeftTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
@@ -518,12 +493,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Middle
-    private TrajectorySequence getBlueLeftMiddleTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getBlueLeftMiddleTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
@@ -555,12 +525,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Right
-    private TrajectorySequence getBlueLeftRightTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getBlueLeftRightTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
@@ -596,12 +561,7 @@ public class AutoF extends LinearOpMode {
     // Right
 
     // Right
-    private TrajectorySequence getBlueRightLeftTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getBlueRightLeftTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
@@ -631,12 +591,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Middle
-    private TrajectorySequence getBlueRightMiddleTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getBlueRightMiddleTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
@@ -665,12 +620,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Right
-    private TrajectorySequence getBlueRightRightTrajectorySequence(SampleMecanumDrive drive) throws InterruptedException {
-
-        // Verify inputs exist.
-        if (drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
+    private TrajectorySequence getBlueRightRightTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
@@ -715,7 +665,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Waits for menu selection.
-    private void waitForMenuSelection() throws InterruptedException {
+    private void waitForMenuSelection() {
 
         // While the op mode is active...
         while (!isStopRequested()) {
