@@ -65,6 +65,8 @@ public class HeatSeekC {
             return;
         }
 
+        robotHardware.stopDriveMotors();
+
         this.leftColumn = leftColumn;
         this.row = row;
         this.redAlliance = redAlliance;
