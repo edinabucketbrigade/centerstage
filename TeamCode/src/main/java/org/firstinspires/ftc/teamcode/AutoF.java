@@ -236,13 +236,13 @@ public class AutoF extends LinearOpMode {
                     }
                     else {
                         if (location == location.Left) {
-                            trajectorySequence = getRedLeftLeftSpikeMarkTrajectorySequence(drive);
+                            trajectorySequence = getRedRightLeftSpikeMarkTrajectorySequence(drive);
                         }
                         else if (location == location.Middle) {
-                            trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
+                            trajectorySequence = getRedRightMiddleSpikeMarkTrajectorySequence(drive);
                         }
                         else if (location == location.Right) {
-                            trajectorySequence = getRedLeftRightSpikeMarkTrajectorySequence(drive);
+                            trajectorySequence = getRedRightRightSpikeMarkTrajectorySequence(drive);
                         }
                         else {
                             throw new InterruptedException("Location is not recognized");
@@ -250,28 +250,31 @@ public class AutoF extends LinearOpMode {
                     }
                 }
                 else {
-                    if (startLeft) {
-                        /*if (location == location.Left) {
-                            trajectorySequence = getRedLeftLeftSpikeMarkTrajectorySequence(drive);
-                        } else if (location == location.Middle) {
-                            trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
-                        } else if (location == location.Right) {
-                            trajectorySequence = getRedLeftRightSpikeMarkTrajectorySequence(drive);
-                        } else {
-                            throw new InterruptedException("Location is not recognized");
-                        }*/
-                    } else {
-                        /*if (location == location.Left) {
-                            trajectorySequence = getRedLeftLeftSpikeMarkTrajectorySequence(drive);
-                        } else if (location == location.Middle) {
-                            trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
-                        } else if (location == location.Right) {
-                            trajectorySequence = getRedLeftRightSpikeMarkTrajectorySequence(drive);
-                        } else {
-                            throw new InterruptedException("Location is not recognized");
-                        }*/
-                    }
+                    throw new InterruptedException("Location is not recognized");
                 }
+                /*else {
+                    if (startLeft) {
+                        if (location == location.Left) {
+                            trajectorySequence = getRedLeftLeftSpikeMarkTrajectorySequence(drive);
+                        } else if (location == location.Middle) {
+                            trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
+                        } else if (location == location.Right) {
+                            trajectorySequence = getRedLeftRightSpikeMarkTrajectorySequence(drive);
+                        } else {
+                            throw new InterruptedException("Location is not recognized");
+                        }
+                    } else {
+                        if (location == location.Left) {
+                            trajectorySequence = getRedLeftLeftSpikeMarkTrajectorySequence(drive);
+                        } else if (location == location.Middle) {
+                            trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
+                        } else if (location == location.Right) {
+                            trajectorySequence = getRedLeftRightSpikeMarkTrajectorySequence(drive);
+                        } else {
+                            throw new InterruptedException("Location is not recognized");
+                        }
+                    }
+                }*/
 
                 // Start following the trajectory sequence.
                 drive.followTrajectorySequenceAsync(trajectorySequence);
