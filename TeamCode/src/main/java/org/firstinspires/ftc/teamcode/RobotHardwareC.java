@@ -86,11 +86,11 @@ public class RobotHardwareC {
     // Initializes this.
     public RobotHardwareC(LinearOpMode opMode) {
 
-        // Remember the op mode.
-        this.opMode = opMode;
-
         // Initialize the FTC dashboard.
         ftcDashboard = FtcDashboard.getInstance();
+
+        // Remember the op mode.
+        this.opMode = opMode;
 
         // Get the hardware map.
         HardwareMap hardwareMap = opMode.hardwareMap;
@@ -106,9 +106,6 @@ public class RobotHardwareC {
         claw = new Claw(this);
         lift = new Lift(this);
 
-        // Initialize the drive interface.
-        drive = new SampleMecanumDrive(hardwareMap);
-
         // Get an AprilTag processor.
         aprilTagProcessor = new AprilTagProcessor.Builder().build();
 
@@ -120,11 +117,22 @@ public class RobotHardwareC {
 
     }
 
+    // Initialize the drive interface.
+    public void initializeDrive() {
+
+        // Get the hardware map.
+        HardwareMap hardwareMap = opMode.hardwareMap;
+
+        // Initialize the drive interface.
+        drive = new SampleMecanumDrive(hardwareMap);
+
+    }
+
     // Update this.
     public void update() throws InterruptedException {
 
         // Update the robot.
-        drive.update();
+        if(drive != null) drive.update();
 
         // Update heat seek.
         heatSeek.update();
@@ -147,18 +155,26 @@ public class RobotHardwareC {
             Pose2d pose = AutoG.getRobotPose(detection, telemetry);
 
             // Update the driver interface.
-            drive.setPoseEstimate(pose);
+            if(drive != null) drive.setPoseEstimate(pose);
 
             // Remember that we localized the robot.
             isLocalized = true;
 
         }
 
-        // Get the robot's pose.
-        Pose2d pose = drive.getPoseEstimate();
+        // Initialize a pose string.
+        String poseString = "";
 
-        // Convert the pose to a string.
-        String poseString = AutoF.toString(pose);
+        // If the drive interface exists...
+        if(drive != null) {
+
+            // Get the robot's pose.
+            Pose2d pose = drive.getPoseEstimate();
+
+            // Convert the pose to a string.
+            poseString = AutoF.toString(pose);
+
+        }
 
         // Get the telemetry.
         Telemetry telemetry = opMode.telemetry;
@@ -559,7 +575,7 @@ public class RobotHardwareC {
     public boolean isAutomaticallyDriving() {
 
         // Return indicating whether the robot is automatically driving.
-        return drive.isBusy();
+        return drive == null ? false : drive.isBusy();
 
     }
 

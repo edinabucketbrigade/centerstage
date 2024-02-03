@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.IDLE;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_A;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_B;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_C;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -103,12 +104,17 @@ public class AutoF extends LinearOpMode {
 
         }
 
+        // Close the claw.
+        robotHardware.closeClaw();
+
+        // Wait a bit.
+        sleep(2000);
+
+        // Raise the wrist.
+        robotHardware.raiseWrist();
+
         // Notify the user that we are waiting for start.
         log("Waiting for start...");
-
-        robotHardware.closeClaw();
-        sleep(1000);
-        robotHardware.raiseWrist();
 
         // Wait for start.
         waitForStart();
@@ -176,6 +182,9 @@ public class AutoF extends LinearOpMode {
             }
         }*/
 
+        // Initialize the drive interface.
+        robotHardware.initializeDrive();
+
         // Start the state machine.
         setState(STEP_A);
 
@@ -206,8 +215,11 @@ public class AutoF extends LinearOpMode {
 
             case STEP_A:
 
-                // Follow the trajectory sequence.
-                drive.followTrajectorySequenceAsync(getRedLeftMiddleSpikeMarkTrajectorySequence(drive));
+                // Get a trajectory sequence.
+                TrajectorySequence trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
+
+                // Start following the trajectory sequence.
+                drive.followTrajectorySequenceAsync(trajectorySequence);
 
                 // Advance to step B.
                 setState(STEP_B);
@@ -215,6 +227,24 @@ public class AutoF extends LinearOpMode {
                 break;
 
             case STEP_B:
+
+                // If we are waiting...
+                if (timer.milliseconds() < 1000) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Lower the wrist.
+                robotHardware.lowerWrist();
+
+                // Advance to step C.
+                setState(STEP_C);
+
+                break;
+
+            case STEP_C:
 
                 // If the robot is driving...
                 if (drive.isBusy()) {
@@ -229,8 +259,6 @@ public class AutoF extends LinearOpMode {
 
                 // Advance to the idle step.
                 setState(IDLE);
-
-                break;
 
             case IDLE:
 
