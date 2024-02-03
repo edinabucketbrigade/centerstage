@@ -579,4 +579,20 @@ public class RobotHardwareC {
 
     }
 
+    // Determines whether the arm is up.
+    public boolean isArmUp() {
+
+        // Return indicating whether the arm is up.
+        return arm.isUp();
+
+    }
+
+    // Determines whether the arm is down.
+    public boolean isArmDown() {
+
+        // Return indicating whether the arm is down.
+        return arm.isDown();
+
+    }
+
 }

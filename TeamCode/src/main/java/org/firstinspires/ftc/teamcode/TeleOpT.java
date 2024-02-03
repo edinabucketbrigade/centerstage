@@ -61,6 +61,9 @@ public class TeleOpT extends LinearOpMode {
         // Get the robot hardware.
         robotHardware = new RobotHardwareC(this);
 
+        // Initialize the drive interface.
+        robotHardware.initializeDrive();
+
         // Start looking for AprilTags.
         robotHardware.startLookingForAprilTags();
 

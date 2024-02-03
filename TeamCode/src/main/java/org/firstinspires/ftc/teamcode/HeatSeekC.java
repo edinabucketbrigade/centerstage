@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_C;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_D;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_E;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_F;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_G;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
@@ -40,7 +41,7 @@ public class HeatSeekC {
     public static double PIXEL_WIDTH = 3;
     public static double TARGET_RED_Y = -TILE_SIZE - TARGET_Y_OFFSET;
     public static double TARGET_BLUE_Y = 2 * TILE_SIZE - TARGET_Y_OFFSET;
-    public static double VELOCITY_PERCENTAGE = 0.5;
+    public static double VELOCITY_PERCENTAGE = 0.7;
     public static double MAXIMUM_VELOCITY = DriveConstants.MAX_VEL * VELOCITY_PERCENTAGE;
     public static double MAXIMUM_ACCELERATION = DriveConstants.MAX_ACCEL * VELOCITY_PERCENTAGE;
 
@@ -119,82 +120,128 @@ public class HeatSeekC {
                 // Execute the trajectory sequence.
                 drive.followTrajectorySequenceAsync(sequence);
 
-                //robotHardware.offsetIntake();
-                //robotHardware.closeClaw();
-
+                // Advance to the next step.
                 setState(STEP_B);
 
                 break;
 
             case STEP_B:
 
+                // If the robot is driving...
                 if (drive.isBusy()) {
+
+                    // Exit the method.
                     return;
+
                 }
 
-                //robotHardware.raiseClaw();
                 // Close the claw so it does not catch when raising the arm.
                 robotHardware.closeClaw();
 
+                // Advance to the next step.
                 setState(STEP_C);
 
                 break;
 
             case STEP_C:
 
+                // If we are waiting...
                 if (timer.milliseconds() < 1000) {
+
+                    // Exit the method.
                     return;
+
                 }
+
                 // Get a lift position.
                 int liftPosition = getTargetLiftPosition(row);
 
-                robotHardware.raiseLift(liftPosition);
+                // Raise the lift.
+                //robotHardware.raiseLift(liftPosition);
+
+                // Raise the wrist.
                 robotHardware.raiseWrist();
+
                 // Raise the arm.
                 robotHardware.raiseArm();
 
+                // Advance to the next step.
                 setState(STEP_D);
 
                 break;
 
             case STEP_D:
 
-                if (timer.milliseconds() < 1000) {
+                // If the arm is not up...
+                if (!robotHardware.isArmUp()) {
+
+                    // Exit the method.
                     return;
+
                 }
 
-//                robotHardware.openGrips();
-                robotHardware.openClaw();
-
+                // Advance to the next step.
                 setState(STEP_E);
 
                 break;
 
             case STEP_E:
 
-                if (timer.milliseconds() < 500) {
+                // If we are waiting...
+                if (timer.milliseconds() < 1000) {
+
+                    // Exit the method.
                     return;
+
                 }
 
-                robotHardware.closeClaw();
+                // Open the claw to drop the pixels.
+                robotHardware.openClaw();
 
+                // Advance to the next step.
                 setState(STEP_F);
 
                 break;
 
             case STEP_F:
 
-                if (timer.milliseconds() < 500) {
+                // If we are waiting...
+                if (timer.milliseconds() < 1000) {
+
+                    // Exit the method.
                     return;
+
                 }
 
-                robotHardware.lowerArm();
-                robotHardware.lowerLift();
-                robotHardware.lowerWrist();
+                // Close the claw.
+                robotHardware.closeClaw();
 
-                setState(IDLE);
+                // Lower the arm.
+                robotHardware.lowerArm();
+
+                // Advance to the next step.
+                setState(STEP_G);
 
                 break;
+
+            case STEP_G:
+
+                // If the arm is not down...
+                if (!robotHardware.isArmDown()) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Lower the wrist.
+                robotHardware.lowerWrist();
+
+                // Open the claw.
+                robotHardware.openClaw();
+
+                // Advance to the next step.
+                setState(IDLE);
 
             case IDLE:
 

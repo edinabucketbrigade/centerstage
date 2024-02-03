@@ -16,7 +16,7 @@ public class Arm {
     public static int DOWN_POSITION = 0;
     public static double LOWER_GAIN = 0.0006;
     public static double MAXIMUM_LOWER_POWER = 0.4;
-    public static double MAXIMUM_RAISE_POWER = 1;
+    public static double MAXIMUM_RAISE_POWER = 0.5;
     public static double RAISE_GAIN = 0.0007;
     public static int UP_POSITION = 750;
 
@@ -214,6 +214,22 @@ public class Arm {
         armMotor.setPower(0);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+    }
+
+    // Determines whether the arm is up.
+    public boolean isUp() {
+
+        // Return indicating whether the arm is up.
+        return upTouch.isPressed();
+
+    }
+
+    // Determines whether the arm is down.
+    public boolean isDown() {
+
+        // Return indicating whether the arm is down.
+        return downTouch.isPressed();
 
     }
 
