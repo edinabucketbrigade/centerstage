@@ -214,9 +214,67 @@ public class AutoF extends LinearOpMode {
         switch (state) {
 
             case STEP_A:
+                TrajectorySequence trajectorySequence;
 
                 // Get a trajectory sequence.
-                TrajectorySequence trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
+                //trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
+
+                if (redAlliance) {
+                    if (startLeft) {
+                        if (location == location.Left) {
+                            trajectorySequence = getRedLeftLeftSpikeMarkTrajectorySequence(drive);
+                        }
+                        else if (location == location.Middle) {
+                            trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
+                        }
+                        else if (location == location.Right) {
+                            trajectorySequence = getRedLeftRightSpikeMarkTrajectorySequence(drive);
+                        }
+                        else {
+                            throw new InterruptedException("Location is not recognized");
+                        }
+                    }
+                    else {
+                        if (location == location.Left) {
+                            trajectorySequence = getRedRightLeftSpikeMarkTrajectorySequence(drive);
+                        }
+                        else if (location == location.Middle) {
+                            trajectorySequence = getRedRightMiddleSpikeMarkTrajectorySequence(drive);
+                        }
+                        else if (location == location.Right) {
+                            trajectorySequence = getRedRightRightSpikeMarkTrajectorySequence(drive);
+                        }
+                        else {
+                            throw new InterruptedException("Location is not recognized");
+                        }
+                    }
+                }
+                else {
+                    throw new InterruptedException("Location is not recognized");
+                }
+                /*else {
+                    if (startLeft) {
+                        if (location == location.Left) {
+                            trajectorySequence = getRedLeftLeftSpikeMarkTrajectorySequence(drive);
+                        } else if (location == location.Middle) {
+                            trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
+                        } else if (location == location.Right) {
+                            trajectorySequence = getRedLeftRightSpikeMarkTrajectorySequence(drive);
+                        } else {
+                            throw new InterruptedException("Location is not recognized");
+                        }
+                    } else {
+                        if (location == location.Left) {
+                            trajectorySequence = getRedLeftLeftSpikeMarkTrajectorySequence(drive);
+                        } else if (location == location.Middle) {
+                            trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
+                        } else if (location == location.Right) {
+                            trajectorySequence = getRedLeftRightSpikeMarkTrajectorySequence(drive);
+                        } else {
+                            throw new InterruptedException("Location is not recognized");
+                        }
+                    }
+                }*/
 
                 // Start following the trajectory sequence.
                 drive.followTrajectorySequenceAsync(trajectorySequence);
@@ -282,11 +340,58 @@ public class AutoF extends LinearOpMode {
         return output;
     }
 
+    private TrajectorySequence getRedLeftLeftSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
+        Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
+        drive.setPoseEstimate(startPose);
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .lineToLinearHeading(new Pose2d(-34,-30,Math.toRadians(180)))
+                .build();
+        return sequence;
+    }
+
     private TrajectorySequence getRedLeftMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         drive.setPoseEstimate(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .back(42)
+                .lineToLinearHeading(new Pose2d(-36,-10, Math.toRadians(-90)))
+                .build();
+        return sequence;
+    }
+
+    private TrajectorySequence getRedLeftRightSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
+        Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
+        drive.setPoseEstimate(startPose);
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .setReversed(true)
+                .splineToLinearHeading(new Pose2d(-37,-30),Math.toRadians(0))
+                .build();
+        return sequence;
+    }
+
+    private TrajectorySequence getRedRightLeftSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
+        Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
+        drive.setPoseEstimate(startPose);
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .splineToLinearHeading(new Pose2d(13,-30), Math.toRadians(180))
+                .build();
+        return sequence;
+    }
+
+    private TrajectorySequence getRedRightMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
+        Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
+        drive.setPoseEstimate(startPose);
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .lineToLinearHeading(new Pose2d(12,-10, Math.toRadians(-90)))
+                .build();
+        return sequence;
+    }
+
+    private TrajectorySequence getRedRightRightSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
+        Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
+        drive.setPoseEstimate(startPose);
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
+                .setReversed(true)
+                .lineToLinearHeading(new Pose2d(10,-30,Math.toRadians(0)))
                 .build();
         return sequence;
     }
