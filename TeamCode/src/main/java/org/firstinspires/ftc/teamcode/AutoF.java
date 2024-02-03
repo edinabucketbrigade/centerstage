@@ -313,7 +313,7 @@ public class AutoF extends LinearOpMode {
                 }
 
                 // Open the left claw.
-                robotHardware.openLeftClaw();
+                robotHardware.openLeftClawFully();
 
                 // Advance to the idle step.
                 setState(IDLE);
