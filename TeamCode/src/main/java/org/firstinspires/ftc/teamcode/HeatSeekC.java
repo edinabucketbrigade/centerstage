@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_D;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_E;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_F;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_G;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_H;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
@@ -33,7 +34,7 @@ public class HeatSeekC {
 
     enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
 
-    public static double TARGET_X = 40;
+    public static double TARGET_X = 43;
     public static double TILE_SIZE = 24;
     public static double TARGET_Y_OFFSET = 7;
     public static int FIRST_ROW_LIFT_POSITION = 300;
@@ -135,7 +136,7 @@ public class HeatSeekC {
 
                 }
 
-                // Close the claw so it does not catch when raising the arm.
+                // Close the claw so it does not catch when raising the lift.
                 robotHardware.closeClaw();
 
                 // Advance to the next step.
@@ -172,8 +173,8 @@ public class HeatSeekC {
 
             case STEP_D:
 
-                // If the arm is not up...
-                if (!robotHardware.isArmUp()) {
+                // If we are waiting...
+                if (timer.milliseconds() < 2000) {
 
                     // Exit the method.
                     return;
@@ -213,9 +214,6 @@ public class HeatSeekC {
 
                 }
 
-                // Close the claw.
-                robotHardware.closeClaw();
-
                 // Lower the arm.
                 robotHardware.lowerArm();
 
@@ -226,8 +224,24 @@ public class HeatSeekC {
 
             case STEP_G:
 
-                // If the arm is not down...
-                if (!robotHardware.isArmDown()) {
+                // If we are waiting...
+                if (timer.milliseconds() < 500) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Close the claw.
+                robotHardware.closeClaw();
+
+                // Advance to the next step.
+                setState(STEP_H);
+
+            case STEP_H:
+
+                // If we are waiting...
+                if (timer.milliseconds() < 1000) {
 
                     // Exit the method.
                     return;

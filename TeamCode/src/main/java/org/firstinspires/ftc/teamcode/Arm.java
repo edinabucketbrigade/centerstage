@@ -217,20 +217,4 @@ public class Arm {
 
     }
 
-    // Determines whether the arm is up.
-    public boolean isUp() {
-
-        // Return indicating whether the arm is up.
-        return upTouch.isPressed();
-
-    }
-
-    // Determines whether the arm is down.
-    public boolean isDown() {
-
-        // Return indicating whether the arm is down.
-        return downTouch.isPressed();
-
-    }
-
 }
