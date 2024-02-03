@@ -352,7 +352,7 @@ public class RobotHardwareC {
         log("Initializing robot...");
 
         // Open the claw.
-        openClaw();
+        openClawFully();
 
         // Lower the wrist.
         lowerWrist();
@@ -468,10 +468,10 @@ public class RobotHardwareC {
     }
 
     // Opens the left claw.
-    public void openLeftClaw() {
+    public void openLeftClawFully() {
 
         // Open the left claw.
-        claw.openLeft();
+        claw.openLeftFully();
 
     }
 
@@ -484,10 +484,10 @@ public class RobotHardwareC {
     }
 
     // Opens the right claw.
-    public void openRightClaw() {
+    public void openRightClawFully() {
 
         // Open the right claw.
-        claw.openRight();
+        claw.openRightFully();
 
     }
 
@@ -500,10 +500,17 @@ public class RobotHardwareC {
     }
 
     // Opens the claw.
-    public void openClaw() {
+    public void openClawFully() {
 
         // Open the claw.
-        claw.open();
+        claw.openFully();
+
+    }
+
+    public void openClawPartially() {
+
+        // Open the claw.
+        claw.openPartially();
 
     }
 

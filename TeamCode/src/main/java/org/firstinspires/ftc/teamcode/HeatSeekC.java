@@ -197,7 +197,7 @@ public class HeatSeekC {
                 }
 
                 // Open the claw to drop the pixels.
-                robotHardware.openClaw();
+                robotHardware.openClawPartially();
 
                 // Advance to the next step.
                 setState(STEP_F);
@@ -252,7 +252,7 @@ public class HeatSeekC {
                 robotHardware.lowerWrist();
 
                 // Open the claw.
-                robotHardware.openClaw();
+                robotHardware.openClawFully();
 
                 // Advance to the next step.
                 setState(IDLE);
