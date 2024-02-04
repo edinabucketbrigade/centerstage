@@ -37,7 +37,7 @@ public class HeatSeekC {
 
     enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
 
-    public static double TARGET_X = 42;
+    public static double TARGET_X = 44.5;
     public static double TILE_SIZE = 24;
     public static double TARGET_Y_OFFSET = 4;
     public static int FIRST_ROW_LIFT_POSITION = 0;
