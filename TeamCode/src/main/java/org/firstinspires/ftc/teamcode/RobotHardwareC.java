@@ -62,7 +62,6 @@ public class RobotHardwareC {
 
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
-    public static final int MAXIMUM_ROW = 11;
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
 

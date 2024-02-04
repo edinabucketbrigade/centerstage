@@ -13,7 +13,6 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_I;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_J;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_K;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.getMaximumColumn;
@@ -48,6 +47,7 @@ public class HeatSeekC {
     public static double VELOCITY_PERCENTAGE = 0.7;
     public static double MAXIMUM_VELOCITY = DriveConstants.MAX_VEL * VELOCITY_PERCENTAGE;
     public static double MAXIMUM_ACCELERATION = DriveConstants.MAX_ACCEL * VELOCITY_PERCENTAGE;
+    public static int MAXIMUM_ROW = (int)Math.floor((MAXIMUM_POSITION - FIRST_ROW_LIFT_POSITION) / LIFT_INCREMENT);
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
