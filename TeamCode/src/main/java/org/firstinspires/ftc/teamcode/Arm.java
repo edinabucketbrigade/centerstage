@@ -26,6 +26,8 @@ public class Arm {
     private TouchSensor downTouch;
     private boolean isLowering;
     private boolean isRaising;
+    private boolean isUp;
+    private boolean isDown = true;
 
     // Initializes this.
     public Arm(RobotHardwareC robotHardware) {
@@ -69,21 +71,23 @@ public class Arm {
         // Get the arm's power.
         double power = armMotor.getPower();
 
-        // Get the arm touch sensor values.
-        boolean isDown = downTouch.isPressed();
-        boolean isUp = upTouch.isPressed();
-
         // If we are lowering the arm...
         if (isLowering) {
 
+            // Determine whether the down touch sensor is pressed.
+            boolean isDownPressed = downTouch.isPressed();
+
             // If the arm is down...
-            if(isDown) {
+            if(isDownPressed) {
 
                 // Reset the arm.
                 reset();
 
                 // Remember that we finished lowering the arm.
                 isLowering = false;
+
+                // Remember that the arm is down.
+                isDown = true;
 
             }
 
@@ -102,14 +106,20 @@ public class Arm {
         // Otherwise, if we are raising the arm...
         else if(isRaising) {
 
+            // Determine whether the up touch sensor is pressed.
+            boolean isUpPressed = upTouch.isPressed();
+
             // If the arm is up...
-            if(isUp) {
+            if(isUpPressed) {
 
                 // Stop the arm motor.
                 armMotor.setPower(0);
 
                 // Remember that we finished raising the arm.
                 isRaising = false;
+
+                // Remember that the arm is up.
+                isUp = true;
 
             }
 
@@ -150,6 +160,7 @@ public class Arm {
         // Raise the arm.
         isLowering = false;
         isRaising = true;
+        isDown = false;
 
     }
 
@@ -159,6 +170,7 @@ public class Arm {
         // Lower the arm.
         isLowering = true;
         isRaising = false;
+        isUp = false;
 
     }
 
@@ -214,6 +226,22 @@ public class Arm {
         armMotor.setPower(0);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+    }
+
+    // Determines whether the arm is down.
+    public boolean isDown() {
+
+        // Return indicating whether the arm is down.
+        return isDown;
+
+    }
+
+    // Determines whether the arm is up.
+    public boolean isUp() {
+
+        // Return indicating whether the arm is up.
+        return isUp;
 
     }
 
