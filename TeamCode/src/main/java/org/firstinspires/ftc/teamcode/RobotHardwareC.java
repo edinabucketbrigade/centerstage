@@ -78,6 +78,7 @@ public class RobotHardwareC {
     private boolean isLocalized;
     private FtcDashboard ftcDashboard;
     private HeatSeekC heatSeek = new HeatSeekC(this);
+    private Retract retract = new Retract(this);
     private Lift lift;
     private Arm arm;
     private Claw claw;
@@ -136,6 +137,9 @@ public class RobotHardwareC {
         // Update heat seek.
         heatSeek.update();
 
+        // Update retract.
+        retract.update();
+
         // Update the hardware.
         arm.update();
         claw.update();
@@ -183,7 +187,7 @@ public class RobotHardwareC {
         double rightBackMillimeters = rightBackDistance.getDistance(DistanceUnit.MM);
 
         // Update the telemetry.
-        telemetry.addData("Status", "Localized = %b, Heat Seeking = %b, Turtle Mode = %b", isLocalized, heatSeek.isActive(), isTurtleMode);
+        telemetry.addData("Status", "Localized = %b, Heat Seeking = %b, Retracting = %b, Turtle Mode = %b", isLocalized, heatSeek.isActive(), retract.isActive(), isTurtleMode);
         if(isLocalized) {
             telemetry.addData("Pose", poseString);
         }
@@ -458,6 +462,21 @@ public class RobotHardwareC {
 
     }
 
+    public boolean isRetracting() {
+
+        // Return indicating whether we are retracting.
+        return retract.isActive();
+
+    }
+
+    // Starts retracting.
+    public void startRetracting() {
+
+        // Start retracting.
+        retract.start();
+
+    }
+
     // Closes the left claw.
     public void closeLeftClaw() {
 
@@ -590,6 +609,22 @@ public class RobotHardwareC {
         leftBackDrive.setPower(0);
         rightFrontDrive.setPower(0);
         rightBackDrive.setPower(0);
+    }
+
+    public boolean isArmDown() {
+        return arm.isDown();
+    }
+
+    public boolean isArmUp() {
+        return arm.isUp();
+    }
+
+    public boolean isLiftDown() {
+        return lift.isDown();
+    }
+
+    public boolean isLiftUp() {
+        return lift.isUp();
     }
 
 }

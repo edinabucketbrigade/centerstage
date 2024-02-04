@@ -18,12 +18,14 @@ public class Lift {
     public static double LOWER_POWER = 0.6;
     public static int MAXIMUM_POSITION = 1650;
     public static double RAISE_POWER = 1;
+    public static int THRESHOLD = 50;
 
     private RobotHardwareC robotHardware;
     private DcMotor leftMotor;
     private DcMotor rightMotor;
     private TouchSensor touch;
     private boolean isLowering;
+    private int targetPosition;
 
     // Initializes this.
     public Lift(RobotHardwareC robotHardware) {
@@ -62,21 +64,19 @@ public class Lift {
         }
 
         // Determine whether the lift is down.
-        boolean isDown = touch.isPressed();
+        boolean isDownPressed = touch.isPressed();
 
         // Get the lift's position.
         int leftPosition = leftMotor.getCurrentPosition();
         int rightPosition = rightMotor.getCurrentPosition();
 
         // If we finished lowering the lift...
-        if (isLowering && isDown) {
-
+        if (isLowering && isDownPressed) {
             // Reset the lift.
             reset();
 
             // Remember that we finished lowering the lift.
             isLowering = false;
-
         }
 
         // Get the lift's power.
@@ -90,7 +90,7 @@ public class Lift {
         Telemetry telemetry = opMode.telemetry;
 
         // Add lift information to the telemetry.
-        telemetry.addData("Lift", "Down = %b, Lowering = %b, Position = %d/%d, Power = %.2f/%.2f", isDown, isLowering, leftPosition, rightPosition, leftPower, rightPower);
+        telemetry.addData("Lift", "Lowering = %b, Position = %d/%d, Power = %.2f/%.2f", isLowering, leftPosition, rightPosition, leftPower, rightPower);
 
     }
 
@@ -115,6 +115,9 @@ public class Lift {
 
     // Raises the lift.
     public void raise(int position) {
+
+        // Set target position.
+        targetPosition = position;
 
         // Raise the lift.
         setPosition(leftMotor, position, RAISE_POWER);
@@ -206,6 +209,27 @@ public class Lift {
         // Show the message.
         Utilities.log(message, telemetry);
 
+    }
+
+    public boolean isDown() {
+        return isInPosition(DOWN_POSITION);
+    }
+
+    public boolean isUp() {
+        return isInPosition(targetPosition);
+    }
+
+    private boolean isInPosition(int targetPosition) {
+        int leftPosition = leftMotor.getCurrentPosition();
+        int rightPosition = rightMotor.getCurrentPosition();
+        int leftDifference = Math.abs(leftPosition - targetPosition);
+        int rightDifference = Math.abs(rightPosition - targetPosition);
+        if (leftDifference < THRESHOLD && rightDifference < THRESHOLD) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
 }

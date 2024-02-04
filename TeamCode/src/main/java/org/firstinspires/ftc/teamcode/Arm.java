@@ -16,7 +16,7 @@ public class Arm {
     public static int DOWN_POSITION = 0;
     public static double LOWER_GAIN = 0.0006;
     public static double MAXIMUM_LOWER_POWER = 0.4;
-    public static double MAXIMUM_RAISE_POWER = 0.5;
+    public static double MAXIMUM_RAISE_POWER = 0.2;
     public static double RAISE_GAIN = 0.0007;
     public static int UP_POSITION = 750;
 

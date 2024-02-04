@@ -6,6 +6,9 @@ import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.getMaximumColumn;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.isEven;
+import static org.firstinspires.ftc.teamcode.TeleOpT.State.HEAT_SEEKING;
+import static org.firstinspires.ftc.teamcode.TeleOpT.State.IDLE;
+import static org.firstinspires.ftc.teamcode.TeleOpT.State.RETRACTING;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -33,6 +36,7 @@ public class TeleOpT extends LinearOpMode {
     - dpad = move pixels
     - a = start heat seek
     - y = stop heat seek
+    - x = retract
 
     Debug Mode (hold right trigger)
 
@@ -44,6 +48,8 @@ public class TeleOpT extends LinearOpMode {
     - dpad up = raise lift
      */
 
+    enum State { IDLE, HEAT_SEEKING, RETRACTING }
+
     public static String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
     public static double TRIGGER_THRESHOLD = 0.5;
     public static String WHITE_CIRCLE = "⚪"; // See https://unicode-explorer.com/list/geometric-shapes
@@ -53,6 +59,8 @@ public class TeleOpT extends LinearOpMode {
     private Gamepad previousGamepad1 = new Gamepad();
     private Gamepad currentGamepad2 = new Gamepad();
     private Gamepad previousGamepad2 = new Gamepad();
+
+    private State state = IDLE;
 
     // Runs the op mode.
     @Override
@@ -115,6 +123,52 @@ public class TeleOpT extends LinearOpMode {
             // Determine whether the robot is localized.
             boolean localized = robotHardware.isLocalized();
 
+            switch (state) {
+                case HEAT_SEEKING:
+
+                    // Determine whether we are heat seeking.
+                    boolean isHeatSeeking = robotHardware.isHeatSeeking();
+
+                    if (isHeatSeeking) {
+                        break;
+                    }
+
+                    if (currentGamepad2.x && !previousGamepad2.x && !debugging) {
+                        // Start retracting.
+                        robotHardware.startRetracting();
+
+                        state = RETRACTING;
+                    }
+
+                    break;
+                case RETRACTING:
+
+                    // Determine whether we are retracting.
+                    boolean isRetracting = robotHardware.isRetracting();
+
+                    if (isRetracting) {
+                        break;
+                    }
+
+                    state = IDLE;
+
+                    break;
+                case IDLE:
+
+                    // If the robot is localized and the pixel driver pressed a...
+                    if(localized && currentGamepad2.a && !previousGamepad2.a && !debugging) {
+
+                        // Start heat seeking.
+                        robotHardware.startHeatSeeking(leftColumn, leftRow, AutoF.redAlliance);
+
+                        state = HEAT_SEEKING;
+                    }
+
+                    break;
+                default:
+                    throw new InterruptedException("Unrecognized state.");
+            }
+
             // Determine whether we are heat seeking.
             boolean isHeatSeeking = robotHardware.isHeatSeeking();
 
@@ -124,13 +178,7 @@ public class TeleOpT extends LinearOpMode {
                 // Move the robot.
                 robotHardware.moveRobot();
 
-                // If the robot is localized and the pixel driver pressed a...
-                if(localized && currentGamepad2.a && !previousGamepad2.a && !debugging) {
 
-                    // Start heat seeking.
-                    robotHardware.startHeatSeeking(leftColumn, leftRow, AutoF.redAlliance);
-
-                }
 
             }
 

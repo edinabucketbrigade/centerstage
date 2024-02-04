@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.IDLE;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_A;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_B;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_C;
+import static org.firstinspires.ftc.teamcode.AutoF.State.IDLE;
+import static org.firstinspires.ftc.teamcode.AutoF.State.STEP_A;
+import static org.firstinspires.ftc.teamcode.AutoF.State.STEP_B;
+import static org.firstinspires.ftc.teamcode.AutoF.State.STEP_C;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -72,7 +72,7 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
     enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
-    private HeatSeekC.State state = IDLE;
+    private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
 
     @Override
@@ -1031,7 +1031,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Sets the state.
-    private void setState(HeatSeekC.State state) {
+    private void setState(State state) {
 
         // Set the state.
         this.state = state;

@@ -12,6 +12,7 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_H;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_I;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_J;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_K;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_L;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -36,7 +37,8 @@ public class HeatSeekC {
 
     enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
 
-    public static double TARGET_X = 44.5;
+    public static double PLACE_TARGET_X = 44.5;
+    public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
     public static double TILE_SIZE = 24;
     public static double TARGET_Y_OFFSET = 4;
     public static int FIRST_ROW_LIFT_POSITION = 0;
@@ -44,9 +46,8 @@ public class HeatSeekC {
     public static double PIXEL_WIDTH = 3;
     public static double TARGET_RED_Y = -TILE_SIZE - TARGET_Y_OFFSET;
     public static double TARGET_BLUE_Y = 2 * TILE_SIZE - TARGET_Y_OFFSET;
-    public static double VELOCITY_PERCENTAGE = 0.7;
-    public static double MAXIMUM_VELOCITY = DriveConstants.MAX_VEL * VELOCITY_PERCENTAGE;
-    public static double MAXIMUM_ACCELERATION = DriveConstants.MAX_ACCEL * VELOCITY_PERCENTAGE;
+    public static double APPROACH_SPEED = 50;
+    public static double PLACE_SPEED = 20;
     public static int MAXIMUM_ROW = (int)Math.floor((MAXIMUM_POSITION - FIRST_ROW_LIFT_POSITION) / LIFT_INCREMENT);
 
     private RobotHardwareC robotHardware;
@@ -96,12 +97,6 @@ public class HeatSeekC {
         // Get the drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
-        // Construct a velocity constraint.
-        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY, DriveConstants.TRACK_WIDTH);
-
-        // Construct an acceleration constraint.
-        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
-
         switch (state) {
             case STEP_A:
 
@@ -143,7 +138,7 @@ public class HeatSeekC {
             case STEP_C:
 
                 // If we are waiting...
-                if (timer.milliseconds() < 2000) {
+                if (!robotHardware.isArmUp() && !robotHardware.isLiftUp()) {
 
                     // Exit the method.
                     return;
@@ -157,26 +152,7 @@ public class HeatSeekC {
 
             case STEP_D:
 
-                // Get the robot's current pose.
-                Pose2d currentPose = drive.getPoseEstimate();
-
-                // Get a target y coordinate.
-                double targetY = getTargetY(leftColumn, row, redAlliance);
-
-                // Construct a target position.
-                Vector2d targetPosition = new Vector2d(TARGET_X, targetY);
-
-                // Construct a target pose.
-                Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
-
-                // Construct a trajectory sequence.
-                TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
-                        .setConstraints(velocityConstraint, accelerationConstraint)
-                        .lineToLinearHeading(targetPose)
-                        .build();
-
-                // Execute the trajectory sequence.
-                drive.followTrajectorySequenceAsync(sequence);
+                startDrivingToBackdrop(APPROACH_SPEED, APPROACH_TARGET_X);
 
                 // Advance to the next step.
                 setState(STEP_E);
@@ -184,16 +160,28 @@ public class HeatSeekC {
                 break;
 
             case STEP_E:
-
                 if (drive.isBusy()) {
                     return;
                 }
 
+                startDrivingToBackdrop(PLACE_SPEED, PLACE_TARGET_X);
+
+                // Advance to the next step.
                 setState(STEP_F);
 
                 break;
 
             case STEP_F:
+
+                if (drive.isBusy()) {
+                    return;
+                }
+
+                setState(STEP_G);
+
+                break;
+
+            case STEP_G:
 
                 // If we are waiting...
                 if (timer.milliseconds() < 500) {
@@ -207,94 +195,9 @@ public class HeatSeekC {
                 robotHardware.openClawPartially();
 
                 // Advance to the next step.
-                setState(STEP_G);
-
-                break;
-
-            case STEP_G:
-
-                // If we are waiting...
-                if (timer.milliseconds() < 1000) {
-
-                    // Exit the method.
-                    return;
-
-                }
-
-                currentPose = drive.getPoseEstimate();
-
-                TrajectorySequence backUpSequence = drive.trajectorySequenceBuilder(currentPose)
-                        .setConstraints(velocityConstraint, accelerationConstraint)
-                        .forward(4)
-                        .build();
-
-                drive.followTrajectorySequenceAsync(backUpSequence);
-
-                // Advance to the next step.
-                setState(STEP_H);
-
-                break;
-
-            case STEP_H:
-
-                if (drive.isBusy()) {
-                    return;
-                }
-
-                // Lower the lift.
-                robotHardware.lowerLift();
-
-                // Advance to the next step.
-                setState(STEP_I);
-
-                break;
-
-            case STEP_I:
-                if (timer.milliseconds() < 1000) {
-                    return;
-                }
-
-                // Lower the arm.
-                robotHardware.lowerArm();
-
-                setState(STEP_J);
-
-                break;
-
-            case STEP_J:
-
-                // If we are waiting...
-                if (timer.milliseconds() < 500) {
-
-                    // Exit the method.
-                    return;
-
-                }
-
-                // Close the claw.
-                robotHardware.closeClaw();
-
-                // Advance to the next step.
-                setState(STEP_K);
-
-            case STEP_K:
-
-                // If we are waiting...
-                if (timer.milliseconds() < 1000) {
-
-                    // Exit the method.
-                    return;
-
-                }
-
-                // Lower the wrist.
-                robotHardware.lowerWrist();
-
-                // Open the claw.
-                robotHardware.openClawFully();
-
-                // Advance to the next step.
                 setState(IDLE);
+
+                break;
 
             case IDLE:
 
@@ -305,7 +208,6 @@ public class HeatSeekC {
                 throw new InterruptedException("Unrecognized state");
 
         }
-
     }
 
     // Sets the state.
@@ -380,6 +282,37 @@ public class HeatSeekC {
         // Return indicating if this is active.
         return state != IDLE;
 
+    }
+
+    public void startDrivingToBackdrop(double speed, double targetX) throws InterruptedException {
+        // Construct a velocity constraint.
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(speed, DriveConstants.TRACK_WIDTH);
+
+        // Construct an acceleration constraint.
+        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(speed);
+
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Get the robot's current pose.
+        Pose2d currentPose = drive.getPoseEstimate();
+
+        // Get a target y coordinate.
+        double targetY = getTargetY(leftColumn, row, redAlliance);
+
+        // Construct a target position.
+        Vector2d targetPosition = new Vector2d(targetX, targetY);
+
+        // Construct a target pose.
+        Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
+
+        // Construct a trajectory sequence.
+        TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
+                .setConstraints(velocityConstraint, accelerationConstraint)
+                .lineToLinearHeading(targetPose)
+                .build();
+
+        // Execute the trajectory sequence.
+        drive.followTrajectorySequenceAsync(sequence);
     }
 
 }
