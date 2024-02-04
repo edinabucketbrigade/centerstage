@@ -45,7 +45,7 @@ public class Retract {
             case STEP_B:
 
                 // If we are waiting...
-                if (!robotHardware.isArmDown() && !robotHardware.isLiftDown()) {
+                if (!robotHardware.isArmDown() || !robotHardware.isLiftDown()) {
 
                     // Exit the method.
                     return;

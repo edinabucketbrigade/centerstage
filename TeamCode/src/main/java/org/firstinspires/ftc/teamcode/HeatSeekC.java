@@ -173,22 +173,8 @@ public class HeatSeekC {
 
             case STEP_F:
 
-                if (drive.isBusy()) {
+                if (drive.isBusy() || !robotHardware.isArmUp() || !robotHardware.isLiftUp()) {
                     return;
-                }
-
-                setState(STEP_G);
-
-                break;
-
-            case STEP_G:
-
-                // If we are waiting...
-                if (timer.milliseconds() < 500) {
-
-                    // Exit the method.
-                    return;
-
                 }
 
                 // Open the claw to drop the pixels.
