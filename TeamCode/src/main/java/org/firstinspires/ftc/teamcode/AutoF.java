@@ -348,7 +348,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getRedLeftLeftSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(-34,-30,Math.toRadians(180)))
                 .build();
@@ -357,7 +357,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getRedLeftMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(-36,-14, Math.toRadians(-90)))
                 .build();
@@ -366,7 +366,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getRedLeftRightSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
                 .splineToLinearHeading(new Pose2d(-37,-30),Math.toRadians(0))
@@ -376,7 +376,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getRedRightLeftSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .splineToLinearHeading(new Pose2d(13,-30), Math.toRadians(180))
                 .build();
@@ -385,7 +385,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getRedRightMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(12,-14, Math.toRadians(-90)))
                 .build();
@@ -394,7 +394,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getRedRightRightSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
                 .lineToLinearHeading(new Pose2d(10,-30,Math.toRadians(0)))
@@ -404,7 +404,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getBlueLeftLeftSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(13,30,Math.toRadians(180)))
                 .build();
@@ -413,7 +413,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getBlueLeftMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)))
                 .build();
@@ -422,7 +422,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getBlueLeftRightSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
                 .splineToLinearHeading(new Pose2d(10,30),Math.toRadians(0))
@@ -432,7 +432,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getBlueRightLeftSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(-34,30,Math.toRadians(180)))
                 .build();
@@ -441,7 +441,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getBlueRightMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(-36,14, Math.toRadians(90)))
                 .build();
@@ -450,7 +450,7 @@ public class AutoF extends LinearOpMode {
 
     private TrajectorySequence getBlueRightRightSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
                 .splineToLinearHeading(new Pose2d(-37,30),Math.toRadians(0))
@@ -461,7 +461,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getRedLeftLeftTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(RED_LEFT_LEFT_SPIKE_MARK_POSITION, Math.toRadians(0)))
@@ -495,7 +495,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getRedLeftMiddleTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
 //                .addTemporalMarker(PURPLE_PIXEL_DELAY, () -> {
 //                    robotHardware.openLeftClaw();
@@ -539,7 +539,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getRedLeftRightTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(18)
@@ -575,7 +575,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getRedRightLeftTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(RED_RIGHT_LEFT_POSITION, Math.toRadians(0)))
@@ -604,7 +604,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getRedRightMiddleTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(26)
@@ -633,7 +633,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getRedRightRightTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
@@ -662,7 +662,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getBlueLeftLeftTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(18)
@@ -696,7 +696,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getBlueLeftMiddleTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(42)
@@ -728,7 +728,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getBlueLeftRightTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(BLUE_LEFT_RIGHT_SPIKE_MARK_POSITION, Math.toRadians(0)))
@@ -764,7 +764,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getBlueRightLeftTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
@@ -794,7 +794,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getBlueRightMiddleTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .back(26)
@@ -823,7 +823,7 @@ public class AutoF extends LinearOpMode {
     private TrajectorySequence getBlueRightRightTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(-90));
-        drive.setPoseEstimate(startPose);
+        robotHardware.setPose(startPose);
 
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(BLUE_RIGHT_RIGHT_POSITION, Math.toRadians(0)))
