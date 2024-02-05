@@ -62,6 +62,8 @@ public class AutoF extends LinearOpMode {
     public static final int FIRST_ROW = 1;
     public static double PURPLE_PIXEL_DELAY = 1;
     public static Boolean redAlliance;
+    public static Pose2d currentPose;
+    public static Boolean lastRanAutonomous;
     private Boolean startLeft;
     private Boolean parkLeft;
     private OpenCvWebcam camera;
@@ -80,6 +82,9 @@ public class AutoF extends LinearOpMode {
 
         // Clear the red alliance value.
         redAlliance = null;
+
+        // Remember that we last ran autonomous.
+        lastRanAutonomous = true;
 
         // Get the robot hardware.
         robotHardware = new RobotHardwareC(this);
@@ -209,6 +214,9 @@ public class AutoF extends LinearOpMode {
 
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Update the robot's current pose.
+        currentPose = robotHardware.getPose();
 
         // Update the state machine.
         switch (state) {

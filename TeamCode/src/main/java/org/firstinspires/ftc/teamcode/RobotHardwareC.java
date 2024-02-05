@@ -60,6 +60,8 @@ public class RobotHardwareC {
        Webcam 1
     */
 
+    public static final String RED_SQUARE = "\uD83D\uDFE5"; // See https://unicode-explorer.com/list/geometric-shapes
+    public static final String GREEN_SQUARE = "\uD83D\uDFE9"; // See https://unicode-explorer.com/list/geometric-shapes
     private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     public static final int MINIMUM_COLUMN = 1;
@@ -187,9 +189,10 @@ public class RobotHardwareC {
         double rightBackMillimeters = rightBackDistance.getDistance(DistanceUnit.MM);
 
         // Update the telemetry.
-        telemetry.addData("Status", "Localized = %b, Heat Seeking = %b, Retracting = %b, Turtle Mode = %b", isLocalized, heatSeek.isActive(), retract.isActive(), isTurtleMode);
+        telemetry.addData("Localized", isLocalized ? GREEN_SQUARE : RED_SQUARE);
+        telemetry.addData("Status", "Heat Seeking = %b, Retracting = %b, Turtle Mode = %b", heatSeek.isActive(), retract.isActive(), isTurtleMode);
         if(isLocalized) {
-            telemetry.addData("Pose", poseString);
+            telemetry.addData("Robot Pose", poseString);
         }
         telemetry.addData("Back Distance", "Left = %.0f mm, Right = %.0f mm", leftBackMillimeters, rightBackMillimeters);
 
@@ -625,6 +628,44 @@ public class RobotHardwareC {
 
     public boolean isLiftUp() {
         return lift.isUp();
+    }
+
+    // Get the robot's pose.
+    public Pose2d getPose() {
+
+        // If the drive interface is missing...
+        if(drive == null) {
+
+            // Exit the method.
+            return null;
+
+        }
+
+        // Get the robot's pose.
+        Pose2d pose = drive.getPoseEstimate();
+
+        // Return the pose.
+        return pose;
+
+    }
+
+    // Sets the robot's pose.
+    public void setPose(Pose2d pose) {
+
+        // If the drive interface is missing...
+        if(drive == null) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Set the robot's pose.
+        drive.setPoseEstimate(pose);
+
+        // Remember that we localized the robot.
+        isLocalized = true;
+
     }
 
 }

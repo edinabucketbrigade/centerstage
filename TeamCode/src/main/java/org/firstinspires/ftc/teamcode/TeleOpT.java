@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.AutoF.lastRanAutonomous;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
@@ -11,6 +12,7 @@ import static org.firstinspires.ftc.teamcode.TeleOpT.State.IDLE;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.RETRACTING;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -50,9 +52,9 @@ public class TeleOpT extends LinearOpMode {
 
     enum State { IDLE, HEAT_SEEKING, RETRACTING }
 
-    public static String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
+    public static final String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
     public static double TRIGGER_THRESHOLD = 0.5;
-    public static String WHITE_CIRCLE = "⚪"; // See https://unicode-explorer.com/list/geometric-shapes
+    public static final String WHITE_CIRCLE = "⚪"; // See https://unicode-explorer.com/list/geometric-shapes
 
     private RobotHardwareC robotHardware;
     private Gamepad currentGamepad1 = new Gamepad();
@@ -79,8 +81,27 @@ public class TeleOpT extends LinearOpMode {
         int leftColumn = MINIMUM_COLUMN;
         int leftRow = MINIMUM_ROW;
 
-        // DEBUG
-        //AutoF.redAlliance = null;
+        // If we last ran an autonomous op mode...
+        if(lastRanAutonomous) {
+
+            // Get the robot's pose at the end of the autonomous op mode.
+            Pose2d currentPose = AutoF.currentPose;
+
+            // Set the robot's pose.
+            robotHardware.setPose(currentPose);
+
+        }
+
+        // Otherwise (if we last ran a tele op mode)...
+        else {
+
+            // Clear the red alliance value.
+            AutoF.redAlliance = null;
+
+        }
+
+        // Remember that we last ran a tele op mode.
+        lastRanAutonomous = false;
 
         // Wait for menu selection.
         waitForMenuSelection();
