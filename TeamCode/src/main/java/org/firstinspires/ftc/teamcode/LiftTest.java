@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
 @Config
+@Disabled
 public class LiftTest extends LinearOpMode {
 
     public static double POWER = 0.2;

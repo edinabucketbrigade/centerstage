@@ -63,7 +63,7 @@ public class AutoF extends LinearOpMode {
     public static double PURPLE_PIXEL_DELAY = 1;
     public static Boolean redAlliance;
     public static Pose2d currentPose;
-    public static Boolean lastRanAutonomous;
+    public static boolean lastRanAutonomous;
     private Boolean startLeft;
     private Boolean parkLeft;
     private OpenCvWebcam camera;

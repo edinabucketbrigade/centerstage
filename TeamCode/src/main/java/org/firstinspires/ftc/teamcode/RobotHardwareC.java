@@ -660,6 +660,14 @@ public class RobotHardwareC {
 
         }
 
+        // If the pose is missing...
+        if(pose == null) {
+
+            // Exit the method.
+            return;
+
+        }
+
         // Set the robot's pose.
         drive.setPoseEstimate(pose);
 

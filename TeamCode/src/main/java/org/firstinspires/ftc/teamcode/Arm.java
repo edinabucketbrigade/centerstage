@@ -16,8 +16,9 @@ public class Arm {
     public static int DOWN_POSITION = 0;
     public static double LOWER_GAIN = 0.0006;
     public static double MAXIMUM_LOWER_POWER = 0.4;
-    public static double MAXIMUM_RAISE_POWER = 0.2;
-    public static double RAISE_GAIN = 0.0007;
+    public static double MAXIMUM_RAISE_POWER = 0.5;
+    public static double RAISE_EXPONENT = 2;
+    public static double RAISE_GAIN = 0.000001;
     public static int UP_POSITION = 750;
 
     private RobotHardwareC robotHardware;
@@ -128,7 +129,7 @@ public class Arm {
 
                 // Raise the arm.
                 double positionError = Math.abs(UP_POSITION - currentPosition);
-                double armPower = Math.min(positionError * RAISE_GAIN, MAXIMUM_RAISE_POWER);
+                double armPower = Math.min(Math.pow(positionError, RAISE_EXPONENT) * RAISE_GAIN, MAXIMUM_RAISE_POWER);
                 armMotor.setPower(armPower);
 
             }
