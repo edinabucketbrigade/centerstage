@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.AutoF.State.IDLE;
 import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_SPIKE_MARK;
-import static org.firstinspires.ftc.teamcode.AutoF.State.LOWER_WRIST;
 import static org.firstinspires.ftc.teamcode.AutoF.State.OPEN_CLAW;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -16,6 +15,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -40,8 +40,8 @@ public class AutoF extends LinearOpMode {
     public static final Vector2d RED_DETOUR_BACKDROP = new Vector2d(28, -12);
     public static final Vector2d RED_BACKDROP = new Vector2d(44, -36);
     public static final Vector2d RED_PIXELS = new Vector2d(-58, -10);
-    public static final Vector2d RED_LEFT_START = new Vector2d(-36, -61);
-    public static final Vector2d RED_RIGHT_START = new Vector2d(12, -61);
+    public static final Pose2d RED_LEFT_START = new Pose2d(-36, -61, Math.toRadians(-90));
+    public static final Pose2d RED_RIGHT_START = new Pose2d(12, -61, Math.toRadians(-90));
     public static final Vector2d RED_RIGHT_LEFT_POSITION = new Vector2d(14, -30);
     public static final Vector2d RED_RIGHT_RIGHT_POSITION = new Vector2d(23, -30);
     public static final Vector2d RED_LEFT_RIGHT_RIGGING_POSITION = new Vector2d(-9.5, -35);
@@ -50,8 +50,8 @@ public class AutoF extends LinearOpMode {
     public static final Vector2d BLUE_DETOUR_BACKDROP = new Vector2d(28, 12);
     public static final Vector2d BLUE_BACKDROP = new Vector2d(44, 36);
     public static final Vector2d BLUE_PIXELS = new Vector2d(-58, 10);
-    public static final Vector2d BLUE_LEFT_START = new Vector2d(12, 61);
-    public static final Vector2d BLUE_RIGHT_START = new Vector2d(-36, 61);
+    public static final Pose2d BLUE_LEFT_START = new Pose2d(12, 61, Math.toRadians(90));
+    public static final Pose2d BLUE_RIGHT_START = new Pose2d(-36, 61, Math.toRadians(90));
     public static final Vector2d BLUE_RIGHT_LEFT_POSITION = new Vector2d(23, 30);
     public static final Vector2d BLUE_RIGHT_RIGHT_POSITION = new Vector2d(14, 30);
     public static final Vector2d BLUE_LEFT_LEFT_RIGGING_POSITION = new Vector2d(-9.5, 35);
@@ -61,6 +61,17 @@ public class AutoF extends LinearOpMode {
     private static final String TAG = "Bucket Brigade";
     public static final int FIRST_ROW = 1;
     public static double PURPLE_PIXEL_DELAY = 1;
+
+    public static double RED_START_LEFT_SPIKE_LEFT_X = -37.5;
+    public static double RED_START_LEFT_SPIKE_LEFT_Y = -26.5;
+    public static double RED_START_LEFT_SPIKE_LEFT_HEADING = 180;
+    public static double RED_START_LEFT_SPIKE_MIDDLE_X = -36;
+    public static double RED_START_LEFT_SPIKE_MIDDLE_Y = -14;
+    public static double RED_START_LEFT_SPIKE_MIDDLE_HEADING = -90;
+    public static double RED_START_LEFT_SPIKE_RIGHT_X = -34.5;
+    public static double RED_START_LEFT_SPIKE_RIGHT_Y = -29.5;
+    public static double RED_START_LEFT_SPIKE_RIGHT_HEADING = 0;
+
     public static Boolean redAlliance;
     public static Pose2d currentPose;
     public static boolean lastRanAutonomous;
@@ -73,7 +84,7 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection.Location location;
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
-    enum State { IDLE, DRIVE_TO_SPIKE_MARK, LOWER_WRIST, OPEN_CLAW }
+    enum State { IDLE, DRIVE_TO_SPIKE_MARK, OPEN_CLAW }
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
 
@@ -138,55 +149,6 @@ public class AutoF extends LinearOpMode {
         // Start looking for AprilTags.
         robotHardware.startLookingForAprilTags();
 
-        /*if (redAlliance) {
-            if (startLeft) {
-                if (location == location.Left) {
-                    sequence = getRedLeftLeftTrajectorySequence(drive);
-                }
-                if (location == location.Middle) {
-                    sequence = getRedLeftMiddleTrajectorySequence(drive);
-                }
-                if (location == location.Right) {
-                    sequence = getRedLeftRightTrajectorySequence(drive);
-                }
-            }
-            else {
-                if (location == location.Left) {
-                    sequence = getRedRightLeftTrajectorySequence(drive);
-                }
-                if (location == location.Middle) {
-                    sequence = getRedRightMiddleTrajectorySequence(drive);
-                }
-                if (location == location.Right) {
-                    sequence = getRedRightRightTrajectorySequence(drive);
-                }
-            }
-        }
-        else {
-            if (startLeft) {
-                if (location == location.Left) {
-                    sequence = getBlueLeftLeftTrajectorySequence(drive);
-                }
-                if (location == location.Middle) {
-                    sequence = getBlueLeftMiddleTrajectorySequence(drive);
-                }
-                if (location == location.Right) {
-                    sequence = getBlueLeftRightTrajectorySequence(drive);
-                }
-            }
-            else {
-                if (location == location.Left) {
-                    sequence = getBlueRightLeftTrajectorySequence(drive);
-                }
-                if (location == location.Middle) {
-                    sequence = getBlueRightMiddleTrajectorySequence(drive);
-                }
-                if (location == location.Right) {
-                    sequence = getBlueRightRightTrajectorySequence(drive);
-                }
-            }
-        }*/
-
         // Initialize the drive interface.
         robotHardware.initializeDrive();
 
@@ -223,82 +185,11 @@ public class AutoF extends LinearOpMode {
 
             case DRIVE_TO_SPIKE_MARK:
 
-                TrajectorySequence trajectorySequence;
+                // Get a spike mark trajectory sequence.
+                TrajectorySequence trajectorySequence = getSpikeMarkTrajectorySequence();
 
-                // Get a trajectory sequence.
-                //trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
-
-                if (redAlliance) {
-                    if (startLeft) {
-                        if (location == location.Left) {
-                            trajectorySequence = getRedLeftLeftSpikeMarkTrajectorySequence(drive);
-                        }
-                        else if (location == location.Middle) {
-                            trajectorySequence = getRedLeftMiddleSpikeMarkTrajectorySequence(drive);
-                        }
-                        else if (location == location.Right) {
-                            trajectorySequence = getRedLeftRightSpikeMarkTrajectorySequence(drive);
-                        }
-                        else {
-                            throw new InterruptedException("Location is not recognized");
-                        }
-                    }
-                    else {
-                        if (location == location.Left) {
-                            trajectorySequence = getRedRightLeftSpikeMarkTrajectorySequence(drive);
-                        }
-                        else if (location == location.Middle) {
-                            trajectorySequence = getRedRightMiddleSpikeMarkTrajectorySequence(drive);
-                        }
-                        else if (location == location.Right) {
-                            trajectorySequence = getRedRightRightSpikeMarkTrajectorySequence(drive);
-                        }
-                        else {
-                            throw new InterruptedException("Location is not recognized");
-                        }
-                    }
-                }
-                else {
-                    if (startLeft) {
-                        if (location == location.Left) {
-                            trajectorySequence = getBlueLeftLeftSpikeMarkTrajectorySequence(drive);
-                        } else if (location == location.Middle) {
-                            trajectorySequence = getBlueLeftMiddleSpikeMarkTrajectorySequence(drive);
-                        } else if (location == location.Right) {
-                            trajectorySequence = getBlueLeftRightSpikeMarkTrajectorySequence(drive);
-                        } else {
-                            throw new InterruptedException("Location is not recognized");
-                        }
-                    } else {
-                        if (location == location.Left) {
-                            trajectorySequence = getBlueRightLeftSpikeMarkTrajectorySequence(drive);
-                        } else if (location == location.Middle) {
-                            trajectorySequence = getBlueRightMiddleSpikeMarkTrajectorySequence(drive);
-                        } else if (location == location.Right) {
-                            trajectorySequence = getBlueRightRightSpikeMarkTrajectorySequence(drive);
-                        } else {
-                            throw new InterruptedException("Location is not recognized");
-                        }
-                    }
-                }
-
-                // Start following the trajectory sequence.
+                // Start driving to the spike mark.
                 drive.followTrajectorySequenceAsync(trajectorySequence);
-
-                // Advance to the next step.
-                setState(LOWER_WRIST);
-
-                break;
-
-            case LOWER_WRIST:
-
-                // If we are waiting...
-                if (timer.milliseconds() < 1000) {
-
-                    // Exit the method.
-                    return;
-
-                }
 
                 // Lower the wrist.
                 robotHardware.lowerWrist();
@@ -345,119 +236,7 @@ public class AutoF extends LinearOpMode {
         String output = String.format("x %.2f, y %.2f, heading %.2f", x, y, degrees);
         return output;
     }
-
-    private TrajectorySequence getRedLeftLeftSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-34,-30,Math.toRadians(180)))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getRedLeftMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-36,-14, Math.toRadians(-90)))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getRedLeftRightSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-37,-30),Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getRedRightLeftSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .splineToLinearHeading(new Pose2d(13,-30), Math.toRadians(180))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getRedRightMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(12,-14, Math.toRadians(-90)))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getRedRightRightSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .setReversed(true)
-                .lineToLinearHeading(new Pose2d(10,-30,Math.toRadians(0)))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getBlueLeftLeftSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(13,30,Math.toRadians(180)))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getBlueLeftMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getBlueLeftRightSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .setReversed(true)
-                .splineToLinearHeading(new Pose2d(10,30),Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getBlueRightLeftSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-34,30,Math.toRadians(180)))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getBlueRightMiddleSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-36,14, Math.toRadians(90)))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getBlueRightRightSpikeMarkTrajectorySequence(SampleMecanumDrive drive) {
-        Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-37,30),Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
+/*
     private TrajectorySequence getRedLeftLeftTrajectorySequence(SampleMecanumDrive drive) {
 
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
@@ -847,7 +626,7 @@ public class AutoF extends LinearOpMode {
                 .build();
         return sequence;
     }
-
+*/
     private void log(String message) {
 
         // If the telemetry is missing...
@@ -1048,4 +827,138 @@ public class AutoF extends LinearOpMode {
         timer.reset();
 
     }
+
+    // Gets a start pose.
+    private Pose2d getStartPose() throws InterruptedException {
+
+        // Verify the inputs exist.
+        if(redAlliance == null) {
+            throw new InterruptedException("The red alliance value is missing.");
+        }
+        if(startLeft == null) {
+            throw new InterruptedException("The start left value is missing.");
+        }
+
+        // Return a start pose.
+        if(redAlliance) {
+            if(startLeft) {
+                return RED_LEFT_START;
+            }
+            else {
+                return RED_RIGHT_START;
+            }
+        }
+        else {
+            if(startLeft) {
+                return BLUE_LEFT_START;
+            }
+            else {
+                return BLUE_RIGHT_START;
+            }
+        }
+
+    }
+
+    // Gets a spike mark trajectory sequence.
+    private TrajectorySequence getSpikeMarkTrajectorySequence() throws InterruptedException {
+
+        // Get a drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Verify the inputs exist.
+        if(drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+        if(location == null) {
+            throw new InterruptedException("The location is missing.");
+        }
+        if(redAlliance == null) {
+            throw new InterruptedException("The red alliance value is missing.");
+        }
+        if(startLeft == null) {
+            throw new InterruptedException("The start left value is missing.");
+        }
+
+        // Get a start pose.
+        Pose2d startPose = getStartPose();
+
+        // Set the robot's pose.
+        robotHardware.setPose(startPose);
+
+        // Set the trajectory sequence's start pose.
+        TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(startPose);
+
+        // Add the appropriate maneuvers.
+        if (redAlliance) {
+            if (startLeft) {
+                if (location == location.Left) {
+                    Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_LEFT_X, RED_START_LEFT_SPIKE_LEFT_Y, Math.toRadians(RED_START_LEFT_SPIKE_LEFT_HEADING));
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .lineToLinearHeading(targetPose);
+                }
+                else if (location == location.Middle) {
+                    Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_MIDDLE_X, RED_START_LEFT_SPIKE_MIDDLE_Y, Math.toRadians(RED_START_LEFT_SPIKE_MIDDLE_HEADING));
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .lineToLinearHeading(targetPose);
+                }
+                else {
+                    Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_RIGHT_X, RED_START_LEFT_SPIKE_RIGHT_Y);
+                    double targetHeading = Math.toRadians(RED_START_LEFT_SPIKE_RIGHT_HEADING);
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .setReversed(true)
+                            .splineToLinearHeading(targetPose, targetHeading);
+                }
+            }
+            else {
+                if (location == location.Left) {
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .splineToLinearHeading(new Pose2d(13,-30), Math.toRadians(180));
+                }
+                else if (location == location.Middle) {
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .lineToLinearHeading(new Pose2d(12,-14, Math.toRadians(-90)));
+                }
+                else {
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .setReversed(true)
+                            .lineToLinearHeading(new Pose2d(10,-30, Math.toRadians(0)));
+                }
+            }
+        }
+        else {
+            if (startLeft) {
+                if (location == location.Left) {
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .lineToLinearHeading(new Pose2d(13,30, Math.toRadians(180)));
+                } else if (location == location.Middle) {
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)));
+                } else {
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .setReversed(true)
+                            .splineToLinearHeading(new Pose2d(10,30), Math.toRadians(0));
+                }
+            } else {
+                if (location == location.Left) {
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .lineToLinearHeading(new Pose2d(-34,30, Math.toRadians(180)));
+                } else if (location == location.Middle) {
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .lineToLinearHeading(new Pose2d(-36,14, Math.toRadians(90)));
+                } else {
+                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                            .setReversed(true)
+                            .splineToLinearHeading(new Pose2d(-37,30),Math.toRadians(0));
+                }
+            }
+        }
+
+        // Build the trajectory sequence.
+        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
+
+        // Return the result.
+        return trajectorySequence;
+
+    }
+
 }
