@@ -21,7 +21,7 @@ public class Claw {
     public static double RIGHT_CLOSED = 0.5;
     public static double RIGHT_PARTIALLY_OPEN = 0.33;
     public static double RIGHT_FULLY_OPEN = 0.24;
-    public static double WRIST_DOWN_POSITION = 0.27;
+    public static double WRIST_DOWN_POSITION = 0.275;
     public static double WRIST_UP_POSITION = 0.92;
 
     private RobotHardwareC robotHardware;
