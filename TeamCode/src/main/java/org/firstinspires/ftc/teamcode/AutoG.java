@@ -207,12 +207,12 @@ public class AutoG extends LinearOpMode {
             return false;
 
         }
+
         // Get the tag identifier.
         int tagId = detection.id;
 
         // Determine whether the detection is a match.
-        //boolean isMatch = isBackdropTag(tagId) || isWallTag(tagId);
-        boolean isMatch = isBackdropTag(tagId);
+        boolean isMatch = isBackdropTag(tagId) || isWallTag(tagId);
 
         // Return the result.
         return isMatch;

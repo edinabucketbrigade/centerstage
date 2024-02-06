@@ -66,6 +66,7 @@ public class RobotHardwareC {
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
+    public static double SLOW_DRIVE_POWER = 0.05;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -147,23 +148,31 @@ public class RobotHardwareC {
         claw.update();
         lift.update();
 
-        // Get a detection.
-        AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
+        // Determine whether the robot is moving slowly.
+        boolean isMovingSlowly = isMovingSlowly();
 
-        // If there is a detection...
-        if (detection != null) {
+        // If the robot is moving slowly...
+        if(isMovingSlowly) {
 
-            // Get the telemetry.
-            Telemetry telemetry = opMode.telemetry;
+            // Get a detection.
+            AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
 
-            // Get the robot's pose.
-            Pose2d pose = AutoG.getRobotPose(detection, telemetry);
+            // If there is a detection...
+            if (detection != null) {
 
-            // Update the driver interface.
-            if(drive != null) drive.setPoseEstimate(pose);
+                // Get the telemetry.
+                Telemetry telemetry = opMode.telemetry;
 
-            // Remember that we localized the robot.
-            isLocalized = true;
+                // Get the robot's pose.
+                Pose2d pose = AutoG.getRobotPose(detection, telemetry);
+
+                // Update the driver interface.
+                if (drive != null) drive.setPoseEstimate(pose);
+
+                // Remember that we localized the robot.
+                isLocalized = true;
+
+            }
 
         }
 
@@ -673,6 +682,27 @@ public class RobotHardwareC {
 
         // Remember that we localized the robot.
         isLocalized = true;
+
+    }
+
+    // Determines whether the robot is moving slowly.
+    private boolean isMovingSlowly() {
+
+        // Get the drive motor powers.
+        double leftFrontDrivePower = leftFrontDrive.getPower();
+        double leftBackDrivePower = leftBackDrive.getPower();
+        double rightFrontDrivePower = rightFrontDrive.getPower();
+        double rightBackDrivePower = rightBackDrive.getPower();
+
+        // Determine whether the robot is moving slowly.
+        boolean isMovingSlowly =
+                leftFrontDrivePower <= SLOW_DRIVE_POWER &&
+                leftBackDrivePower <= SLOW_DRIVE_POWER &&
+                rightFrontDrivePower <= SLOW_DRIVE_POWER &&
+                rightBackDrivePower <= SLOW_DRIVE_POWER;
+
+        // Return the result.
+        return isMovingSlowly;
 
     }
 
