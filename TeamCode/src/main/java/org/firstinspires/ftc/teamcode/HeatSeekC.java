@@ -1,12 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.IDLE;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_A;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_B;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_C;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_D;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_E;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_F;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.CLOSE_CLAW;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.RAISE_ARM_LIFT_AND_WRIST;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.DRIVE_TO_APPROACH_POSITION;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.DRIVE_TO_PLACE_POSITION;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.OPEN_CLAW;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -29,7 +28,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Config
 public class HeatSeekC {
 
-    enum State { IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N }
+    enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW }
 
     public static double PLACE_TARGET_X = 44.5;
     public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
@@ -55,17 +54,28 @@ public class HeatSeekC {
         this.robotHardware = robotHardware;
     }
 
+    // Starts heat seeking.
     public void start(int leftColumn, int row, boolean redAlliance) {
+
+        // If we are already heat seeking...
         if(state != IDLE) {
+
+            // Exit the method.
             return;
+
         }
 
+        // Stop the drive motors.
         robotHardware.stopDriveMotors();
 
+        // Remember the inputs.
         this.leftColumn = leftColumn;
         this.row = row;
         this.redAlliance = redAlliance;
-        setState(STEP_A);
+
+        // Start heat seeking.
+        setState(CLOSE_CLAW);
+
     }
 
     // Stops heat seeking.
@@ -82,23 +92,26 @@ public class HeatSeekC {
 
     }
 
+    // Updates this.
     public void update() throws InterruptedException {
 
         // Get the drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
+        // Switch based on the state.
         switch (state) {
-            case STEP_A:
+
+            case CLOSE_CLAW:
 
                 // Close the claw so it does not catch when raising the lift.
                 robotHardware.closeClaw();
 
                 // Advance to the next step.
-                setState(STEP_B);
+                setState(RAISE_ARM_LIFT_AND_WRIST);
 
                 break;
 
-            case STEP_B:
+            case RAISE_ARM_LIFT_AND_WRIST:
 
                 // If we are waiting...
                 if (timer.milliseconds() < 500) {
@@ -121,11 +134,11 @@ public class HeatSeekC {
                 robotHardware.raiseArm();
 
                 // Advance to the next step.
-                setState(STEP_C);
+                setState(DRIVE_TO_APPROACH_POSITION);
 
                 break;
 
-            case STEP_C:
+            case DRIVE_TO_APPROACH_POSITION:
 
                 // If we are waiting...
                 if (!robotHardware.isArmUp() && !robotHardware.isLiftUp()) {
@@ -135,36 +148,40 @@ public class HeatSeekC {
 
                 }
 
-                // Advance to the next step.
-                setState(STEP_D);
-
-                break;
-
-            case STEP_D:
-
+                // Drive to the approach position.
                 startDrivingToBackdrop(APPROACH_SPEED, APPROACH_TARGET_X);
 
                 // Advance to the next step.
-                setState(STEP_E);
+                setState(DRIVE_TO_PLACE_POSITION);
 
                 break;
 
-            case STEP_E:
+            case DRIVE_TO_PLACE_POSITION:
+
+                // If the robot is driving...
                 if (drive.isBusy()) {
+
+                    // Exit the method.
                     return;
+
                 }
 
+                // Drive to the place position.
                 startDrivingToBackdrop(PLACE_SPEED, PLACE_TARGET_X);
 
                 // Advance to the next step.
-                setState(STEP_F);
+                setState(OPEN_CLAW);
 
                 break;
 
-            case STEP_F:
+            case OPEN_CLAW:
 
+                // If we are waiting...
                 if (drive.isBusy() || !robotHardware.isArmUp() || !robotHardware.isLiftUp()) {
+
+                    // Exit the method.
                     return;
+
                 }
 
                 // Open the claw to drop the pixels.
@@ -184,6 +201,7 @@ public class HeatSeekC {
                 throw new InterruptedException("Unrecognized state");
 
         }
+
     }
 
     // Sets the state.
@@ -260,13 +278,16 @@ public class HeatSeekC {
 
     }
 
+    // Starts driving to the backdrop.
     public void startDrivingToBackdrop(double speed, double targetX) throws InterruptedException {
+
         // Construct a velocity constraint.
         TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(speed, DriveConstants.TRACK_WIDTH);
 
         // Construct an acceleration constraint.
         TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(speed);
 
+        // Get the drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
         // Get the robot's current pose.
@@ -289,6 +310,7 @@ public class HeatSeekC {
 
         // Execute the trajectory sequence.
         drive.followTrajectorySequenceAsync(sequence);
+
     }
 
 }

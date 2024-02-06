@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.Retract.State.IDLE;
-import static org.firstinspires.ftc.teamcode.Retract.State.STEP_A;
-import static org.firstinspires.ftc.teamcode.Retract.State.STEP_B;
+import static org.firstinspires.ftc.teamcode.Retract.State.LOWER_LIFT_AND_ARM;
+import static org.firstinspires.ftc.teamcode.Retract.State.LOWER_WRIST_AND_OPEN_CLAW;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
 public class Retract {
-    enum State {IDLE, STEP_A, STEP_B, STEP_C, STEP_D, STEP_E, STEP_F, STEP_G, STEP_H, STEP_I, STEP_J, STEP_K, STEP_L, STEP_M, STEP_N}
+    enum State {IDLE, LOWER_LIFT_AND_ARM, LOWER_WRIST_AND_OPEN_CLAW}
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
@@ -19,17 +19,29 @@ public class Retract {
         this.robotHardware = robotHardware;
     }
 
+    // Starts retracting.
     public void start() {
+
+        // If we are already retracting...
         if (state != IDLE) {
+
+            // Exit the method.
             return;
+
         }
 
-        setState(STEP_A);
+        // Start retracting.
+        setState(LOWER_LIFT_AND_ARM);
+
     }
 
+    // Updates this.
     public void update() throws InterruptedException {
+
+        // Switch based on the state.
         switch (state) {
-            case STEP_A:
+
+            case LOWER_LIFT_AND_ARM:
 
                 // Lower the lift.
                 robotHardware.lowerLift();
@@ -38,11 +50,11 @@ public class Retract {
                 robotHardware.lowerArm();
 
                 // Advance to the next step.
-                setState(STEP_B);
+                setState(LOWER_WRIST_AND_OPEN_CLAW);
 
                 break;
 
-            case STEP_B:
+            case LOWER_WRIST_AND_OPEN_CLAW:
 
                 // If we are waiting...
                 if (!robotHardware.isArmDown() || !robotHardware.isLiftDown()) {
@@ -58,6 +70,7 @@ public class Retract {
                 // Open the claw.
                 robotHardware.openClawFully();
 
+                // Advance to the next step.
                 setState(IDLE);
 
             case IDLE:
@@ -67,7 +80,9 @@ public class Retract {
             default:
 
                 throw new InterruptedException("Unrecognized state");
+
         }
+
     }
 
     // Sets the state.
@@ -88,4 +103,5 @@ public class Retract {
         return state != IDLE;
 
     }
+
 }
