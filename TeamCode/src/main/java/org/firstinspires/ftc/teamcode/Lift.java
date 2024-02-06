@@ -72,11 +72,13 @@ public class Lift {
 
         // If we finished lowering the lift...
         if (isLowering && isDownPressed) {
+
             // Reset the lift.
             reset();
 
             // Remember that we finished lowering the lift.
             isLowering = false;
+
         }
 
         // Get the lift's power.

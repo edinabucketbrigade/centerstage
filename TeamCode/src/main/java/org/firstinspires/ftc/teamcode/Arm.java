@@ -19,6 +19,7 @@ public class Arm {
     public static double MAXIMUM_RAISE_POWER = 0.5;
     public static double RAISE_EXPONENT = 2;
     public static double RAISE_GAIN = 0.000001;
+    public static int THRESHOLD = 50;
     public static int UP_POSITION = 750;
 
     private RobotHardwareC robotHardware;
@@ -27,8 +28,6 @@ public class Arm {
     private TouchSensor downTouch;
     private boolean isLowering;
     private boolean isRaising;
-    private boolean isUp;
-    private boolean isDown = true;
 
     // Initializes this.
     public Arm(RobotHardwareC robotHardware) {
@@ -58,8 +57,8 @@ public class Arm {
     // Update this.
     public void update() {
 
-        // If the robot is automatically driving...
-        if(robotHardware.isAutomaticallyDriving()) {
+        // If the robot is automatically driving and we are not moving the arm...
+        if(robotHardware.isAutomaticallyDriving() && !isLowering && !isRaising) {
 
             // Exit the method.
             return;
@@ -69,26 +68,20 @@ public class Arm {
         // Get the arm's current position.
         int currentPosition = armMotor.getCurrentPosition();
 
-        // Get the arm's power.
-        double power = armMotor.getPower();
-
         // If we are lowering the arm...
         if (isLowering) {
 
-            // Determine whether the down touch sensor is pressed.
-            boolean isDownPressed = downTouch.isPressed();
+            // Determine whether the arm is down.
+            boolean isDown = isDownHelper(currentPosition);
 
             // If the arm is down...
-            if(isDownPressed) {
-
-                // Reset the arm.
-                reset();
+            if(isDown) {
 
                 // Remember that we finished lowering the arm.
                 isLowering = false;
 
-                // Remember that the arm is down.
-                isDown = true;
+                // Stop the arm motor.
+                armMotor.setPower(0);
 
             }
 
@@ -107,24 +100,21 @@ public class Arm {
         // Otherwise, if we are raising the arm...
         else if(isRaising) {
 
-            // Determine whether the up touch sensor is pressed.
-            boolean isUpPressed = upTouch.isPressed();
+            // Determine whether the arm is up.
+            boolean isUp = isUpHelper(currentPosition);
 
             // If the arm is up...
-            if(isUpPressed) {
-
-                // Stop the arm motor.
-                armMotor.setPower(0);
+            if(isUp) {
 
                 // Remember that we finished raising the arm.
                 isRaising = false;
 
-                // Remember that the arm is up.
-                isUp = true;
+                // Stop the arm motor.
+                armMotor.setPower(0);
 
             }
 
-            // Otherwise (if the arm is not down)...
+            // Otherwise (if the arm is not up)...
             else {
 
                 // Raise the arm.
@@ -144,6 +134,45 @@ public class Arm {
 
         }
 
+        // If the robot is automatically driving...
+        if(robotHardware.isAutomaticallyDriving()) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Determine whether the down touch sensor is pressed.
+        boolean isDownPressed = downTouch.isPressed();
+
+        // If the down touch sensor is pressed...
+        if(isDownPressed) {
+
+            // Reset the arm.
+            reset();
+
+        }
+
+        // Determine whether the up touch sensor is pressed.
+        boolean isUpPressed = upTouch.isPressed();
+
+        // If the up touch sensor is pressed...
+        if(isUpPressed) {
+
+            // Stop the arm motor.
+            armMotor.setPower(0);
+
+        }
+
+        // Get the arm's power.
+        double power = armMotor.getPower();
+
+        // Determine whether the arm is up.
+        boolean isUp = isUpHelper(currentPosition);
+
+        // Determine whether the arm is down.
+        boolean isDown = isDownHelper(currentPosition);
+
         // Get the op mode.
         LinearOpMode opMode = robotHardware.getOpMode();
 
@@ -161,7 +190,6 @@ public class Arm {
         // Raise the arm.
         isLowering = false;
         isRaising = true;
-        isDown = false;
 
     }
 
@@ -171,7 +199,6 @@ public class Arm {
         // Lower the arm.
         isLowering = true;
         isRaising = false;
-        isUp = false;
 
     }
 
@@ -230,20 +257,27 @@ public class Arm {
 
     }
 
-    // Determines whether the arm is down.
     public boolean isDown() {
-
-        // Return indicating whether the arm is down.
-        return isDown;
-
+        int currentPosition = armMotor.getCurrentPosition();
+        return isInPosition(currentPosition, DOWN_POSITION);
     }
 
-    // Determines whether the arm is up.
+    private boolean isDownHelper(int currentPosition) {
+        return isInPosition(currentPosition, DOWN_POSITION);
+    }
+
     public boolean isUp() {
+        int currentPosition = armMotor.getCurrentPosition();
+        return isInPosition(currentPosition, UP_POSITION);
+    }
 
-        // Return indicating whether the arm is up.
-        return isUp;
+    private boolean isUpHelper(int currentPosition) {
+        return isInPosition(currentPosition, UP_POSITION);
+    }
 
+    private boolean isInPosition(int currentPosition, int targetPosition) {
+        int difference = Math.abs(currentPosition - targetPosition);
+        return difference < THRESHOLD;
     }
 
 }
