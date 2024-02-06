@@ -7,12 +7,6 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_C;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_D;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_E;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_F;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_G;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_H;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_I;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_J;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_K;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.STEP_L;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -77,18 +71,14 @@ public class HeatSeekC {
     // Stops heat seeking.
     public void stop() {
 
+        // Get the drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Cancel the trajectory sequence.
+        drive.breakFollowing();
+
         // Stop heat seeking.
         setState(IDLE);
-
-        // TODO: Return the robot to a neutral position
-
-        // TODO: Cancel the trajectory sequence.  See:
-        //
-        // Automatic Driving in Teleo
-        // https://learnroadrunner.com/advanced.html#interrupting-a-live-trajectory
-        //
-        // Update cancelable demos
-        // https://github.com/NoahBres/road-runner-quickstart/tree/advanced-examples/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/advanced
 
     }
 
