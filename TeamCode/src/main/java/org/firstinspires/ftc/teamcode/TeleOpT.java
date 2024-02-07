@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.AutoF.lastRanAutonomous;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.MAXIMUM_ROW;
+import static org.firstinspires.ftc.teamcode.Lift.DOWN_POSITION;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -55,6 +56,7 @@ public class TeleOpT extends LinearOpMode {
     public static final String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
     public static double TRIGGER_THRESHOLD = 0.5;
     public static final String WHITE_CIRCLE = "⚪"; // See https://unicode-explorer.com/list/geometric-shapes
+    public static int HANG_POSITION = 790;
 
     private RobotHardwareC robotHardware;
     private Gamepad currentGamepad1 = new Gamepad();
@@ -261,6 +263,16 @@ public class TeleOpT extends LinearOpMode {
 
             }
 
+            if(currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
+                //lift up
+                robotHardware.raiseLift(MAXIMUM_POSITION);
+            }
+
+            if(currentGamepad1.dpad_down && !previousGamepad1.dpad_up){
+                //lift down
+                robotHardware.lowerLift(HANG_POSITION);
+            }
+
             // Set turtle mode.
             robotHardware.setTurtleMode(currentGamepad1.right_bumper);
 
@@ -274,7 +286,7 @@ public class TeleOpT extends LinearOpMode {
                     robotHardware.closeClaw();
 
                     // Lower the lift.
-                    robotHardware.lowerLift();
+                    robotHardware.lowerLift(DOWN_POSITION);
 
                 }
 

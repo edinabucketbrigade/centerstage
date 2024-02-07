@@ -560,6 +560,12 @@ public class RobotHardwareC {
 
     }
 
+    // Raises the wrist to release point
+    public void releaseWrist(){
+        // Raise wrist
+        claw.releaseWrist();
+    }
+
     // Lowers the wrist.
     public void lowerWrist() {
 
@@ -577,10 +583,10 @@ public class RobotHardwareC {
     }
 
     // Lowers the lift.
-    public void lowerLift() throws InterruptedException {
+    public void lowerLift(int position) throws InterruptedException {
 
         // Lower the lift.
-        lift.lower();
+        lift.lower(position);
 
     }
 
