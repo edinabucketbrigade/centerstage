@@ -56,7 +56,7 @@ public class TeleOpT extends LinearOpMode {
     public static final String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
     public static double TRIGGER_THRESHOLD = 0.5;
     public static final String WHITE_CIRCLE = "⚪"; // See https://unicode-explorer.com/list/geometric-shapes
-    public static int HANG_POSITION = 1200;
+    public static int HANG_POSITION = 790;
 
     private RobotHardwareC robotHardware;
     private Gamepad currentGamepad1 = new Gamepad();
