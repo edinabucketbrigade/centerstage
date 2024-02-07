@@ -18,11 +18,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Config
 public class Claw {
 
-    public static double LEFT_CLOSED = 0.4;
+    public static double LEFT_CLOSED = 0.35;
     public static double LEFT_PARTIALLY_OPEN = 0.44;
     public static double LEFT_FULLY_OPEN = 0.67;
     public static double PIXEL_CAPTURE_THRESHOLD = 30;
-    public static double RIGHT_CLOSED = 0.55;
+    public static double RIGHT_CLOSED = 0.6;
     public static double RIGHT_PARTIALLY_OPEN = 0.52;
     public static double RIGHT_FULLY_OPEN = 0.3;
     public static double WRIST_GROUND_POSITION = 0.265;
