@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.RAISE_ARM_LIFT_AND_
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.DRIVE_TO_APPROACH_POSITION;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.DRIVE_TO_PLACE_POSITION;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.OPEN_CLAW;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.RELEASE_WRIST;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -28,7 +29,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Config
 public class HeatSeekC {
 
-    enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW }
+    enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW, RELEASE_WRIST }
 
     public static double PLACE_TARGET_X = 44.5;
     public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
@@ -188,6 +189,24 @@ public class HeatSeekC {
                 robotHardware.openClawPartially();
 
                 // Advance to the next step.
+                setState(RELEASE_WRIST);
+
+                break;
+
+            case RELEASE_WRIST:
+
+                // If we are waiting...
+                if (timer.milliseconds() < 500) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Raise wrist to release position.
+                robotHardware.releaseWrist();
+
+                //Advance to the next step.
                 setState(IDLE);
 
                 break;

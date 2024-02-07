@@ -15,14 +15,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Claw {
 
     public static double LEFT_CLOSED = 0.3;
-    public static double LEFT_PARTIALLY_OPEN = 0.5;
+    public static double LEFT_PARTIALLY_OPEN = 0.35;
     public static double LEFT_FULLY_OPEN = 0.62;
     public static double PIXEL_CAPTURE_THRESHOLD = 30;
     public static double RIGHT_CLOSED = 0.5;
-    public static double RIGHT_PARTIALLY_OPEN = 0.33;
+    public static double RIGHT_PARTIALLY_OPEN = 0.45;
     public static double RIGHT_FULLY_OPEN = 0.24;
     public static double WRIST_DOWN_POSITION = 0.275;
     public static double WRIST_UP_POSITION = 0.92;
+    public static double WRIST_RELEASE_POSITION = 0.98;
 
     private RobotHardwareC robotHardware;
     private Servo leftServo;
@@ -304,6 +305,15 @@ public class Claw {
         // Remember that the wrist is up.
         isWristDown = false;
 
+    }
+
+    // Raises the wrist to release point.
+    public void releaseWrist() {
+        // Raise the wrist
+        wristServo.setPosition(WRIST_RELEASE_POSITION);
+
+        // Remember wrist is up.
+        isWristDown = false;
     }
 
     // Lowers the wrist.

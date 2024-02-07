@@ -560,6 +560,12 @@ public class RobotHardwareC {
 
     }
 
+    // Raises the wrist to release point
+    public void releaseWrist(){
+        // Raise wrist
+        claw.releaseWrist();
+    }
+
     // Lowers the wrist.
     public void lowerWrist() {
 
