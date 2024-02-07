@@ -129,11 +129,11 @@ public class Lift {
     }
 
     // Lowers the lift.
-    public void lower() {
+    public void lower(int position) {
 
         // Lower the lift.
-        setPosition(leftMotor, DOWN_POSITION, LOWER_POWER);
-        setPosition(rightMotor, DOWN_POSITION, LOWER_POWER);
+        setPosition(leftMotor, position, LOWER_POWER);
+        setPosition(rightMotor, position, LOWER_POWER);
         isLowering = true;
 
     }
