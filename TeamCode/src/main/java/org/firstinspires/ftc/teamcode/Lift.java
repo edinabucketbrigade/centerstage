@@ -16,7 +16,7 @@ public class Lift {
 
     public static int DOWN_POSITION = 0;
     public static double LOWER_POWER = 0.6;
-    public static int MAXIMUM_POSITION = 1650;
+    public static int MAXIMUM_POSITION = 1700;
     public static double RAISE_POWER = 1;
     public static int THRESHOLD = 50;
 
@@ -129,11 +129,11 @@ public class Lift {
     }
 
     // Lowers the lift.
-    public void lower() {
+    public void lower(int position) {
 
         // Lower the lift.
-        setPosition(leftMotor, DOWN_POSITION, LOWER_POWER);
-        setPosition(rightMotor, DOWN_POSITION, LOWER_POWER);
+        setPosition(leftMotor, position, LOWER_POWER);
+        setPosition(rightMotor, position, LOWER_POWER);
         isLowering = true;
 
     }

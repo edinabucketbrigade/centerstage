@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.Lift.DOWN_POSITION;
 import static org.firstinspires.ftc.teamcode.Retract.State.IDLE;
 import static org.firstinspires.ftc.teamcode.Retract.State.LOWER_LIFT_AND_ARM;
 import static org.firstinspires.ftc.teamcode.Retract.State.LOWER_WRIST_AND_OPEN_CLAW;
@@ -44,7 +45,7 @@ public class Retract {
             case LOWER_LIFT_AND_ARM:
 
                 // Lower the lift.
-                robotHardware.lowerLift();
+                robotHardware.lowerLift(DOWN_POSITION);
 
                 // Lower the arm.
                 robotHardware.lowerArm();
