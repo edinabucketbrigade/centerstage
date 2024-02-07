@@ -65,7 +65,7 @@ public class Retract {
 
                 }
 
-                // Set the wrist position to ground.
+                // Move the wrist to the ground position.
                 robotHardware.setWristGround();
 
                 // Open the claw.

@@ -147,8 +147,8 @@ public class AutoF extends LinearOpMode {
         // Wait a bit.
         sleep(2000);
 
-        // Raise the wrist.
-        robotHardware.raiseWrist();
+        // Move the wrist to the backdrop position.
+        robotHardware.setWristBackdrop();
 
         // Notify the user that we are waiting for start.
         log("Waiting for start...");
@@ -213,8 +213,8 @@ public class AutoF extends LinearOpMode {
                 // Start driving to the spike mark.
                 drive.followTrajectorySequenceAsync(spikeMarkTrajectorySequence);
 
-                // Lower the wrist.
-                robotHardware.lowerWrist();
+                // Move the wrist to the ground position.
+                robotHardware.setWristGround();
 
                 // Advance to the next step.
                 setState(RELEASE_PURPLE_PIXEL);
@@ -268,8 +268,8 @@ public class AutoF extends LinearOpMode {
                 // Raise the lift.
                 robotHardware.raiseLift(liftPosition);
 
-                // Raise the wrist.
-                robotHardware.raiseWrist();
+                // Move the wrist to the backdrop position.
+                robotHardware.setWristBackdrop();
 
                 // Raise the arm.
                 robotHardware.raiseArm();

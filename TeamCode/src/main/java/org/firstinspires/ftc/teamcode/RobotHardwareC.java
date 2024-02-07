@@ -369,7 +369,7 @@ public class RobotHardwareC {
         // Open the claw.
         openClawFully();
 
-        // Set the wrist position to ground.
+        // Move the wrist to the ground position.
         setWristGround();
 
         // Notify the user that the robot is initialized.

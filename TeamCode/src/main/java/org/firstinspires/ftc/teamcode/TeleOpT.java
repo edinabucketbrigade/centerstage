@@ -304,16 +304,16 @@ public class TeleOpT extends LinearOpMode {
                 // If the pixel driver pressed x...
                 if(currentGamepad2.x && !previousGamepad2.x) {
 
-                    // Lower the wrist.
-                    robotHardware.lowerWrist();
+                    // Move the wrist to the ground position.
+                    robotHardware.setWristGround();
 
                 }
 
                 // If the pixel driver pressed b...
                 if(currentGamepad2.b && !previousGamepad2.b) {
 
-                    // Toggle the wrist.
-                    robotHardware.raiseWrist();
+                    // Move the wrist to the backdrop position.
+                    robotHardware.setWristBackdrop();
 
                 }
 
