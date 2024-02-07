@@ -1,18 +1,27 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.AutoF.State.APPROACH_BACKDROP;
+import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_PLACE_POSITION;
 import static org.firstinspires.ftc.teamcode.AutoF.State.IDLE;
 import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_SPIKE_MARK;
-import static org.firstinspires.ftc.teamcode.AutoF.State.OPEN_CLAW;
+import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_ARM_LIFT_AND_WRIST;
+import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PURPLE_PIXEL;
+import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_YELLOW_PIXEL;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -72,6 +81,17 @@ public class AutoF extends LinearOpMode {
     public static double RED_START_LEFT_SPIKE_RIGHT_Y = -29.5;
     public static double RED_START_LEFT_SPIKE_RIGHT_HEADING = 0;
 
+    public static final double RED_MIDDLE_X = 0;
+    public static final double RED_MIDDLE_Y = -12;
+    public static final double RED_TOWARDS_BACKDROP_HEADING = 0;
+    public static final double RED_DETOUR_BACKDROP_X = 28;
+    public static final double RED_DETOUR_BACKDROP_Y = -12;
+    public static final double RED_BACKDROP_X = 44;
+    public static final double RED_BACKDROP_Y = -36;
+    public static final double RED_PIXELS_X = -58;
+    public static final double RED_PIXELS_Y = -10;
+    public static final double RED_TOWARDS_PIXELS_HEADING = 180;
+
     public static Boolean redAlliance;
     public static Pose2d currentPose;
     public static boolean lastRanAutonomous;
@@ -84,9 +104,10 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection.Location location;
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
-    enum State { IDLE, DRIVE_TO_SPIKE_MARK, OPEN_CLAW }
+    enum State { IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, APPROACH_BACKDROP, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RETRACT }
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
+    private Pose2d lastEnd;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -186,20 +207,21 @@ public class AutoF extends LinearOpMode {
             case DRIVE_TO_SPIKE_MARK:
 
                 // Get a spike mark trajectory sequence.
-                TrajectorySequence trajectorySequence = getSpikeMarkTrajectorySequence();
+                TrajectorySequence spikeMarkTrajectorySequence = getSpikeMarkTrajectorySequence();
+                lastEnd = spikeMarkTrajectorySequence.end();
 
                 // Start driving to the spike mark.
-                drive.followTrajectorySequenceAsync(trajectorySequence);
+                drive.followTrajectorySequenceAsync(spikeMarkTrajectorySequence);
 
                 // Lower the wrist.
                 robotHardware.lowerWrist();
 
                 // Advance to the next step.
-                setState(OPEN_CLAW);
+                setState(RELEASE_PURPLE_PIXEL);
 
                 break;
 
-            case OPEN_CLAW:
+            case RELEASE_PURPLE_PIXEL:
 
                 // If the robot is driving...
                 if (drive.isBusy()) {
@@ -213,7 +235,106 @@ public class AutoF extends LinearOpMode {
                 robotHardware.openLeftClawFully();
 
                 // Advance to the next step.
+                setState(APPROACH_BACKDROP);
+
+                break;
+
+            case APPROACH_BACKDROP:
+
+                if (timer.milliseconds() > 500) {
+                    return;
+                }
+
+                TrajectorySequence backdropTrajectorySequence = getBackdropTrajectorySequence();
+                lastEnd = backdropTrajectorySequence.end();
+
+                // Start driving to the backdrop.
+                drive.followTrajectorySequenceAsync(backdropTrajectorySequence);
+
+                // Advance to the next step.
+                setState(RAISE_ARM_LIFT_AND_WRIST);
+
+                break;
+
+            case RAISE_ARM_LIFT_AND_WRIST:
+
+                if (drive.isBusy()) {
+                    return;
+                }
+
+                // Get a lift position.
+                int liftPosition = HeatSeekC.getTargetLiftPosition(1);
+
+                // Raise the lift.
+                robotHardware.raiseLift(liftPosition);
+
+                // Raise the wrist.
+                robotHardware.raiseWrist();
+
+                // Raise the arm.
+                robotHardware.raiseArm();
+
+                setState(DRIVE_TO_PLACE_POSITION);
+
+                break;
+
+            case DRIVE_TO_PLACE_POSITION:
+
+                // If we are waiting...
+                if (!robotHardware.isArmUp() && !robotHardware.isLiftUp()) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Construct a velocity constraint.
+                TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(HeatSeekC.PLACE_SPEED, DriveConstants.TRACK_WIDTH);
+
+                // Construct an acceleration constraint.
+                TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
+
+                // Get the robot's current pose.
+                Pose2d currentPose = drive.getPoseEstimate();
+
+                int leftColumn = 1;
+                int row = 1;
+
+                // Get a target y coordinate.
+                double targetY = HeatSeekC.getTargetY(leftColumn, row, redAlliance);
+
+                // Construct a target position.
+                Vector2d targetPosition = new Vector2d(HeatSeekC.PLACE_TARGET_X, targetY);
+
+                // Construct a target pose.
+                Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
+
+                // Construct a trajectory sequence.
+                TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
+                        .setConstraints(velocityConstraint, accelerationConstraint)
+                        .lineToLinearHeading(targetPose)
+                        .build();
+
+                // Execute the trajectory sequence.
+                drive.followTrajectorySequenceAsync(sequence);
+
+                setState(RELEASE_YELLOW_PIXEL);
+
+                break;
+
+            case RELEASE_YELLOW_PIXEL:
+
+                // Open the left claw.
+                robotHardware.openClawPartially();
+
                 setState(IDLE);
+
+                break;
+
+            case RETRACT:
+
+                // Start retracting.
+                robotHardware.startRetracting();
 
             case IDLE:
 
@@ -276,24 +397,11 @@ public class AutoF extends LinearOpMode {
         Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
         robotHardware.setPose(startPose);
         TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-//                .addTemporalMarker(PURPLE_PIXEL_DELAY, () -> {
-//                    robotHardware.openLeftClaw();
-//                })
                 .back(42)
                 .setReversed(true)
-//                .UNSTABLE_addDisplacementMarkerOffset(4, () -> {
-//                    robotHardware.openLeftClaw();
-//                })
                 .splineTo(RED_MIDDLE,Math.toRadians(0))
                 .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
                 .splineTo(RED_BACKDROP, Math.toRadians(0))
-//                .UNSTABLE_addDisplacementMarkerOffset(0, () -> {
-//                    robotHardware.raiseArm();
-//
-//                    int targetLiftPosition = HeatSeekC.getTargetLiftPosition(FIRST_ROW);
-//                    robotHardware.raiseLift(targetLiftPosition);
-//                    robotHardware.openRightClaw();
-//                })
 //                .setReversed(false)
 //                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
 //                .splineTo(RED_MIDDLE,Math.toRadians(180))
@@ -952,6 +1060,100 @@ public class AutoF extends LinearOpMode {
                 }
             }
         }
+
+        // Build the trajectory sequence.
+        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
+
+        // Return the result.
+        return trajectorySequence;
+
+    }
+
+        // Gets a backdrop trajectory sequence.
+        private TrajectorySequence getBackdropTrajectorySequence() throws InterruptedException {
+
+            // Get a drive interface.
+            SampleMecanumDrive drive = robotHardware.getDrive();
+
+            // Set the trajectory sequence's start pose.
+            TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
+
+            Pose2d targetPose1 = new Pose2d(RED_MIDDLE_X, RED_MIDDLE_Y);
+            double targetHeading1 = Math.toRadians(RED_TOWARDS_BACKDROP_HEADING);
+            Pose2d targetPose2 = new Pose2d(RED_DETOUR_BACKDROP_X, RED_DETOUR_BACKDROP_Y);
+            double targetHeading2 = Math.toRadians(RED_TOWARDS_BACKDROP_HEADING);
+            Pose2d targetPose3 = new Pose2d(RED_BACKDROP_X, RED_BACKDROP_Y);
+            double targetHeading3 = Math.toRadians(RED_TOWARDS_BACKDROP_HEADING);
+            trajectorySequenceBuilder = trajectorySequenceBuilder
+                    .setReversed(true)
+                    .splineToLinearHeading(targetPose1, targetHeading1)
+                    .splineToLinearHeading(targetPose2, targetHeading2)
+                    .splineToLinearHeading(targetPose3, targetHeading3);
+
+            // Add the appropriate maneuvers.
+            /*if (redAlliance) {
+                if (startLeft) {
+                    if (location == location.Left) {
+                        Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_LEFT_X, RED_START_LEFT_SPIKE_LEFT_Y, Math.toRadians(RED_START_LEFT_SPIKE_LEFT_HEADING));
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .lineToLinearHeading(targetPose);
+                    }
+                    else if (location == location.Middle) {
+                        Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_MIDDLE_X, RED_START_LEFT_SPIKE_MIDDLE_Y, Math.toRadians(RED_START_LEFT_SPIKE_MIDDLE_HEADING));
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .lineToLinearHeading(targetPose);
+                    }
+                    else {
+                        Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_RIGHT_X, RED_START_LEFT_SPIKE_RIGHT_Y);
+                        double targetHeading = Math.toRadians(RED_START_LEFT_SPIKE_RIGHT_HEADING);
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .setReversed(true)
+                                .splineToLinearHeading(targetPose, targetHeading);
+                    }
+                }
+                else {
+                    if (location == location.Left) {
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .splineToLinearHeading(new Pose2d(13,-30), Math.toRadians(180));
+                    }
+                    else if (location == location.Middle) {
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .lineToLinearHeading(new Pose2d(12,-14, Math.toRadians(-90)));
+                    }
+                    else {
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .setReversed(true)
+                                .lineToLinearHeading(new Pose2d(10,-30, Math.toRadians(0)));
+                    }
+                }
+            }
+            else {
+                if (startLeft) {
+                    if (location == location.Left) {
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .lineToLinearHeading(new Pose2d(13,30, Math.toRadians(180)));
+                    } else if (location == location.Middle) {
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)));
+                    } else {
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .setReversed(true)
+                                .splineToLinearHeading(new Pose2d(10,30), Math.toRadians(0));
+                    }
+                } else {
+                    if (location == location.Left) {
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .lineToLinearHeading(new Pose2d(-34,30, Math.toRadians(180)));
+                    } else if (location == location.Middle) {
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .lineToLinearHeading(new Pose2d(-36,14, Math.toRadians(90)));
+                    } else {
+                        trajectorySequenceBuilder = trajectorySequenceBuilder
+                                .setReversed(true)
+                                .splineToLinearHeading(new Pose2d(-37,30),Math.toRadians(0));
+                    }
+                }
+            }*/
 
         // Build the trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
