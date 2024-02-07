@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.WristPosition.BACKDROP;
+import static org.firstinspires.ftc.teamcode.WristPosition.GROUND;
+import static org.firstinspires.ftc.teamcode.WristPosition.RELEASE;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -21,8 +25,8 @@ public class Claw {
     public static double RIGHT_CLOSED = 0.55;
     public static double RIGHT_PARTIALLY_OPEN = 0.52;
     public static double RIGHT_FULLY_OPEN = 0.3;
-    public static double WRIST_DOWN_POSITION = 0.265;
-    public static double WRIST_UP_POSITION = 0.92;
+    public static double WRIST_GROUND_POSITION = 0.265;
+    public static double WRIST_BACKDROP_POSITION = 0.91;
     public static double WRIST_RELEASE_POSITION = 0.98;
 
     private RobotHardwareC robotHardware;
@@ -33,7 +37,7 @@ public class Claw {
     private NormalizedColorSensor rightColor;
     public boolean isRightOpen = true;
     public boolean isLeftOpen = true;
-    private boolean isWristDown;
+    private WristPosition wristPosition;
     private DigitalChannel greenLeftLed;
     private DigitalChannel redLeftLed;
     private DigitalChannel greenRightLed;
@@ -114,7 +118,7 @@ public class Claw {
             automaticallyCaptureLeft = true;
 
             // Open the left claw.
-            openLeftFully();
+            //openLeftFully();
 
         }
 
@@ -141,7 +145,7 @@ public class Claw {
             automaticallyCaptureRight = true;
 
             // Open the right claw.
-            openRightFully();
+            //openRightFully();
 
         }
 
@@ -153,7 +157,7 @@ public class Claw {
         Telemetry telemetry = opMode.telemetry;
 
         // Add claw information to the telemetry.
-        telemetry.addData("Claw", "Left Open = %b, Right Open = %b, Wrist Down = %b, Left Distance = %.0f mm, Right Distance = %.0f mm, Capture Left = %b, Capture Right = %b", isLeftOpen, isRightOpen, isWristDown, leftMillimeters, rightMillimeters, automaticallyCaptureLeft, automaticallyCaptureRight);
+        telemetry.addData("Claw", "Left Open = %b, Right Open = %b, Wrist Position = %s, Left Distance = %.0f mm, Right Distance = %.0f mm, Capture Left = %b, Capture Right = %b", isLeftOpen, isRightOpen, wristPosition, leftMillimeters, rightMillimeters, automaticallyCaptureLeft, automaticallyCaptureRight);
 
     }
 
@@ -295,42 +299,44 @@ public class Claw {
     public void toggleWrist() {
 
         // Toggle the wrist.
-        if (isWristDown) {
-            raiseWrist();
+        if (wristPosition == GROUND) {
+            setWristBackdrop();
         } else {
-            lowerWrist();
+            setWristGround();
         }
 
     }
 
-    // Raises the wrist.
-    public void raiseWrist() {
+    // Sets the wrist position to backdrop.
+    public void setWristBackdrop() {
 
-        // Raise the wrist.
-        wristServo.setPosition(WRIST_UP_POSITION);
+        // Set the wrist position to backdrop.
+        wristServo.setPosition(WRIST_BACKDROP_POSITION);
 
-        // Remember that the wrist is up.
-        isWristDown = false;
+        // Remember the wrist position.
+        wristPosition = BACKDROP;
 
     }
 
-    // Raises the wrist to release point.
-    public void releaseWrist() {
-        // Raise the wrist
+    // Sets the wrist position to release.
+    public void setWristRelease() {
+
+        // Set the wrist position to release..
         wristServo.setPosition(WRIST_RELEASE_POSITION);
 
-        // Remember wrist is up.
-        isWristDown = false;
+        // Remember the wrist position.
+        wristPosition = RELEASE;
+
     }
 
-    // Lowers the wrist.
-    public void lowerWrist() {
+    // Sets the wrist position to ground.
+    public void setWristGround() {
 
-        // Lowers the wrist.
-        wristServo.setPosition(WRIST_DOWN_POSITION);
+        // Set the wrist position to ground.
+        wristServo.setPosition(WRIST_GROUND_POSITION);
 
-        // Remember that the wrist is down.
-        isWristDown = true;
+        // Remember the wrist position.
+        wristPosition = GROUND;
 
     }
 

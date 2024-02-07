@@ -128,8 +128,8 @@ public class HeatSeekC {
                 // Raise the lift.
                 robotHardware.raiseLift(liftPosition);
 
-                // Raise the wrist.
-                robotHardware.raiseWrist();
+                // Set the wrist to the backdrop position.
+                robotHardware.setWristBackdrop();
 
                 // Raise the arm.
                 robotHardware.raiseArm();
@@ -185,7 +185,7 @@ public class HeatSeekC {
 
                 }
 
-                // Open the claw to drop the pixels.
+                // Open the claw partially to relase  the pixels.
                 robotHardware.openClawPartially();
 
                 // Advance to the next step.
@@ -203,8 +203,8 @@ public class HeatSeekC {
 
                 }
 
-                // Raise wrist to release position.
-                robotHardware.releaseWrist();
+                // Set the wrist to the release position.
+                robotHardware.setWristRelease();
 
                 //Advance to the next step.
                 setState(IDLE);

@@ -369,8 +369,8 @@ public class RobotHardwareC {
         // Open the claw.
         openClawFully();
 
-        // Lower the wrist.
-        lowerWrist();
+        // Set the wrist position to ground.
+        setWristGround();
 
         // Notify the user that the robot is initialized.
         log("Initialized robot");
@@ -552,25 +552,27 @@ public class RobotHardwareC {
 
     }
 
-    // Raises the wrist.
-    public void raiseWrist() {
+    // Set the wrist position to backdrop.
+    public void setWristBackdrop() {
 
-        // Raise the wrist.
-        claw.raiseWrist();
+        // Set the wrist position to backdrop.
+        claw.setWristBackdrop();
 
     }
 
-    // Raises the wrist to release point
-    public void releaseWrist(){
-        // Raise wrist
-        claw.releaseWrist();
+    // Set the wrist position to release.
+    public void setWristRelease(){
+
+        // Set the wrist position to release.
+        claw.setWristRelease();
+
     }
 
-    // Lowers the wrist.
-    public void lowerWrist() {
+    // Sets the wrist position to ground.
+    public void setWristGround() {
 
-        // Lower the wrist.
-        claw.lowerWrist();
+        // Set the wrist position to ground.
+        claw.setWristGround();
 
     }
 
