@@ -113,6 +113,9 @@ public class Claw {
             // Enable automatically capturing left pixels.
             automaticallyCaptureLeft = true;
 
+            // Open the left claw.
+            openLeftFully();
+
         }
 
         // If there is a pixel in the right claw...
@@ -137,7 +140,11 @@ public class Claw {
             // Enable automatically capturing right pixels.
             automaticallyCaptureRight = true;
 
+            // Open the right claw.
+            openRightFully();
+
         }
+
 
         // Get the op mode.
         LinearOpMode opMode = robotHardware.getOpMode();
