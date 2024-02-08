@@ -202,6 +202,11 @@ public class MeepMeepTesting {
                             .splineTo(new Vector2d(28,-12), Math.toRadians(0))
                             .splineTo(new Vector2d(44,-36), Math.toRadians(0))
 
+                            .setReversed(false)
+                            .splineTo(new Vector2d(28,-12), Math.toRadians(180))
+                            .splineTo(new Vector2d(0,-12), Math.toRadians(180))
+                            .splineTo(new Vector2d(-58,-10), Math.toRadians(180))
+
                             .build()
                 );
         return myBot;
