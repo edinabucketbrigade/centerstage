@@ -176,16 +176,11 @@ public class TeleOpT extends LinearOpMode {
 
                     }
 
-                    // If the pixel drier pressed x...
-                    if (currentGamepad2.x && !previousGamepad2.x && !debugging) {
+                    // Start retracting.
+                    robotHardware.startRetracting();
 
-                        // Start retracting.
-                        robotHardware.startRetracting();
-
-                        // Advance to the retracting state.
-                        state = RETRACTING;
-
-                    }
+                    // Advance to the retracting state.
+                    state = RETRACTING;
 
                     break;
 

@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.DRIVE_TO_APPROACH_P
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.DRIVE_TO_PLACE_POSITION;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.OPEN_CLAW;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.RELEASE_WRIST;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.State.WAIT_FOR_RELEASE;
 import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
@@ -29,7 +30,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Config
 public class HeatSeekC {
 
-    enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW, RELEASE_WRIST }
+    enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW, RELEASE_WRIST, WAIT_FOR_RELEASE }
 
     public static double PLACE_TARGET_X = 44.5;
     public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
@@ -41,7 +42,7 @@ public class HeatSeekC {
     public static double TARGET_RED_Y = -TILE_SIZE - TARGET_Y_OFFSET;
     public static double TARGET_BLUE_Y = 2 * TILE_SIZE - TARGET_Y_OFFSET;
     public static double APPROACH_SPEED = 50;
-    public static double PLACE_SPEED = 20;
+    public static double PLACE_SPEED = 30;
     public static int MAXIMUM_ROW = (int)Math.floor((MAXIMUM_POSITION - FIRST_ROW_LIFT_POSITION) / LIFT_INCREMENT);
 
     private RobotHardwareC robotHardware;
@@ -185,7 +186,7 @@ public class HeatSeekC {
 
                 }
 
-                // Open the claw partially to relase  the pixels.
+                // Open the claw partially to release  the pixels.
                 robotHardware.openClawPartially();
 
                 // Advance to the next step.
@@ -207,6 +208,16 @@ public class HeatSeekC {
                 robotHardware.setWristRelease();
 
                 //Advance to the next step.
+                setState(WAIT_FOR_RELEASE);
+
+                break;
+
+            case WAIT_FOR_RELEASE:
+
+                if (timer.milliseconds() < 500) {
+                    return;
+                }
+
                 setState(IDLE);
 
                 break;
