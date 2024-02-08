@@ -58,8 +58,8 @@ public class Arm {
     public void update() {
 
         // If the robot is automatically driving and we are not moving the arm...
-        //if(robotHardware.isAutomaticallyDriving() && !isLowering && !isRaising) {
-        if(robotHardware.isAutomaticallyDriving()) {
+        if(robotHardware.isAutomaticallyDriving() && !isLowering && !isRaising) {
+        //if(robotHardware.isAutomaticallyDriving()) {
 
             // Exit the method.
             return;

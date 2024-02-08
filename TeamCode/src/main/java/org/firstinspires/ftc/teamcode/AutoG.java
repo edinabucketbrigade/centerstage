@@ -23,6 +23,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagMetadata;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -51,14 +53,23 @@ public class AutoG extends LinearOpMode {
     // Y offset between the camera's front the the robot's center
     private static final double CAMERA_Y_OFFSET = 7;
 
-    // Maximum pitch for valid AprilTag detection
-    public static final double MAXIMUM_PITCH = 10;
-
     // Maximum velocity
     private static final double MAXIMUM_VELOCITY = DriveConstants.MAX_VEL;
 
     // Maximum acceleration
     private static final double MAXIMUM_ACCELERATION = DriveConstants.MAX_ACCEL;
+
+    // Number of AprilTags to consider when looking for an accurate detection
+    public static int TAG_WINDOW = 10;
+
+    // Heading threshold in degrees
+    public static double HEADING_THRESHOLD = 5;
+
+    // Position threshold in inches
+    public static double POSITION_THRESHOLD = 2;
+
+    // Recent AprilTag detections
+    private static LinkedList<AprilTagDetection> recentDetections = new LinkedList<>();
 
     // Used to detect april tags
     private AprilTagProcessor aprilTagProcessor;
@@ -90,11 +101,8 @@ public class AutoG extends LinearOpMode {
         // Wait for the user to press start.
         waitForStart();
 
-        // Wait for an AprilTag detection.
-        AprilTagDetection detection = waitForDetection();
-
-        // Get the robot's pose.
-        Pose2d startPose = getRobotPose(detection, telemetry);
+        // Wait for a robot pose.
+        Pose2d startPose = waitForRobotPose();
 
         // Update the telemetry.
         telemetry.update();
@@ -128,8 +136,8 @@ public class AutoG extends LinearOpMode {
 
     }
 
-    // Waits for an AprilTag detection.
-    private AprilTagDetection waitForDetection() {
+    // Waits for a robot pose.
+    private Pose2d waitForRobotPose() {
 
         // While the op mode is active...
         while (opModeIsActive()) {
@@ -140,19 +148,19 @@ public class AutoG extends LinearOpMode {
             // Update the telemetry.
             telemetry.update();
 
-            // Get a detection.
-            AprilTagDetection detection = getDetection(aprilTagProcessor);
+            // Get a robot pose.
+            Pose2d pose = getRobotPose(aprilTagProcessor, telemetry);
 
-            // If the detection is missing...
-            if (detection == null) {
+            // If the pose is missing...
+            if (pose == null) {
 
-                // Skip this detection.
+                // Skip this pose.
                 continue;
 
             }
 
-            // Return the detection.
-            return detection;
+            // Return the pose.
+            return pose;
 
         }
 
@@ -194,20 +202,6 @@ public class AutoG extends LinearOpMode {
 
         }
 
-        // Get the detection's pose.
-        AprilTagPoseFtc pose = detection.ftcPose;
-
-        // Get the pose's pitch.
-        double pitch = pose.pitch;
-
-        // If the pitch is invalid...
-        if (pitch > MAXIMUM_PITCH) {
-
-            // Return indicating that the detection is not a match.
-            return false;
-
-        }
-
         // Get the tag identifier.
         int tagId = detection.id;
 
@@ -219,32 +213,160 @@ public class AutoG extends LinearOpMode {
 
     }
 
-    // Gets an AprilTag detection.
-    public static AprilTagDetection getDetection(AprilTagProcessor aprilTagProcessor) {
+    // Gets a robot pose from recent AprilTag detections.
+    public static Pose2d getRobotPose(AprilTagProcessor aprilTagProcessor, Telemetry telemetry) {
 
-        // Get the AprilTag detections.
-        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+        // Update the recent AprilTag detection list.
+        //////////////////////////////////////////////////////////////////////
 
-        // For each detection...
-        for (AprilTagDetection detection : detections) {
+        // Get the current AprilTag detections.
+        List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
 
-            // If the detection is a match...
-            if (isMatch(detection)) {
+        // Get the matching AprilTag detections.
+        List<AprilTagDetection> matchingDetections = getMatches(currentDetections);
 
-                // Return the detection.
-                return detection;
+        // For each matching detection...
+        for(AprilTagDetection detection : matchingDetections) {
+
+            // Count the recent detections.
+            int recentCount = recentDetections.size();
+
+            // If we have too many recent detections...
+            if(recentCount >= TAG_WINDOW) {
+
+                // Delete the oldest recent detection.
+                recentDetections.pollFirst();
+
+            }
+
+            // Add the matching detection to the recent detection list.
+            recentDetections.addLast(detection);
+
+        }
+
+        // Verify that we have enough recent AprilTag detections.
+        //////////////////////////////////////////////////////////////////////
+
+        // Count the matching detections.
+        int matchingCount = matchingDetections.size();
+
+        // Count the recent detections.
+        int recentCount = recentDetections.size();
+
+        // Display the detection counts.
+        telemetry.addData("Detections", "matching = %d, recent = %d", matchingCount, recentCount);
+
+        // If we do not have enough recent detections...
+        if(recentCount < TAG_WINDOW) {
+
+            // Return indicating that we cannot determine the robot's pose.
+            return null;
+
+        }
+
+        // Convert the recent AprilTag detections to robot poses.
+        //////////////////////////////////////////////////////////////////////
+
+        // Construct a pose list.
+        List<Pose2d> recentPoses = new ArrayList<>();
+
+        // For each recent detection...
+        for(AprilTagDetection detection : recentDetections) {
+
+            // Get a robot pose.
+            Pose2d recentPose = getRobotPose(detection, telemetry);
+
+            // Add the pose to the list.
+            recentPoses.add(recentPose);
+
+        }
+
+        // Clear the recent detections.
+        //////////////////////////////////////////////////////////////////////
+
+        // Clear the recent detections.
+        recentDetections.clear();
+
+        // Get the average pose.
+        //////////////////////////////////////////////////////////////////////
+
+        // Get the average pose.
+        Pose2d averagePose = getAveragePose(recentPoses);
+
+        // Verify the recent poses are close to the average.
+        //////////////////////////////////////////////////////////////////////
+
+        // Get the average pose values.
+        double averageHeadingRadians = averagePose.getHeading();
+        double averageHeadingDegrees = Math.toDegrees(averageHeadingRadians);
+        double averageX = averagePose.getX();
+        double averageY = averagePose.getY();
+
+        // Display the average pose.
+        telemetry.addData("Average Pose", "x = %.1f, y = %.1f, heading = %.1f", averageX, averageY, averageHeadingDegrees);
+
+        // For each recent pose...
+        for(Pose2d recentPose : recentPoses) {
+
+            // Get the recent pose values.
+            double recentHeadingRadians = recentPose.getHeading();
+            double recentHeadingDegrees = Math.toDegrees(recentHeadingRadians);
+            double recentX = recentPose.getX();
+            double recentY = recentPose.getY();
+
+            // Determine whether the average and recent poses match.
+            boolean headingMatch = areEqual(averageHeadingDegrees, recentHeadingDegrees, HEADING_THRESHOLD);
+            boolean xMatch = areEqual(averageX, recentX, POSITION_THRESHOLD);
+            boolean yMatch = areEqual(averageY, recentY, POSITION_THRESHOLD);
+            boolean isMatch = headingMatch && xMatch && yMatch;
+
+            // Display the recent pose.
+            telemetry.addData("Recent Pose", "x = %.1f, y = %.1f, heading = %.1f, match = %b", recentX, recentY, recentHeadingDegrees, isMatch);
+
+            // If the poses do not match...
+            if(!isMatch) {
+
+                // Return indicating that we cannot determine the robot's pose.
+                return null;
 
             }
 
         }
 
-        // If we made it this far, return indicating that there are no detections.
-        return null;
+        // Return the average of the recent poses.
+        //////////////////////////////////////////////////////////////////////
+
+        // Return the average of the recent poses.
+        return averagePose;
+
+    }
+
+    // Get matching AprilTag detections.
+    public static List<AprilTagDetection> getMatches(List<AprilTagDetection> inputDetections) {
+
+        // Initialize an output list.
+        List<AprilTagDetection> outputDetections = new ArrayList<>();
+
+        // For each input detection...
+        for (AprilTagDetection detection : inputDetections) {
+
+            // If the detection is a match...
+            if (isMatch(detection)) {
+
+                // Add the detection to the output list.
+                outputDetections.add(detection);
+
+            }
+
+        }
+
+        // Return the output detections.
+        return outputDetections;
 
     }
 
     // Gets the robot's pose from an AprilTag detection.
-    public static Pose2d getRobotPose(AprilTagDetection detection, Telemetry telemetry) {
+    private static Pose2d getRobotPose(AprilTagDetection detection, Telemetry telemetry) {
 
         // Get the tag's pose.
         AprilTagPoseFtc tagPose = detection.ftcPose;
@@ -351,6 +473,50 @@ public class AutoG extends LinearOpMode {
         // Return the result.
         return isWallTag;
 
+    }
+
+    // Determines whether values are equal within a threshold.
+    public static boolean areEqual(double a, double b, double threshold) {
+        return Math.abs(a - b) <= threshold;
+    }
+
+    // Gets an average pose.
+    public static Pose2d getAveragePose(List<Pose2d> inputPoses) {
+
+        // Construct value lists.
+        List<Double> headings = new ArrayList<>();
+        List<Double> xCoordinates = new ArrayList<>();
+        List<Double> yCoordinates = new ArrayList<>();
+
+        // For each pose...
+        for(Pose2d inputPose : inputPoses) {
+
+            // Get the input pose values.
+            double inputHeading = inputPose.getHeading();
+            double inputX = inputPose.getX();
+            double inputY = inputPose.getY();
+
+            // Add the values to the lists.
+            headings.add(inputHeading);
+            xCoordinates.add(inputX);
+            yCoordinates.add(inputY);
+
+        }
+
+        // Get the average pose.
+        double averageHeading = getAverageValue(headings);
+        double averageX = getAverageValue(xCoordinates);
+        double averageY = getAverageValue(yCoordinates);
+        Pose2d averagePose = new Pose2d(averageX, averageY, averageHeading);
+
+        // Return the average pose.
+        return averagePose;
+
+    }
+
+    // Gets an average.
+    public static double getAverageValue(List<Double> values) {
+        return values.stream().mapToDouble(val -> val).average().orElse(0.0);
     }
 
 }

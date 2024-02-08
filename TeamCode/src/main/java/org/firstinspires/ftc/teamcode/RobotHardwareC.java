@@ -18,7 +18,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 @Config
@@ -66,7 +65,6 @@ public class RobotHardwareC {
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
-    public static double SLOW_DRIVE_POWER = 0.05;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -148,31 +146,20 @@ public class RobotHardwareC {
         claw.update();
         lift.update();
 
-        // Determine whether the robot is moving slowly.
-        boolean isMovingSlowly = isMovingSlowly();
+        // Get the telemetry.
+        Telemetry telemetry = opMode.telemetry;
 
-        // If the robot is moving slowly...
-        if(isMovingSlowly) {
+        // Get a robot pose.
+        Pose2d pose = AutoG.getRobotPose(aprilTagProcessor, telemetry);
 
-            // Get a detection.
-            AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
+        // If there is a robot pose...
+        if (pose != null) {
 
-            // If there is a detection...
-            if (detection != null) {
+            // Update the driver interface.
+            if (drive != null) drive.setPoseEstimate(pose);
 
-                // Get the telemetry.
-                Telemetry telemetry = opMode.telemetry;
-
-                // Get the robot's pose.
-                Pose2d pose = AutoG.getRobotPose(detection, telemetry);
-
-                // Update the driver interface.
-                if (drive != null) drive.setPoseEstimate(pose);
-
-                // Remember that we localized the robot.
-                isLocalized = true;
-
-            }
+            // Remember that we localized the robot.
+            isLocalized = true;
 
         }
 
@@ -183,15 +170,12 @@ public class RobotHardwareC {
         if(drive != null) {
 
             // Get the robot's pose.
-            Pose2d pose = drive.getPoseEstimate();
+            pose = drive.getPoseEstimate();
 
             // Convert the pose to a string.
             poseString = AutoF.toString(pose);
 
         }
-
-        // Get the telemetry.
-        Telemetry telemetry = opMode.telemetry;
 
         // Get the back distances.
         double leftBackMillimeters = leftBackDistance.getDistance(DistanceUnit.MM);
@@ -690,27 +674,6 @@ public class RobotHardwareC {
 
         // Remember that we localized the robot.
         isLocalized = true;
-
-    }
-
-    // Determines whether the robot is moving slowly.
-    private boolean isMovingSlowly() {
-
-        // Get the drive motor powers.
-        double leftFrontDrivePower = leftFrontDrive.getPower();
-        double leftBackDrivePower = leftBackDrive.getPower();
-        double rightFrontDrivePower = rightFrontDrive.getPower();
-        double rightBackDrivePower = rightBackDrive.getPower();
-
-        // Determine whether the robot is moving slowly.
-        boolean isMovingSlowly =
-                leftFrontDrivePower <= SLOW_DRIVE_POWER &&
-                leftBackDrivePower <= SLOW_DRIVE_POWER &&
-                rightFrontDrivePower <= SLOW_DRIVE_POWER &&
-                rightBackDrivePower <= SLOW_DRIVE_POWER;
-
-        // Return the result.
-        return isMovingSlowly;
 
     }
 

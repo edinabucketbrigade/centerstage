@@ -32,7 +32,7 @@ public class HeatSeekC {
 
     enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW, RELEASE_WRIST, WAIT_FOR_RELEASE }
 
-    public static double PLACE_TARGET_X = 44.5;
+    public static double PLACE_TARGET_X = 45;
     public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
     public static double TILE_SIZE = 24;
     public static double TARGET_Y_OFFSET = 4;
@@ -42,7 +42,7 @@ public class HeatSeekC {
     public static double TARGET_RED_Y = -TILE_SIZE - TARGET_Y_OFFSET;
     public static double TARGET_BLUE_Y = 2 * TILE_SIZE - TARGET_Y_OFFSET;
     public static double APPROACH_SPEED = 50;
-    public static double PLACE_SPEED = 30;
+    public static double PLACE_SPEED = 20;
     public static int MAXIMUM_ROW = (int)Math.floor((MAXIMUM_POSITION - FIRST_ROW_LIFT_POSITION) / LIFT_INCREMENT);
 
     private RobotHardwareC robotHardware;

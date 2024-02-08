@@ -178,7 +178,7 @@ public class RobotHardwareB {
 
         // Update heat seek.
         heatSeek.update();
-
+/*
         // Get a detection.
         AprilTagDetection detection = AutoG.getDetection(aprilTagProcessor);
 
@@ -198,7 +198,7 @@ public class RobotHardwareB {
             isLocalized = true;
 
         }
-
+*/
         // Get the robot's pose.
         Pose2d pose = drive.getPoseEstimate();
 
