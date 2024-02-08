@@ -65,6 +65,9 @@ public class TeleOpT extends LinearOpMode {
     private Gamepad previousGamepad2 = new Gamepad();
 
     private State state = IDLE;
+    // Initialize left pixel's column and row.
+    private int leftColumn = MINIMUM_COLUMN;
+    private int leftRow = MINIMUM_ROW;
 
     // Runs the op mode.
     @Override
@@ -79,9 +82,7 @@ public class TeleOpT extends LinearOpMode {
         // Start looking for AprilTags.
         robotHardware.startLookingForAprilTags();
 
-        // Initialize left pixel's column and row.
-        int leftColumn = MINIMUM_COLUMN;
-        int leftRow = MINIMUM_ROW;
+
 
         // If we last ran an autonomous op mode...
         if(lastRanAutonomous) {
@@ -143,77 +144,24 @@ public class TeleOpT extends LinearOpMode {
             // Determine whether the user is debugging.
             boolean debugging = currentGamepad2.right_trigger > TRIGGER_THRESHOLD;
 
-            // Determine whether the robot is localized.
-            boolean localized = robotHardware.isLocalized();
-
             // Switch based on the state.
             switch (state) {
 
                 case HEAT_SEEKING:
 
-                    // If the pixel driver pressed y...
-                    if(currentGamepad2.y && !previousGamepad2.y && !debugging) {
-
-                        // Stop heat seeking.
-                        robotHardware.stopHeatSeeking();
-
-                        // Start retracting.
-                        robotHardware.startRetracting();
-
-                        // Advance to the retracting state.
-                        state = RETRACTING;
-
-                    }
-
-                    // Determine whether we are actively heat seeking.
-                    boolean isHeatSeeking = robotHardware.isHeatSeeking();
-
-                    // If we are actively heat seeking...
-                    if (isHeatSeeking) {
-
-                        // Exit the method.
-                        break;
-
-                    }
-
-                    // Start retracting.
-                    robotHardware.startRetracting();
-
-                    // Advance to the retracting state.
-                    state = RETRACTING;
+                    handleHeatSeeking(debugging);
 
                     break;
 
                 case RETRACTING:
 
-                    // Determine whether we are actively retracting.
-                    boolean isRetracting = robotHardware.isRetracting();
-
-                    // If we are actively retracting...
-                    if (isRetracting) {
-
-                        // Exit the method.
-                        break;
-
-                    }
-
-                    // Advance to the idle state.
-                    state = IDLE;
+                    handleRetracting();
 
                     break;
 
                 case IDLE:
 
-                    // If the robot is localized and the pixel driver pressed a...
-                    if(localized && currentGamepad2.a && !previousGamepad2.a && !debugging) {
-
-                        // Start heat seeking.
-                        robotHardware.startHeatSeeking(leftColumn, leftRow, AutoF.redAlliance);
-
-                        // Advance to the heat seeking state.
-                        state = HEAT_SEEKING;
-
-                    }
+                    handleIdle(debugging);
 
                     break;
 
@@ -499,6 +447,80 @@ public class TeleOpT extends LinearOpMode {
 
         // Show the message.
         Utilities.log(message, telemetry);
+
+    }
+
+    // Handles the heat seeking state.
+    private void handleHeatSeeking(boolean debugging) {
+
+        // If the pixel driver pressed y...
+        if(currentGamepad2.y && !previousGamepad2.y && !debugging) {
+
+            // Stop heat seeking.
+            robotHardware.stopHeatSeeking();
+
+            // Start retracting.
+            robotHardware.startRetracting();
+
+            // Advance to the retracting state.
+            state = RETRACTING;
+
+        }
+
+        // Determine whether we are actively heat seeking.
+        boolean isHeatSeeking = robotHardware.isHeatSeeking();
+
+        // If we are actively heat seeking...
+        if (isHeatSeeking) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Start retracting.
+        robotHardware.startRetracting();
+
+        // Advance to the retracting state.
+        state = RETRACTING;
+
+    }
+
+    // Handles the retracting state.
+    private void handleRetracting() {
+
+        // Determine whether we are actively retracting.
+        boolean isRetracting = robotHardware.isRetracting();
+
+        // If we are actively retracting...
+        if (isRetracting) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Advance to the idle state.
+        state = IDLE;
+
+    }
+
+    // Handles the idle state.
+    private void handleIdle(boolean debugging) {
+
+        // Determine whether the robot is localized.
+        boolean localized = robotHardware.isLocalized();
+
+        // If the robot is localized and the pixel driver pressed a...
+        if(localized && currentGamepad2.a && !previousGamepad2.a && !debugging) {
+
+            // Start heat seeking.
+            robotHardware.startHeatSeeking(leftColumn, leftRow, AutoF.redAlliance);
+
+            // Advance to the heat seeking state.
+            state = HEAT_SEEKING;
+
+        }
 
     }
 
