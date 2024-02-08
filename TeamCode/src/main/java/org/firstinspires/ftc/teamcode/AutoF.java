@@ -6,7 +6,13 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.IDLE;
 import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_SPIKE_MARK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_ARM_LIFT_AND_WRIST;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PURPLE_PIXEL;
+import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_WRIST;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_YELLOW_PIXEL;
+import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
+import static org.firstinspires.ftc.teamcode.CenterStageCVDetection.Location.Left;
+import static org.firstinspires.ftc.teamcode.CenterStageCVDetection.Location.Middle;
+import static org.firstinspires.ftc.teamcode.CenterStageCVDetection.Location.Right;
+import static org.firstinspires.ftc.teamcode.AutoF.State.WAIT_FOR_RELEASE;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -104,7 +110,7 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection.Location location;
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
-    enum State { IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, APPROACH_BACKDROP, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RETRACT }
+    enum State { IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, APPROACH_BACKDROP, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RELEASE_WRIST, WAIT_FOR_RELEASE, RETRACT }
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
     private Pose2d lastEnd;
@@ -263,7 +269,7 @@ public class AutoF extends LinearOpMode {
                 }
 
                 // Get a lift position.
-                int liftPosition = HeatSeekC.getTargetLiftPosition(1);
+                int liftPosition = HeatSeekC.getTargetLiftPosition(FIRST_ROW);
 
                 // Raise the lift.
                 robotHardware.raiseLift(liftPosition);
@@ -294,14 +300,22 @@ public class AutoF extends LinearOpMode {
                 // Construct an acceleration constraint.
                 TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
 
-                // Get the robot's current pose.
-                Pose2d currentPose = drive.getPoseEstimate();
-
-                int leftColumn = 1;
-                int row = 1;
-
+                int leftColumn;
+                if(location == Left) {
+                    leftColumn = 1;
+                }
+                else if(location == Middle) {
+                    leftColumn = 3;
+                }
+                else if(location == Right) {
+                    leftColumn = 5;
+                }
+                else {
+                    throw new InterruptedException("The location is missing.");
+                }
+                
                 // Get a target y coordinate.
-                double targetY = HeatSeekC.getTargetY(leftColumn, row, redAlliance);
+                double targetY = HeatSeekC.getTargetY(leftColumn, FIRST_ROW, redAlliance);
 
                 // Construct a target position.
                 Vector2d targetPosition = new Vector2d(HeatSeekC.PLACE_TARGET_X, targetY);
@@ -310,7 +324,7 @@ public class AutoF extends LinearOpMode {
                 Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
 
                 // Construct a trajectory sequence.
-                TrajectorySequence sequence = drive.trajectorySequenceBuilder(currentPose)
+                TrajectorySequence sequence = drive.trajectorySequenceBuilder(lastEnd)
                         .setConstraints(velocityConstraint, accelerationConstraint)
                         .lineToLinearHeading(targetPose)
                         .build();
@@ -324,10 +338,41 @@ public class AutoF extends LinearOpMode {
 
             case RELEASE_YELLOW_PIXEL:
 
-                // Open the left claw.
+                if (drive.isBusy()) {
+                    return;
+                }
+                
                 robotHardware.openClawPartially();
 
-                setState(IDLE);
+                setState(RELEASE_WRIST);
+
+                break;
+
+            case RELEASE_WRIST:
+
+                // If we are waiting...
+                if (timer.milliseconds() < 500) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Set the wrist to the release position.
+                robotHardware.setWristRelease();
+
+                //Advance to the next step.
+                setState(WAIT_FOR_RELEASE);
+
+                break;
+
+            case WAIT_FOR_RELEASE:
+
+                if (timer.milliseconds() < 500) {
+                    return;
+                }
+
+                setState(RETRACT);
 
                 break;
 
@@ -999,7 +1044,7 @@ public class AutoF extends LinearOpMode {
         // Add the appropriate maneuvers.
         if (redAlliance) {
             if (startLeft) {
-                if (location == location.Left) {
+                if (location == Left) {
                     Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_LEFT_X, RED_START_LEFT_SPIKE_LEFT_Y, Math.toRadians(RED_START_LEFT_SPIKE_LEFT_HEADING));
                     trajectorySequenceBuilder = trajectorySequenceBuilder
                             .lineToLinearHeading(targetPose);
@@ -1018,7 +1063,7 @@ public class AutoF extends LinearOpMode {
                 }
             }
             else {
-                if (location == location.Left) {
+                if (location == Left) {
                     trajectorySequenceBuilder = trajectorySequenceBuilder
                             .splineToLinearHeading(new Pose2d(13,-30), Math.toRadians(180));
                 }
@@ -1035,7 +1080,7 @@ public class AutoF extends LinearOpMode {
         }
         else {
             if (startLeft) {
-                if (location == location.Left) {
+                if (location == Left) {
                     trajectorySequenceBuilder = trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(13,30, Math.toRadians(180)));
                 } else if (location == location.Middle) {
@@ -1047,7 +1092,7 @@ public class AutoF extends LinearOpMode {
                             .splineToLinearHeading(new Pose2d(10,30), Math.toRadians(0));
                 }
             } else {
-                if (location == location.Left) {
+                if (location == Left) {
                     trajectorySequenceBuilder = trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(-34,30, Math.toRadians(180)));
                 } else if (location == location.Middle) {
@@ -1078,17 +1123,17 @@ public class AutoF extends LinearOpMode {
             // Set the trajectory sequence's start pose.
             TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
-            Pose2d targetPose1 = new Pose2d(RED_MIDDLE_X, RED_MIDDLE_Y);
+            Vector2d targetPose1 = new Vector2d(RED_MIDDLE_X, RED_MIDDLE_Y);
             double targetHeading1 = Math.toRadians(RED_TOWARDS_BACKDROP_HEADING);
-            Pose2d targetPose2 = new Pose2d(RED_DETOUR_BACKDROP_X, RED_DETOUR_BACKDROP_Y);
+            Vector2d targetPose2 = new Vector2d(RED_DETOUR_BACKDROP_X, RED_DETOUR_BACKDROP_Y);
             double targetHeading2 = Math.toRadians(RED_TOWARDS_BACKDROP_HEADING);
-            Pose2d targetPose3 = new Pose2d(RED_BACKDROP_X, RED_BACKDROP_Y);
+            Vector2d targetPose3 = new Vector2d(RED_BACKDROP_X, RED_BACKDROP_Y);
             double targetHeading3 = Math.toRadians(RED_TOWARDS_BACKDROP_HEADING);
             trajectorySequenceBuilder = trajectorySequenceBuilder
                     .setReversed(true)
-                    .splineToLinearHeading(targetPose1, targetHeading1)
-                    .splineToLinearHeading(targetPose2, targetHeading2)
-                    .splineToLinearHeading(targetPose3, targetHeading3);
+                    .splineTo(targetPose1, targetHeading1)
+                    .splineTo(targetPose2, targetHeading2)
+                    .splineTo(targetPose3, targetHeading3);
 
             // Add the appropriate maneuvers.
             /*if (redAlliance) {

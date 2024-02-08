@@ -195,8 +195,14 @@ public class MeepMeepTesting {
 
                                 //.splineToLinearHeading(new Pose2d(10,30),Math.toRadians(0))
 
+                            .lineToLinearHeading(new Pose2d(-37.5, -26.5, Math.toRadians(180)))
 
-                                .build()
+                            .setReversed(true)
+                            .splineTo(new Vector2d(0,-12), Math.toRadians(0))
+                            .splineTo(new Vector2d(28,-12), Math.toRadians(0))
+                            .splineTo(new Vector2d(44,-36), Math.toRadians(0))
+
+                            .build()
                 );
         return myBot;
     }
