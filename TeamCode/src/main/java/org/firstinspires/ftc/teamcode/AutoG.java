@@ -60,7 +60,7 @@ public class AutoG extends LinearOpMode {
     private static final double MAXIMUM_ACCELERATION = DriveConstants.MAX_ACCEL;
 
     // Number of AprilTags to consider when looking for an accurate detection
-    public static int TAG_WINDOW = 10;
+    public static int TAG_WINDOW = 5;
 
     // Heading threshold in degrees
     public static double HEADING_THRESHOLD = 5;
