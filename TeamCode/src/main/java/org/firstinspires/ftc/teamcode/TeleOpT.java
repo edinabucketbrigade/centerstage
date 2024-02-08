@@ -82,8 +82,6 @@ public class TeleOpT extends LinearOpMode {
         // Start looking for AprilTags.
         robotHardware.startLookingForAprilTags();
 
-
-
         // If we last ran an autonomous op mode...
         if(lastRanAutonomous) {
 
@@ -182,157 +180,8 @@ public class TeleOpT extends LinearOpMode {
 
             }
 
-            // If the robot driver pressed x...
-            if(currentGamepad1.x && !previousGamepad1.x) {
-
-                // Toggle the left claw.
-                robotHardware.toggleLeftClaw();
-
-            }
-
-            // If the robot driver pressed b...
-            if(currentGamepad1.b && !previousGamepad1.b) {
-
-                // Toggle the right claw.
-                robotHardware.toggleRightClaw();
-
-            }
-
-            // If the robot driver pressed a...
-            if(currentGamepad1.a && !previousGamepad1.a) {
-
-                // Toggle the claws.
-                robotHardware.toggleClaws();
-
-            }
-
-            if(currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
-                //lift up
-                robotHardware.raiseLift(MAXIMUM_POSITION);
-            }
-
-            if(currentGamepad1.dpad_down && !previousGamepad1.dpad_up){
-                //lift down
-                robotHardware.lowerLift(HANG_POSITION);
-            }
-
             // Set turtle mode.
             robotHardware.setTurtleMode(currentGamepad1.right_bumper);
-
-            // If the user is debugging...
-            if(debugging) {
-
-                // If the pixel driver pressed dpad down...
-                if(currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
-
-                    // Close the claw so it does not catch when lowering the lift.
-                    robotHardware.closeClaw();
-
-                    // Lower the lift.
-                    robotHardware.lowerLift(DOWN_POSITION);
-
-                }
-
-                // If the pixel driver pressed dpad up...
-                if(currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
-
-                    // Close the claw so it does not catch when raising the lift.
-                    robotHardware.closeClaw();
-
-                    // Raise the lift.
-                    robotHardware.raiseLift(MAXIMUM_POSITION);
-
-                }
-
-                // If the pixel driver pressed x...
-                if(currentGamepad2.x && !previousGamepad2.x) {
-
-                    // Move the wrist to the ground position.
-                    robotHardware.setWristGround();
-
-                }
-
-                // If the pixel driver pressed b...
-                if(currentGamepad2.b && !previousGamepad2.b) {
-
-                    // Move the wrist to the backdrop position.
-                    robotHardware.setWristBackdrop();
-
-                }
-
-                // If the pixel driver pressed a...
-                if(currentGamepad2.a && !previousGamepad2.a) {
-
-                    // Close the claw so it does not catch when lowering the arm.
-                    robotHardware.closeClaw();
-
-                    // Lower the arm.
-                    robotHardware.lowerArm();
-
-                }
-
-                // If the pixel driver pressed y...
-                if(currentGamepad2.y && !previousGamepad2.y) {
-
-                    // Close the claw so it does not catch when raising the arm.
-                    robotHardware.closeClaw();
-
-                    // Raise the arm.
-                    robotHardware.raiseArm();
-
-                }
-
-            }
-
-            // Otherwise (if the user is not debugging)...
-            else {
-
-                // If the pixel driver pressed dpad right...
-                if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
-
-                    // Increment the left column.
-                    int maximumColumn = getMaximumColumn(leftRow);
-                    leftColumn = Math.min(leftColumn + 1, maximumColumn - 1);
-
-                }
-
-                // If the pixel driver pressed dpad left...
-                if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left) {
-
-                    // Decrement the left column.
-                    leftColumn = Math.max(leftColumn - 1, MINIMUM_COLUMN);
-
-                }
-
-                // If the pixel driver pressed dpad up...
-                if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
-
-                    // Increment the left row.
-                    leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
-
-                    // Update the left column if needed.
-                    int maximumColumn = getMaximumColumn(leftRow);
-                    if (leftColumn >= maximumColumn) {
-                        leftColumn = maximumColumn - 1;
-                    }
-
-                }
-
-                // If the pixel driver pressed dpad down...
-                if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
-
-                    // Decrement the left row.
-                    leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
-
-                    // Update the left column if needed.
-                    int maximumColumn = getMaximumColumn(leftRow);
-                    if (leftColumn >= maximumColumn) {
-                        leftColumn = maximumColumn - 1;
-                    }
-
-                }
-
-            }
 
             // Compute the right column and row.
             int rightColumn = leftColumn + 1;
@@ -506,19 +355,174 @@ public class TeleOpT extends LinearOpMode {
     }
 
     // Handles the idle state.
-    private void handleIdle(boolean debugging) {
+    private void handleIdle(boolean debugging) throws InterruptedException {
 
-        // Determine whether the robot is localized.
-        boolean localized = robotHardware.isLocalized();
+        // If the robot driver pressed x...
+        if(currentGamepad1.x && !previousGamepad1.x) {
 
-        // If the robot is localized and the pixel driver pressed a...
-        if(localized && currentGamepad2.a && !previousGamepad2.a && !debugging) {
+            // Toggle the left claw.
+            robotHardware.toggleLeftClaw();
 
-            // Start heat seeking.
-            robotHardware.startHeatSeeking(leftColumn, leftRow, AutoF.redAlliance);
+        }
 
-            // Advance to the heat seeking state.
-            state = HEAT_SEEKING;
+        // If the robot driver pressed b...
+        if(currentGamepad1.b && !previousGamepad1.b) {
+
+            // Toggle the right claw.
+            robotHardware.toggleRightClaw();
+
+        }
+
+        // If the robot driver pressed a...
+        if(currentGamepad1.a && !previousGamepad1.a) {
+
+            // Toggle the claws.
+            robotHardware.toggleClaws();
+
+        }
+
+        // If the robot driver pressed dpad up...
+        if(currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
+
+            // Raise the lift to its maximum height.
+            robotHardware.raiseLift(MAXIMUM_POSITION);
+
+        }
+
+        // If the robot driver pressed dpad down...
+        if(currentGamepad1.dpad_down && !previousGamepad1.dpad_up){
+
+            // Lower the lift to the hang position.
+            robotHardware.lowerLift(HANG_POSITION);
+
+        }
+
+        // If the user is debugging...
+        if(debugging) {
+
+            // If the pixel driver pressed dpad down...
+            if(currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+
+                // Close the claw so it does not catch when lowering the lift.
+                robotHardware.closeClaw();
+
+                // Lower the lift.
+                robotHardware.lowerLift(DOWN_POSITION);
+
+            }
+
+            // If the pixel driver pressed dpad up...
+            if(currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+
+                // Close the claw so it does not catch when raising the lift.
+                robotHardware.closeClaw();
+
+                // Raise the lift.
+                robotHardware.raiseLift(MAXIMUM_POSITION);
+
+            }
+
+            // If the pixel driver pressed x...
+            if(currentGamepad2.x && !previousGamepad2.x) {
+
+                // Move the wrist to the ground position.
+                robotHardware.setWristGround();
+
+            }
+
+            // If the pixel driver pressed b...
+            if(currentGamepad2.b && !previousGamepad2.b) {
+
+                // Move the wrist to the backdrop position.
+                robotHardware.setWristBackdrop();
+
+            }
+
+            // If the pixel driver pressed a...
+            if(currentGamepad2.a && !previousGamepad2.a) {
+
+                // Close the claw so it does not catch when lowering the arm.
+                robotHardware.closeClaw();
+
+                // Lower the arm.
+                robotHardware.lowerArm();
+
+            }
+
+            // If the pixel driver pressed y...
+            if(currentGamepad2.y && !previousGamepad2.y) {
+
+                // Close the claw so it does not catch when raising the arm.
+                robotHardware.closeClaw();
+
+                // Raise the arm.
+                robotHardware.raiseArm();
+
+            }
+
+        }
+
+        // Otherwise (if the user is not debugging)...
+        else {
+
+            // If the pixel driver pressed dpad right...
+            if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
+
+                // Increment the left column.
+                int maximumColumn = getMaximumColumn(leftRow);
+                leftColumn = Math.min(leftColumn + 1, maximumColumn - 1);
+
+            }
+
+            // If the pixel driver pressed dpad left...
+            if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left) {
+
+                // Decrement the left column.
+                leftColumn = Math.max(leftColumn - 1, MINIMUM_COLUMN);
+
+            }
+
+            // If the pixel driver pressed dpad up...
+            if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+
+                // Increment the left row.
+                leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
+
+                // Update the left column if needed.
+                int maximumColumn = getMaximumColumn(leftRow);
+                if (leftColumn >= maximumColumn) {
+                    leftColumn = maximumColumn - 1;
+                }
+
+            }
+
+            // If the pixel driver pressed dpad down...
+            if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+
+                // Decrement the left row.
+                leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
+
+                // Update the left column if needed.
+                int maximumColumn = getMaximumColumn(leftRow);
+                if (leftColumn >= maximumColumn) {
+                    leftColumn = maximumColumn - 1;
+                }
+
+            }
+
+            // Determine whether the robot is localized.
+            boolean localized = robotHardware.isLocalized();
+
+            // If the robot is localized and the pixel driver pressed a...
+            if(localized && currentGamepad2.a && !previousGamepad2.a) {
+
+                // Start heat seeking.
+                robotHardware.startHeatSeeking(leftColumn, leftRow, AutoF.redAlliance);
+
+                // Advance to the heat seeking state.
+                state = HEAT_SEEKING;
+
+            }
 
         }
 
