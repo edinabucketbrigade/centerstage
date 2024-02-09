@@ -11,10 +11,10 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PURPLE_PIXEL;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_WRIST;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_YELLOW_PIXEL;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
-import static org.firstinspires.ftc.teamcode.CenterStageCVDetection.Location.Left;
-import static org.firstinspires.ftc.teamcode.CenterStageCVDetection.Location.Middle;
-import static org.firstinspires.ftc.teamcode.CenterStageCVDetection.Location.Right;
 import static org.firstinspires.ftc.teamcode.AutoF.State.WAIT_FOR_RELEASE;
+import static org.firstinspires.ftc.teamcode.TeamPropLocation.LEFT;
+import static org.firstinspires.ftc.teamcode.TeamPropLocation.MIDDLE;
+import static org.firstinspires.ftc.teamcode.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -42,67 +42,11 @@ import org.openftc.easyopencv.OpenCvWebcam;
 @Autonomous(preselectTeleOp = "TeleOpT")
 public class AutoF extends LinearOpMode {
 
-    enum Route {
-        RED_LEFT_DIRECT,
-        RED_LEFT_INDIRECT,
-        RED_RIGHT_DIRECT,
-        RED_RIGHT_INDIRECT,
-        BLUE_LEFT_DIRECT,
-        BLUE_LEFT_INDIRECT,
-        BLUE_RIGHT_DIRECT,
-        BLUE_RIGHT_INDIRECT,
-    }
-
-    public static final Vector2d RED_MIDDLE = new Vector2d(0, -12);
-    public static final Vector2d RED_DETOUR_BACKDROP = new Vector2d(28, -12);
-    public static final Vector2d RED_BACKDROP = new Vector2d(44, -36);
-    public static final Vector2d RED_PIXELS = new Vector2d(-58, -10);
     public static final Pose2d RED_LEFT_START = new Pose2d(-36, -61, Math.toRadians(-90));
     public static final Pose2d RED_RIGHT_START = new Pose2d(12, -61, Math.toRadians(-90));
-    public static final Vector2d RED_RIGHT_LEFT_POSITION = new Vector2d(14, -30);
-    public static final Vector2d RED_RIGHT_RIGHT_POSITION = new Vector2d(23, -30);
-    public static final Vector2d RED_LEFT_RIGHT_RIGGING_POSITION = new Vector2d(-9.5, -35);
-    public static final Vector2d RED_LEFT_LEFT_SPIKE_MARK_POSITION = new Vector2d(-34, -34);
-    public static final Vector2d BLUE_MIDDLE = new Vector2d(0, 12);
-    public static final Vector2d BLUE_DETOUR_BACKDROP = new Vector2d(28, 12);
-    public static final Vector2d BLUE_BACKDROP = new Vector2d(44, 36);
-    public static final Vector2d BLUE_PIXELS = new Vector2d(-58, 10);
     public static final Pose2d BLUE_LEFT_START = new Pose2d(12, 61, Math.toRadians(90));
     public static final Pose2d BLUE_RIGHT_START = new Pose2d(-36, 61, Math.toRadians(90));
-    public static final Vector2d BLUE_RIGHT_LEFT_POSITION = new Vector2d(23, 30);
-    public static final Vector2d BLUE_RIGHT_RIGHT_POSITION = new Vector2d(14, 30);
-    public static final Vector2d BLUE_LEFT_LEFT_RIGGING_POSITION = new Vector2d(-9.5, 35);
-    public static final Vector2d BLUE_LEFT_RIGHT_SPIKE_MARK_POSITION = new Vector2d(-34, 34);
-    public static final Route ROUTE = Route.RED_LEFT_DIRECT;
-    public static final double DELAY = 0.5;
-    private static final String TAG = "Bucket Brigade";
     public static final int FIRST_ROW = 1;
-    public static double PURPLE_PIXEL_DELAY = 1;
-
-    public static double RED_START_LEFT_SPIKE_LEFT_X = -37.5;
-    public static double RED_START_LEFT_SPIKE_LEFT_Y = -26.5;
-    public static double RED_START_LEFT_SPIKE_LEFT_HEADING = 180;
-    public static double RED_START_LEFT_SPIKE_MIDDLE_X = -36;
-    public static double RED_START_LEFT_SPIKE_MIDDLE_Y = -14;
-    public static double RED_START_LEFT_SPIKE_MIDDLE_HEADING = -90;
-    public static double RED_START_LEFT_SPIKE_RIGHT_X = -34.5;
-    public static double RED_START_LEFT_SPIKE_RIGHT_Y = -29.5;
-    public static double RED_START_LEFT_SPIKE_RIGHT_HEADING = 0;
-
-    public static final double RED_MIDDLE_X = 0;
-    public static final double RED_MIDDLE_Y = -12;
-    public static final double RED_TOWARDS_BACKDROP_HEADING = 0;
-    public static final double RED_DETOUR_BACKDROP_X = 28;
-    public static final double RED_DETOUR_BACKDROP_Y = -12;
-    public static final double RED_BACKDROP_X = 44;
-    public static final double RED_BACKDROP_Y = -36;
-    public static final double RED_PIXELS_X = -60;
-    public static final double RED_PIXELS_Y = -10;
-    public static final double RED_LEFT_LEFT_DETOUR_X = -35;
-    public static final double RED_LEFT_LEFT_DETOUR_Y = -13;
-    public static final double RED_TOWARDS_PIXELS_HEADING = 180;
-    public static final double RED_LEFT_MIDDLE_DETOUR_X = -30;
-    public static final double RED_LEFT_MIDDLE_DETOUR_Y = -13;
 
     public static Boolean redAlliance;
     public static Pose2d currentPose;
@@ -113,10 +57,12 @@ public class AutoF extends LinearOpMode {
     private boolean startedStreaming;
     private Gamepad previousGamepad = new Gamepad();
     private Gamepad currentGamepad = new Gamepad();
-    private CenterStageCVDetection.Location location;
+    private TeamPropLocation location;
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
-    enum State { IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, APPROACH_BACKDROP, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RELEASE_WRIST, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK, PARK }
+
+    enum State {IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, APPROACH_BACKDROP, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RELEASE_WRIST, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK, PARK}
+
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
     private Pose2d lastEnd;
@@ -146,7 +92,7 @@ public class AutoF extends LinearOpMode {
         waitForCameraOpen();
 
         // If stop is requested...
-        if(isStopRequested()) {
+        if (isStopRequested()) {
 
             // Exit the method.
             return;
@@ -172,7 +118,7 @@ public class AutoF extends LinearOpMode {
         waitForTeamPropDetection();
 
         // If stop is requested...
-        if(isStopRequested()) {
+        if (isStopRequested()) {
 
             // Exit the method.
             return;
@@ -307,19 +253,16 @@ public class AutoF extends LinearOpMode {
                 TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
 
                 int leftColumn;
-                if(location == Left) {
+                if (location == LEFT) {
                     leftColumn = 1;
-                }
-                else if(location == Middle) {
+                } else if (location == MIDDLE) {
                     leftColumn = 3;
-                }
-                else if(location == Right) {
+                } else if (location == RIGHT) {
                     leftColumn = 5;
-                }
-                else {
+                } else {
                     throw new InterruptedException("The location is missing.");
                 }
-                
+
                 // Get a target y coordinate.
                 double targetY = HeatSeekC.getTargetY(leftColumn, FIRST_ROW, redAlliance);
 
@@ -348,7 +291,7 @@ public class AutoF extends LinearOpMode {
                 if (drive.isBusy()) {
                     return;
                 }
-                
+
                 robotHardware.openClawPartially();
 
                 setState(RELEASE_WRIST);
@@ -447,384 +390,8 @@ public class AutoF extends LinearOpMode {
         String output = String.format("x %.2f, y %.2f, heading %.2f", x, y, degrees);
         return output;
     }
-/*
-    private TrajectorySequence getRedLeftLeftTrajectorySequence(SampleMecanumDrive drive) {
 
-        Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
 
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(RED_LEFT_LEFT_SPIKE_MARK_POSITION, Math.toRadians(0)))
-                .strafeLeft(20)
-                .turn(Math.toRadians(-90))
-                .setReversed(true)
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_MIDDLE, Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE, Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_MIDDLE, Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE, Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    // Middle
-    private TrajectorySequence getRedLeftMiddleTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .back(42)
-                .setReversed(true)
-                .splineTo(RED_MIDDLE,Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_MIDDLE,Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE,Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP,Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_MIDDLE,Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE,Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP,Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    // Right
-    private TrajectorySequence getRedLeftRightTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(RED_LEFT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .back(18)
-                .setReversed(true)
-                .splineTo(RED_LEFT_RIGHT_RIGGING_POSITION, Math.toRadians(0))
-                .turn(Math.toRadians(90))
-                .splineTo(RED_MIDDLE, Math.toRadians(0))
-                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(RED_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_MIDDLE, Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE, Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_MIDDLE, Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE, Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    // Right
-
-    // Left
-    private TrajectorySequence getRedRightLeftTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(RED_RIGHT_LEFT_POSITION, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(RED_BACKDROP, Math.toRadians(180)))
-//                .setReversed(false)
-//                .splineTo(RED_MIDDLE, Math.toRadians(180))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE, Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(RED_MIDDLE, Math.toRadians(180))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE, Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    // Middle
-    private TrajectorySequence getRedRightMiddleTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .back(26)
-                .lineToLinearHeading(new Pose2d(RED_BACKDROP, Math.toRadians(180)))
-//                .setReversed(false)
-//                .splineTo(RED_MIDDLE, Math.toRadians(180))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE, Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(RED_MIDDLE, Math.toRadians(180))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE, Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    // Right
-    private TrajectorySequence getRedRightRightTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(RED_RIGHT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .setReversed(true)
-                .splineTo((RED_RIGHT_RIGHT_POSITION), Math.toRadians(0))
-                .lineToLinearHeading(new Pose2d(RED_BACKDROP, Math.toRadians(180)))
-//                .setReversed(false)
-//                .splineTo(RED_MIDDLE, Math.toRadians(180))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE, Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(RED_MIDDLE, Math.toRadians(180))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(RED_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(RED_MIDDLE, Math.toRadians(0))
-//                .splineTo(RED_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(RED_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    private TrajectorySequence getBlueLeftLeftTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .back(18)
-                .setReversed(true)
-                .splineTo(BLUE_LEFT_LEFT_RIGGING_POSITION, Math.toRadians(0))
-                .turn(Math.toRadians(90))
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    // Middle
-    private TrajectorySequence getBlueLeftMiddleTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .back(42)
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    // Right
-    private TrajectorySequence getBlueLeftRightTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(BLUE_LEFT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(BLUE_LEFT_RIGHT_SPIKE_MARK_POSITION, Math.toRadians(0)))
-                .strafeLeft(20)
-                .turn(Math.toRadians(-90))
-                .setReversed(true)
-                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    // Right
-
-    // Right
-    private TrajectorySequence getBlueRightLeftTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .setReversed(true)
-                .splineTo((BLUE_RIGHT_LEFT_POSITION), Math.toRadians(0))
-                .lineToLinearHeading(new Pose2d(BLUE_BACKDROP, Math.toRadians(180)))
-//                .setReversed(false)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    // Middle
-    private TrajectorySequence getBlueRightMiddleTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(90));
-        robotHardware.setPose(startPose);
-
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .back(26)
-                .lineToLinearHeading(new Pose2d(BLUE_BACKDROP, Math.toRadians(180)))
-//                .setReversed(false)
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-
-    // Right
-    private TrajectorySequence getBlueRightRightTrajectorySequence(SampleMecanumDrive drive) {
-
-        Pose2d startPose = new Pose2d(BLUE_RIGHT_START, Math.toRadians(-90));
-        robotHardware.setPose(startPose);
-
-        TrajectorySequence sequence = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(BLUE_RIGHT_RIGHT_POSITION, Math.toRadians(0)))
-                .lineToLinearHeading(new Pose2d(BLUE_BACKDROP, Math.toRadians(180)))
-//                .setReversed(false)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-//                .setReversed(false)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(180))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(180))
-//                .splineTo(BLUE_PIXELS, Math.toRadians(180))
-//                .setReversed(true)
-//                .splineTo(BLUE_MIDDLE, Math.toRadians(0))
-//                .splineTo(BLUE_DETOUR_BACKDROP, Math.toRadians(0))
-//                .splineTo(BLUE_BACKDROP, Math.toRadians(0))
-                .build();
-        return sequence;
-    }
-*/
     private void log(String message) {
 
         // If the telemetry is missing...
@@ -920,7 +487,7 @@ public class AutoF extends LinearOpMode {
         }
 
         // If stop is requested...
-        if(isStopRequested()) {
+        if (isStopRequested()) {
 
             // Exit the method.
             return;
@@ -958,7 +525,7 @@ public class AutoF extends LinearOpMode {
         }
 
         // If stop is requested...
-        if(isStopRequested()) {
+        if (isStopRequested()) {
 
             // Exit the method.
             return;
@@ -982,7 +549,7 @@ public class AutoF extends LinearOpMode {
         }
 
         // If stop is requested...
-        if(isStopRequested()) {
+        if (isStopRequested()) {
 
             // Exit the method.
             return;
@@ -997,7 +564,7 @@ public class AutoF extends LinearOpMode {
         }
 
         // If stop is requested...
-        if(isStopRequested()) {
+        if (isStopRequested()) {
 
             // Exit the method.
             return;
@@ -1030,12 +597,122 @@ public class AutoF extends LinearOpMode {
     private Pose2d getStartPose() throws InterruptedException {
 
         // Verify the inputs exist.
-        if(redAlliance == null) {
+        if (redAlliance == null) {
             throw new InterruptedException("The red alliance value is missing.");
         }
-        if(startLeft == null) {
+        if (startLeft == null) {
             throw new InterruptedException("The start left value is missing.");
         }
+
+        // Get a start pose.
+        Pose2d startPose = getStartPose(redAlliance, startLeft);
+
+        // Return the result.
+        return startPose;
+
+    }
+
+    // Gets a spike mark trajectory sequence.
+    private TrajectorySequence getSpikeMarkTrajectorySequence() throws InterruptedException {
+
+        // Get a drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Verify the inputs exist.
+        if (drive == null) {
+            throw new InterruptedException("The drive interface is missing.");
+        }
+        if (location == null) {
+            throw new InterruptedException("The location is missing.");
+        }
+        if (redAlliance == null) {
+            throw new InterruptedException("The red alliance value is missing.");
+        }
+        if (startLeft == null) {
+            throw new InterruptedException("The start left value is missing.");
+        }
+
+        // Get a start pose.
+        Pose2d startPose = getStartPose();
+
+        // Set the robot's pose.
+        robotHardware.setPose(startPose);
+
+        // Set the trajectory sequence's start pose.
+        TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(startPose);
+
+        // Drive to the spike mark.
+        driveToSpikeMark(trajectorySequenceBuilder, redAlliance, startLeft, location);
+
+        // Build the trajectory sequence.
+        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
+
+        // Return the result.
+        return trajectorySequence;
+
+    }
+
+    // Gets a backdrop trajectory sequence.
+    private TrajectorySequence getBackdropTrajectorySequence() throws InterruptedException {
+
+        // Get a drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Construct a trajectory sequence builder.
+        TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
+
+        // Drive to the baackdrop.
+        driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft, location);
+
+        // Get a trajectory sequence.
+        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
+
+        // Return the trajectory sequence.
+        return trajectorySequence;
+
+    }
+
+    // Gets a stack trajectory sequence.
+    private TrajectorySequence getStackTrajectorySequence() throws InterruptedException {
+
+        // Get a drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Construct a trajectory sequence builder.
+        TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
+
+        // Drive to the stack.
+        driveToStack(trajectorySequenceBuilder);
+
+        // Construct a trajectory sequence.
+        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
+
+        // Return the result.
+        return trajectorySequence;
+
+    }
+
+    private TrajectorySequence getParkTrajectorySequence() throws InterruptedException {
+
+        // Get a drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Construct a trajectory sequence builder.
+        TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
+
+        // Park.
+        park(trajectorySequenceBuilder, parkLeft);
+
+        // Get a trajectory sequence.
+        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
+
+        // Return the result.
+        return trajectorySequence;
+
+    }
+
+    // Gets a start pose.
+    private static Pose2d getStartPose(boolean redAlliance, boolean startLeft) {
 
         // Return a start pose.
         if(redAlliance) {
@@ -1057,67 +734,41 @@ public class AutoF extends LinearOpMode {
 
     }
 
-    // Gets a spike mark trajectory sequence.
-    private TrajectorySequence getSpikeMarkTrajectorySequence() throws InterruptedException {
-
-        // Get a drive interface.
-        SampleMecanumDrive drive = robotHardware.getDrive();
-
-        // Verify the inputs exist.
-        if(drive == null) {
-            throw new InterruptedException("The drive interface is missing.");
-        }
-        if(location == null) {
-            throw new InterruptedException("The location is missing.");
-        }
-        if(redAlliance == null) {
-            throw new InterruptedException("The red alliance value is missing.");
-        }
-        if(startLeft == null) {
-            throw new InterruptedException("The start left value is missing.");
-        }
-
-        // Get a start pose.
-        Pose2d startPose = getStartPose();
-
-        // Set the robot's pose.
-        robotHardware.setPose(startPose);
-
-        // Set the trajectory sequence's start pose.
-        TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(startPose);
+    // Drives to a spike mark.
+    public static void driveToSpikeMark(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location) {
 
         // Add the appropriate maneuvers.
         if (redAlliance) {
             if (startLeft) {
-                if (location == Left) {
-                    Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_LEFT_X, RED_START_LEFT_SPIKE_LEFT_Y, Math.toRadians(RED_START_LEFT_SPIKE_LEFT_HEADING));
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                if (location == LEFT) {
+                    Pose2d targetPose = new Pose2d(-37.5, -26.5, Math.toRadians(180));
+                    trajectorySequenceBuilder
                             .lineToLinearHeading(targetPose);
                 }
-                else if (location == location.Middle) {
-                    Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_MIDDLE_X, RED_START_LEFT_SPIKE_MIDDLE_Y, Math.toRadians(RED_START_LEFT_SPIKE_MIDDLE_HEADING));
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                else if (location == MIDDLE) {
+                    Pose2d targetPose = new Pose2d(-36, -14, Math.toRadians(-90));
+                    trajectorySequenceBuilder
                             .lineToLinearHeading(targetPose);
                 }
                 else {
-                    Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_RIGHT_X, RED_START_LEFT_SPIKE_RIGHT_Y);
-                    double targetHeading = Math.toRadians(RED_START_LEFT_SPIKE_RIGHT_HEADING);
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                    Pose2d targetPose = new Pose2d(-34.5, -29.5);
+                    double targetHeading = Math.toRadians(0);
+                    trajectorySequenceBuilder
                             .setReversed(true)
                             .splineToLinearHeading(targetPose, targetHeading);
                 }
             }
             else {
-                if (location == Left) {
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                if (location == LEFT) {
+                    trajectorySequenceBuilder
                             .splineToLinearHeading(new Pose2d(13,-30), Math.toRadians(180));
                 }
-                else if (location == location.Middle) {
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                else if (location == MIDDLE) {
+                    trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(12,-14, Math.toRadians(-90)));
                 }
                 else {
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                    trajectorySequenceBuilder
                             .setReversed(true)
                             .lineToLinearHeading(new Pose2d(10,-30, Math.toRadians(0)));
                 }
@@ -1125,180 +776,81 @@ public class AutoF extends LinearOpMode {
         }
         else {
             if (startLeft) {
-                if (location == Left) {
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                if (location == LEFT) {
+                    trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(13,30, Math.toRadians(180)));
-                } else if (location == location.Middle) {
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                } else if (location == MIDDLE) {
+                    trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)));
                 } else {
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                    trajectorySequenceBuilder
                             .setReversed(true)
                             .splineToLinearHeading(new Pose2d(10,30), Math.toRadians(0));
                 }
             } else {
-                if (location == Left) {
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                if (location == LEFT) {
+                    trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(-34,30, Math.toRadians(180)));
-                } else if (location == location.Middle) {
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                } else if (location == MIDDLE) {
+                    trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(-36,14, Math.toRadians(90)));
                 } else {
-                    trajectorySequenceBuilder = trajectorySequenceBuilder
+                    trajectorySequenceBuilder
                             .setReversed(true)
                             .splineToLinearHeading(new Pose2d(-37,30),Math.toRadians(0));
                 }
             }
         }
 
-        // Build the trajectory sequence.
-        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
-
-        // Return the result.
-        return trajectorySequence;
-
     }
 
-        // Gets a backdrop trajectory sequence.
-        private TrajectorySequence getBackdropTrajectorySequence() throws InterruptedException {
+    // Drives to the backdrop.
+    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location) {
 
-            // Get a drive interface.
-            SampleMecanumDrive drive = robotHardware.getDrive();
+        if (location == LEFT) {
+            trajectorySequenceBuilder
+                    .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(180)));
+        } else if (location == MIDDLE) {
 
-            // Set the trajectory sequence's start pose.
-            TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
-
-            if(location == Left) {
-                trajectorySequenceBuilder = trajectorySequenceBuilder
-                    .lineToLinearHeading(new Pose2d(RED_LEFT_LEFT_DETOUR_X, RED_LEFT_LEFT_DETOUR_Y, Math.toRadians(RED_TOWARDS_PIXELS_HEADING)));
-            }
-            else if (location == Middle) {
-
-            }
-            else {
-                trajectorySequenceBuilder = trajectorySequenceBuilder
+        } else {
+            trajectorySequenceBuilder
                     .setReversed(true)
-                    .splineTo(new Vector2d(RED_LEFT_MIDDLE_DETOUR_X,RED_LEFT_MIDDLE_DETOUR_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING));
-            }
+                    .splineTo(new Vector2d(-30, -13), Math.toRadians(0));
+        }
 
-            trajectorySequenceBuilder = trajectorySequenceBuilder
+        trajectorySequenceBuilder
                 .setReversed(true)
-                .splineTo(new Vector2d(RED_MIDDLE_X, RED_MIDDLE_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING))
-                .splineTo(new Vector2d(RED_DETOUR_BACKDROP_X, RED_DETOUR_BACKDROP_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING))
-                .splineTo(new Vector2d(RED_BACKDROP_X, RED_BACKDROP_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING));
-
-            TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
-
-            return trajectorySequence;
-
-            // Add the appropriate maneuvers.
-            /*if (redAlliance) {
-                if (startLeft) {
-                    if (location == location.Left) {
-                        Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_LEFT_X, RED_START_LEFT_SPIKE_LEFT_Y, Math.toRadians(RED_START_LEFT_SPIKE_LEFT_HEADING));
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .lineToLinearHeading(targetPose);
-                    }
-                    else if (location == location.Middle) {
-                        Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_MIDDLE_X, RED_START_LEFT_SPIKE_MIDDLE_Y, Math.toRadians(RED_START_LEFT_SPIKE_MIDDLE_HEADING));
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .lineToLinearHeading(targetPose);
-                    }
-                    else {
-                        Pose2d targetPose = new Pose2d(RED_START_LEFT_SPIKE_RIGHT_X, RED_START_LEFT_SPIKE_RIGHT_Y);
-                        double targetHeading = Math.toRadians(RED_START_LEFT_SPIKE_RIGHT_HEADING);
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .setReversed(true)
-                                .splineToLinearHeading(targetPose, targetHeading);
-                    }
-                }
-                else {
-                    if (location == location.Left) {
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .splineToLinearHeading(new Pose2d(13,-30), Math.toRadians(180));
-                    }
-                    else if (location == location.Middle) {
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .lineToLinearHeading(new Pose2d(12,-14, Math.toRadians(-90)));
-                    }
-                    else {
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .setReversed(true)
-                                .lineToLinearHeading(new Pose2d(10,-30, Math.toRadians(0)));
-                    }
-                }
-            }
-            else {
-                if (startLeft) {
-                    if (location == location.Left) {
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .lineToLinearHeading(new Pose2d(13,30, Math.toRadians(180)));
-                    } else if (location == location.Middle) {
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)));
-                    } else {
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .setReversed(true)
-                                .splineToLinearHeading(new Pose2d(10,30), Math.toRadians(0));
-                    }
-                } else {
-                    if (location == location.Left) {
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .lineToLinearHeading(new Pose2d(-34,30, Math.toRadians(180)));
-                    } else if (location == location.Middle) {
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .lineToLinearHeading(new Pose2d(-36,14, Math.toRadians(90)));
-                    } else {
-                        trajectorySequenceBuilder = trajectorySequenceBuilder
-                                .setReversed(true)
-                                .splineToLinearHeading(new Pose2d(-37,30),Math.toRadians(0));
-                    }
-                }
-            }*/
+                .splineTo(new Vector2d(0, -12), Math.toRadians(0))
+                .splineTo(new Vector2d(28, -12), Math.toRadians(0))
+                .splineTo(new Vector2d(44, -36), Math.toRadians(0));
 
     }
 
-    private TrajectorySequence getStackTrajectorySequence() throws InterruptedException {
+    // Drives to a white pixel stack.
+    public static void driveToStack(TrajectorySequenceBuilder trajectorySequenceBuilder) {
 
-        // Get a drive interface.
-        SampleMecanumDrive drive = robotHardware.getDrive();
-
-        TrajectorySequence trajectorySequence = drive.trajectorySequenceBuilder(lastEnd)
+        trajectorySequenceBuilder
                 .setReversed(false)
-                .splineTo(new Vector2d(RED_DETOUR_BACKDROP_X,RED_DETOUR_BACKDROP_Y), Math.toRadians(RED_TOWARDS_PIXELS_HEADING))
-                .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y), Math.toRadians(RED_TOWARDS_PIXELS_HEADING))
-                .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(RED_TOWARDS_PIXELS_HEADING))
-                .build();
-
-        // Return the result.
-        return trajectorySequence;
+                .splineTo(new Vector2d(28, -12), Math.toRadians(180))
+                .splineTo(new Vector2d(0, -12), Math.toRadians(180))
+                .splineTo(new Vector2d(-60, -10), Math.toRadians(180));
 
     }
 
-    private TrajectorySequence getParkTrajectorySequence() throws InterruptedException {
-
-        // Get a drive interface.
-        SampleMecanumDrive drive = robotHardware.getDrive();
-
-        TrajectorySequence trajectorySequence;
+    // Parks.
+    public static void park(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean parkLeft) {
 
         if (parkLeft) {
-            trajectorySequence = drive.trajectorySequenceBuilder(lastEnd)
+            trajectorySequenceBuilder
                     .setReversed(false)
-                    .lineTo(new Vector2d(44,-12))
-                    .lineTo(new Vector2d(60,-12))
-                    .build();
-        }
-        else {
-            trajectorySequence = drive.trajectorySequenceBuilder(lastEnd)
+                    .lineTo(new Vector2d(44, -12))
+                    .lineTo(new Vector2d(60, -12));
+        } else {
+            trajectorySequenceBuilder
                     .setReversed(false)
-                    .lineTo(new Vector2d(44,-60))
-                    .lineTo(new Vector2d(60,-60))
-                    .build();
+                    .lineTo(new Vector2d(44, -60))
+                    .lineTo(new Vector2d(60, -60));
         }
-
-        // Return the result.
-        return trajectorySequence;
 
     }
 

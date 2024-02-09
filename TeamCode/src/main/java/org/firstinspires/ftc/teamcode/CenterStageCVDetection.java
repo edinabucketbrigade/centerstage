@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.TeamPropLocation.LEFT;
+import static org.firstinspires.ftc.teamcode.TeamPropLocation.MIDDLE;
+import static org.firstinspires.ftc.teamcode.TeamPropLocation.RIGHT;
+
 import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -30,13 +34,7 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     boolean isNew;
     Mat mat = new Mat();
 
-    public enum Location {
-        Left,
-        Right,
-        Middle
-    }
-
-    private Location location;
+    private TeamPropLocation location;
     /*
      *   ROI is an abbreviation of Region of Interest.
      *   This creates a rectangle of areas in the camera where a game element may be placed
@@ -116,11 +114,11 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         middle.release();
 
         if(leftValue >= rightValue && leftValue >= middleValue){
-            location = Location.Left;
+            location = LEFT;
         } else if (rightValue >= middleValue) {
-            location = Location.Right;
+            location = RIGHT;
         } else {
-            location = Location.Middle;
+            location = MIDDLE;
         }
 
         telemetry.addData("Location", location);
@@ -141,16 +139,16 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         *   just a mini if statement that chooses which colors to use based
         *   on the location of the prop.
         */
-        Imgproc.rectangle(mat, LEFT_ROI, location == Location.Left? pixelColor:propColor);
-        Imgproc.rectangle(mat, MIDDLE_ROI, location == Location.Middle? pixelColor:propColor);
-        Imgproc.rectangle(mat, RIGHT_ROI, location == Location.Right? pixelColor:propColor);
+        Imgproc.rectangle(mat, LEFT_ROI, location == LEFT ? pixelColor:propColor);
+        Imgproc.rectangle(mat, MIDDLE_ROI, location == MIDDLE ? pixelColor:propColor);
+        Imgproc.rectangle(mat, RIGHT_ROI, location == RIGHT ? pixelColor:propColor);
 
         return mat;
     }
     /*
     *   Now that we have a detector pipeline we can use it to create an autonomous OpMode
     */
-    public Location getLocation(){
+    public TeamPropLocation getLocation(){
         return location;
     }
 }
