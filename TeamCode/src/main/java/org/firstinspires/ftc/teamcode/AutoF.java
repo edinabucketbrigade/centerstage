@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.AutoF.State.APPROACH_BACKDROP;
-import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_PIXEL_STACK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_PLACE_POSITION;
 import static org.firstinspires.ftc.teamcode.AutoF.State.GRAB_OFF_STACK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.IDLE;
 import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_SPIKE_MARK;
+import static org.firstinspires.ftc.teamcode.AutoF.State.PARK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_ARM_LIFT_AND_WRIST;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PURPLE_PIXEL;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_WRIST;
@@ -98,9 +98,11 @@ public class AutoF extends LinearOpMode {
     public static final double RED_BACKDROP_Y = -36;
     public static final double RED_PIXELS_X = -60;
     public static final double RED_PIXELS_Y = -10;
-    public static final double RED_DETOUR_MIDDLE_X = -35;
-    public static final double RED_DETOUR_MIDDLE_Y = -13;
+    public static final double RED_LEFT_LEFT_DETOUR_X = -35;
+    public static final double RED_LEFT_LEFT_DETOUR_Y = -13;
     public static final double RED_TOWARDS_PIXELS_HEADING = 180;
+    public static final double RED_LEFT_MIDDLE_DETOUR_X = -30;
+    public static final double RED_LEFT_MIDDLE_DETOUR_Y = -13;
 
     public static Boolean redAlliance;
     public static Pose2d currentPose;
@@ -114,7 +116,7 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection.Location location;
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
-    enum State { IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, APPROACH_BACKDROP, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RELEASE_WRIST, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK }
+    enum State { IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, APPROACH_BACKDROP, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RELEASE_WRIST, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK, PARK }
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
     private Pose2d lastEnd;
@@ -386,7 +388,18 @@ public class AutoF extends LinearOpMode {
                 // Start retracting.
                 robotHardware.startRetracting();
 
-                setState(DRIVE_TO_PIXEL_STACK);
+                setState(PARK);
+
+                break;
+
+            case PARK:
+
+                TrajectorySequence parkTrajectorySequence = getParkTrajectorySequence();
+                lastEnd = parkTrajectorySequence.end();
+
+                drive.followTrajectorySequenceAsync(parkTrajectorySequence);
+
+                setState(IDLE);
 
                 break;
 
@@ -1157,18 +1170,15 @@ public class AutoF extends LinearOpMode {
 
             if(location == Left) {
                 trajectorySequenceBuilder = trajectorySequenceBuilder
-                    .lineToLinearHeading(new Pose2d(RED_START_LEFT_SPIKE_LEFT_X, RED_START_LEFT_SPIKE_LEFT_Y, RED_START_LEFT_SPIKE_LEFT_HEADING))
-                    .lineToLinearHeading(new Pose2d(RED_DETOUR_MIDDLE_X, RED_DETOUR_MIDDLE_Y, Math.toRadians(RED_TOWARDS_PIXELS_HEADING)));
+                    .lineToLinearHeading(new Pose2d(RED_LEFT_LEFT_DETOUR_X, RED_LEFT_LEFT_DETOUR_Y, Math.toRadians(RED_TOWARDS_PIXELS_HEADING)));
             }
             else if (location == Middle) {
-                trajectorySequenceBuilder = trajectorySequenceBuilder
-                    .lineToLinearHeading(new Pose2d(-36,-14, Math.toRadians(-90)));
+
             }
             else {
                 trajectorySequenceBuilder = trajectorySequenceBuilder
                     .setReversed(true)
-                    .splineToLinearHeading(new Pose2d(-37,-30),Math.toRadians(0))
-                    .splineTo(new Vector2d(-30,-13), Math.toRadians(0));
+                    .splineTo(new Vector2d(RED_LEFT_MIDDLE_DETOUR_X,RED_LEFT_MIDDLE_DETOUR_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING));
             }
 
             trajectorySequenceBuilder = trajectorySequenceBuilder
@@ -1259,6 +1269,33 @@ public class AutoF extends LinearOpMode {
                 .splineTo(new Vector2d(RED_MIDDLE_X,RED_MIDDLE_Y), Math.toRadians(RED_TOWARDS_PIXELS_HEADING))
                 .splineTo(new Vector2d(RED_PIXELS_X,RED_PIXELS_Y), Math.toRadians(RED_TOWARDS_PIXELS_HEADING))
                 .build();
+
+        // Return the result.
+        return trajectorySequence;
+
+    }
+
+    private TrajectorySequence getParkTrajectorySequence() throws InterruptedException {
+
+        // Get a drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        TrajectorySequence trajectorySequence;
+
+        if (parkLeft) {
+            trajectorySequence = drive.trajectorySequenceBuilder(lastEnd)
+                    .setReversed(false)
+                    .lineTo(new Vector2d(44,-12))
+                    .lineTo(new Vector2d(60,-12))
+                    .build();
+        }
+        else {
+            trajectorySequence = drive.trajectorySequenceBuilder(lastEnd)
+                    .setReversed(false)
+                    .lineTo(new Vector2d(44,-60))
+                    .lineTo(new Vector2d(60,-60))
+                    .build();
+        }
 
         // Return the result.
         return trajectorySequence;
