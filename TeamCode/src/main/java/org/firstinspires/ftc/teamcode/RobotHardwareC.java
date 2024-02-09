@@ -695,4 +695,12 @@ public class RobotHardwareC {
 
     }
 
+    // Stops hanging.
+    public void stopHanging() {
+
+        // Stop hanging.
+        hang.stop();
+
+    }
+
 }

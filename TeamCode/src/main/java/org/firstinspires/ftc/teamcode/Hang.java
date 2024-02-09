@@ -205,4 +205,12 @@ public class Hang {
 
     }
 
+    // Stops hanging.
+    public void stop() {
+
+        // Stops hanging.
+        setState(IDLE);
+
+    }
+
 }

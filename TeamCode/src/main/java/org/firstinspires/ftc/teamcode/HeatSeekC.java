@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.IDLE;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.CLOSE_CLAW;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.State.RAISE_ARM_LIFT_AND_WRIST;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.DRIVE_TO_APPROACH_POSITION;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.DRIVE_TO_PLACE_POSITION;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.OPEN_CLAW;

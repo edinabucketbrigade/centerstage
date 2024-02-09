@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.getMaximumColumn;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.isEven;
+import static org.firstinspires.ftc.teamcode.TeleOpT.State.HANGING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.HEAT_SEEKING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.IDLE;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.RETRACTING;
@@ -31,8 +32,10 @@ public class TeleOpT extends LinearOpMode {
     - x = toggle left claw
     - b = toggle right claw
     - a = toggle both claws
-    - dpad up = raise lift for hanging
-    - dpad down = lift robot onto rigging
+    - dpad up = raise arm and lift for hanging
+      (then use dpad down to raise robot)
+      (after the match, use dpad up to safely lower the robot)
+      (press y to exit hanging mode)
 
     Gamepad 2: Pixel Driver
 
@@ -66,7 +69,6 @@ public class TeleOpT extends LinearOpMode {
     private Gamepad previousGamepad2 = new Gamepad();
 
     private State state = IDLE;
-    // Initialize left pixel's column and row.
     private int leftColumn = MINIMUM_COLUMN;
     private int leftRow = MINIMUM_ROW;
 
@@ -162,6 +164,8 @@ public class TeleOpT extends LinearOpMode {
 
                     handleHanging();
 
+                    break;
+
                 case IDLE:
 
                     handleIdle(debugging);
@@ -199,6 +203,7 @@ public class TeleOpT extends LinearOpMode {
             telemetry.addData("Pixel Placement", output);
             telemetry.addData("Left Pixel", "Column = %d, Row = %d", leftColumn, leftRow);
             telemetry.addData("Red Alliance", AutoF.redAlliance);
+            telemetry.addData("State", state);
             telemetry.addData("Debugging", debugging);
 
             // Update the robot hardware.
@@ -319,6 +324,9 @@ public class TeleOpT extends LinearOpMode {
             // Advance to the retracting state.
             state = RETRACTING;
 
+            // Exit the method.
+            return;
+
         }
 
         // Determine whether we are actively heat seeking.
@@ -391,6 +399,9 @@ public class TeleOpT extends LinearOpMode {
 
             // Start hanging mode.
             robotHardware.startHanging();
+
+            // Advance to the hanging state.
+            state = HANGING;
 
         }
 
@@ -527,6 +538,23 @@ public class TeleOpT extends LinearOpMode {
 
     // Handles the hanging state.
     private void handleHanging() {
+
+        // If the robot driver pressed y...
+        if(currentGamepad1.y && !previousGamepad1.y) {
+
+            // Stop hanging.
+            robotHardware.stopHanging();
+
+            // Start retracting.
+            robotHardware.startRetracting();
+
+            // Advance to the retracting state.
+            state = RETRACTING;
+
+            // Exit the method.
+            return;
+
+        }
 
         // Determine whether we are actively hanging.
         boolean isHanging = robotHardware.isHanging();
