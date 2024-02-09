@@ -80,6 +80,7 @@ public class RobotHardwareC {
     private FtcDashboard ftcDashboard;
     private HeatSeekC heatSeek = new HeatSeekC(this);
     private Retract retract = new Retract(this);
+    private Hang hang = new Hang(this);
     private Lift lift;
     private Arm arm;
     private Claw claw;
@@ -141,6 +142,9 @@ public class RobotHardwareC {
         // Update retract.
         retract.update();
 
+        // Update hang.
+        hang.update();
+
         // Update the hardware.
         arm.update();
         claw.update();
@@ -183,7 +187,7 @@ public class RobotHardwareC {
 
         // Update the telemetry.
         telemetry.addData("Localized", isLocalized ? GREEN_SQUARE : RED_SQUARE);
-        telemetry.addData("Status", "Heat Seeking = %b, Retracting = %b, Turtle Mode = %b", heatSeek.isActive(), retract.isActive(), isTurtleMode);
+        telemetry.addData("Status", "Heat Seeking = %b, Retracting = %b, Hanging = %b, Turtle Mode = %b", heatSeek.isActive(), retract.isActive(), hang.isActive(), isTurtleMode);
         if(isLocalized) {
             telemetry.addData("Robot Pose", poseString);
         }
@@ -473,6 +477,21 @@ public class RobotHardwareC {
 
     }
 
+    public boolean isHanging() {
+
+        // Return indicating whether we are hanging.
+        return hang.isActive();
+
+    }
+
+    // Starts hanging.
+    public void startHanging() {
+
+        // Start hanging.
+        hang.start();
+
+    }
+
     // Closes the left claw.
     public void closeLeftClaw() {
 
@@ -560,24 +579,27 @@ public class RobotHardwareC {
 
     }
 
-    // Raises the lift.
-    public void raiseLift(int position) {
+    // Lowers the lift.
+    public void setLiftPosition(int position) throws InterruptedException {
 
-        // Raise the lift.
-        lift.raise(position);
+        // Lower the lift.
+        lift.setPosition(position);
 
     }
 
-    // Lowers the lift.
-    public void lowerLift(int position) throws InterruptedException {
+    // Gets the lift position.
+    public int getLiftPosition() {
 
-        // Lower the lift.
-        lift.lower(position);
+        // Return the lift position.
+        return lift.getLiftPosition();
 
     }
 
     // Waits for the user to lower the lift.
     public void waitForLiftDown() throws InterruptedException {
+
+        // Raise the wrist.
+        claw.setWristBackdrop();
 
         // Wait for the user to lower the lift.
         lift.waitForDown();
@@ -623,12 +645,8 @@ public class RobotHardwareC {
         return arm.isUp();
     }
 
-    public boolean isLiftDown() {
-        return lift.isDown();
-    }
-
-    public boolean isLiftUp() {
-        return lift.isUp();
+    public boolean isLiftInPosition(int position) {
+        return lift.isInPosition(position);
     }
 
     // Get the robot's pose.
