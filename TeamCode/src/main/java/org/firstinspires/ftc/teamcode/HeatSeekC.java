@@ -34,7 +34,7 @@ public class HeatSeekC {
     public static double PLACE_TARGET_X = 45;
     public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
     public static double TILE_SIZE = 24;
-    public static double TARGET_Y_OFFSET = 4;
+    public static double TARGET_Y_OFFSET = 6;
     public static int FIRST_ROW_LIFT_POSITION = 0;
     public static int LIFT_INCREMENT = 200;
     public static double PIXEL_WIDTH = 3;
