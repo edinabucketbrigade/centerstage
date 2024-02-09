@@ -32,10 +32,11 @@ public class TeleOpT extends LinearOpMode {
     - x = toggle left claw
     - b = toggle right claw
     - a = toggle both claws
-    - dpad up = raise arm and lift for hanging
-      (then use dpad down to raise robot)
-      (after the match, use dpad up to safely lower the robot)
-      (press y to exit hanging mode)
+    - dpad up = hang mode
+      1) raise arm and lift for hanging
+      2) raise robot onto rigging
+      3) lower robot from rigging (use when match ends)
+    - y = cancel hanging
 
     Gamepad 2: Pixel Driver
 
@@ -43,7 +44,7 @@ public class TeleOpT extends LinearOpMode {
 
     - dpad = move pixels
     - a = start heat seek
-    - y = stop heat seek
+    - y = cancel heat seek
 
     Debug Mode (hold right trigger)
 

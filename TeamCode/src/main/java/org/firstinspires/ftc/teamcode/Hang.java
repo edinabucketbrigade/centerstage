@@ -120,8 +120,8 @@ public class Hang {
 
                 }
 
-                // If the robot driver pressed dpad down...
-                if(gamepad1.dpad_down) {
+                // If the robot driver pressed dpad up...
+                if(gamepad1.dpad_up) {
 
                     // Lower the lift to the hang position.
                     robotHardware.setLiftPosition(HANG_POSITION);
