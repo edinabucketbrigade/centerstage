@@ -41,14 +41,14 @@ public class Routes {
         if (redAlliance) {
             if (startLeft) {
                 if (location == LEFT) {
-                    Pose2d targetPose = new Pose2d(-36.5, -26.5, Math.toRadians(180));
+                    Vector2d targetVector = new Vector2d(-49, -19);
                     trajectorySequenceBuilder
-                            .lineToLinearHeading(targetPose);
+                            .lineTo(targetVector);
                 }
                 else if (location == MIDDLE) {
-                    Pose2d targetPose = new Pose2d(-36, -14, Math.toRadians(-90));
+                    Vector2d targetVector = new Vector2d(-36, -14);
                     trajectorySequenceBuilder
-                            .lineToLinearHeading(targetPose);
+                            .lineTo(targetVector);
                 }
                 else {
                     Pose2d targetPose = new Pose2d(-34.5, -32.5);
@@ -111,10 +111,13 @@ public class Routes {
         if (redAlliance) {
             if (startLeft) {
                 trajectorySequenceBuilder.lineTo(new Vector2d(-36, -9));
-                if(location == MIDDLE) {
-                    trajectorySequenceBuilder.turn(Math.toRadians(90));
+                if(location == LEFT) {
+                    trajectorySequenceBuilder.turn(Math.toRadians(-90));
                 }
-                else if(location == RIGHT) {
+                else if(location == MIDDLE) {
+                    trajectorySequenceBuilder.turn(Math.toRadians(-90));
+                }
+                else {
                     trajectorySequenceBuilder.turn(Math.toRadians(180));
                 }
                 trajectorySequenceBuilder

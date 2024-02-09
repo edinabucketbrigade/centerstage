@@ -24,7 +24,7 @@ public class MeepMeepTesting {
     private static final boolean RED_ALLIANCE = true;
     private static final boolean START_LEFT = true;
     private static final boolean PARK_LEFT = true;
-    private static final TeamPropLocation LOCATION = LEFT;
+    private static final TeamPropLocation LOCATION = MIDDLE;
 
     public static final double MAXIMUM_VELOCITY = 60;
     public static final double MAXIMUM_ACCELERATION = 60;
