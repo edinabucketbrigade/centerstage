@@ -9,6 +9,7 @@ import static com.example.meepmeeptesting.TeamPropLocation.MIDDLE;
 import static com.example.meepmeeptesting.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
@@ -21,8 +22,8 @@ import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBui
 
 public class MeepMeepTesting {
 
-    private static final boolean RED_ALLIANCE = false;
-    private static final boolean START_LEFT = true;
+    private static final boolean RED_ALLIANCE = true;
+    private static final boolean START_LEFT = false;
     private static final boolean PARK_LEFT = true;
     private static final TeamPropLocation LOCATION = RIGHT;
 
@@ -71,8 +72,15 @@ public class MeepMeepTesting {
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
 
+        // Construct a target position.
+        double targetX = 40;
+        double targetY = RED_ALLIANCE ? -36 : 36;
+
+        // Construct a target vector.
+        Vector2d targetVector = new Vector2d(targetX, targetY);
+
         // Drive to the backdrop.
-        driveToBackdrop(trajectorySequenceBuilder, RED_ALLIANCE, START_LEFT, LOCATION);
+        driveToBackdrop(trajectorySequenceBuilder, RED_ALLIANCE, START_LEFT, LOCATION, targetVector);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);

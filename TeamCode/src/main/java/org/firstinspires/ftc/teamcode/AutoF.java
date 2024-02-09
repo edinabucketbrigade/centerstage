@@ -48,6 +48,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 public class AutoF extends LinearOpMode {
 
     public static final int FIRST_ROW = 1;
+    public static final double BACKDROP_TARGET_X = 40;
 
     public static Boolean redAlliance;
     public static Pose2d currentPose;
@@ -163,6 +164,12 @@ public class AutoF extends LinearOpMode {
         // Get a lift position.
         int liftPosition = HeatSeekC.getTargetLiftPosition(FIRST_ROW);
 
+        // Get the appropriate left column.
+        int leftColumn = getLeftColumn(location);
+
+        // Get a target y coordinate.
+        double targetY = HeatSeekC.getTargetY(leftColumn, FIRST_ROW, redAlliance);
+
         // Update the state machine.
         switch (state) {
 
@@ -225,7 +232,8 @@ public class AutoF extends LinearOpMode {
                     return;
                 }
 
-                TrajectorySequence approachTrajectorySequence = getBackdropTrajectorySequence();
+                // Construct an approach trajectory sequence.
+                TrajectorySequence approachTrajectorySequence = getBackdropTrajectorySequence(targetY);
                 lastEnd = approachTrajectorySequence.end();
 
                 // Start driving to the backdrop.
@@ -255,7 +263,7 @@ public class AutoF extends LinearOpMode {
             case DRIVE_TO_PLACE_POSITION:
 
                 // If we are waiting...
-                if (!robotHardware.isArmUp() && !robotHardware.isLiftInPosition(liftPosition)) {
+                if (!robotHardware.isArmUp() || !robotHardware.isLiftInPosition(liftPosition)) {
 
                     // Exit the method.
                     return;
@@ -263,34 +271,20 @@ public class AutoF extends LinearOpMode {
                 }
 
                 // Construct a velocity constraint.
-                TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(HeatSeekC.PLACE_SPEED, DriveConstants.TRACK_WIDTH);
+                TrajectoryVelocityConstraint placeVelocityConstraint = new MecanumVelocityConstraint(HeatSeekC.PLACE_SPEED, DriveConstants.TRACK_WIDTH);
 
                 // Construct an acceleration constraint.
-                TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
-
-                int leftColumn;
-                if (location == LEFT) {
-                    leftColumn = 1;
-                } else if (location == MIDDLE) {
-                    leftColumn = 3;
-                } else if (location == RIGHT) {
-                    leftColumn = 5;
-                } else {
-                    throw new InterruptedException("The location is missing.");
-                }
-
-                // Get a target y coordinate.
-                double targetY = HeatSeekC.getTargetY(leftColumn, FIRST_ROW, redAlliance);
+                TrajectoryAccelerationConstraint placeAccelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
 
                 // Construct a target position.
-                Vector2d targetPosition = new Vector2d(HeatSeekC.PLACE_TARGET_X, targetY);
+                Vector2d placeTargetPosition = new Vector2d(HeatSeekC.PLACE_TARGET_X, targetY);
 
                 // Construct a target pose.
-                Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
+                Pose2d targetPose = new Pose2d(placeTargetPosition, Math.toRadians(180));
 
                 // Construct a trajectory sequence.
                 TrajectorySequence placeTrajectorySequence = drive.trajectorySequenceBuilder(lastEnd)
-                        .setConstraints(velocityConstraint, accelerationConstraint)
+                        .setConstraints(placeVelocityConstraint, placeAccelerationConstraint)
                         .lineToLinearHeading(targetPose)
                         .build();
                 lastEnd = placeTrajectorySequence.end();
@@ -669,7 +663,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Gets a backdrop trajectory sequence.
-    private TrajectorySequence getBackdropTrajectorySequence() throws InterruptedException {
+    private TrajectorySequence getBackdropTrajectorySequence(double targetY) throws InterruptedException {
 
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
@@ -677,8 +671,11 @@ public class AutoF extends LinearOpMode {
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
+        // Construct an approach target position.
+        Vector2d approachTargetPosition = new Vector2d(BACKDROP_TARGET_X, targetY);
+
         // Drive to the baackdrop.
-        driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft, location);
+        driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft, location, approachTargetPosition);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -725,6 +722,18 @@ public class AutoF extends LinearOpMode {
         // Return the result.
         return trajectorySequence;
 
+    }
+
+    public static int getLeftColumn(TeamPropLocation location) throws InterruptedException {
+        if (location == LEFT) {
+            return 1;
+        } else if (location == MIDDLE) {
+            return 3;
+        } else if (location == RIGHT) {
+            return 5;
+        } else {
+            throw new InterruptedException("The location is missing.");
+        }
     }
 
 }

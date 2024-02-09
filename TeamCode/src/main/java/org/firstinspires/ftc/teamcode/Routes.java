@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.AutoF.FIRST_ROW;
+import static org.firstinspires.ftc.teamcode.AutoF.getLeftColumn;
 import static org.firstinspires.ftc.teamcode.TeamPropLocation.LEFT;
 import static org.firstinspires.ftc.teamcode.TeamPropLocation.MIDDLE;
 import static org.firstinspires.ftc.teamcode.TeamPropLocation.RIGHT;
@@ -101,7 +103,10 @@ public class Routes {
     }
 
     // Drives to the backdrop.
-    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location) {
+    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location, Vector2d targetVector) throws InterruptedException {
+
+        // Construct a target pose.
+        Pose2d targetPose = new Pose2d(targetVector, Math.toRadians(180));
 
         if (redAlliance) {
             if (startLeft) {
@@ -114,7 +119,7 @@ public class Routes {
                 }
                 trajectorySequenceBuilder
                         .lineTo(new Vector2d(30, -9))
-                        .splineTo(new Vector2d(44, -36), Math.toRadians(0));
+                        .splineTo(targetVector, Math.toRadians(0));
             } else {
                 if(location == MIDDLE) {
                     trajectorySequenceBuilder.back(10);
@@ -122,7 +127,7 @@ public class Routes {
                 else if(location == RIGHT) {
                     trajectorySequenceBuilder.back(14);
                 }
-                trajectorySequenceBuilder.lineToLinearHeading(new Pose2d(44, -36, Math.toRadians(180)));
+                trajectorySequenceBuilder.lineToLinearHeading(targetPose);
             }
         } else {
             if (startLeft) {
@@ -132,7 +137,7 @@ public class Routes {
                 else if(location == LEFT) {
                     trajectorySequenceBuilder.back(14);
                 }
-                trajectorySequenceBuilder.lineToLinearHeading(new Pose2d(44, 36, Math.toRadians(180)));
+                trajectorySequenceBuilder.lineToLinearHeading(targetPose);
             } else {
                 trajectorySequenceBuilder.lineTo(new Vector2d(-36, 9));
                 if(location == MIDDLE || location == RIGHT) {
@@ -143,7 +148,7 @@ public class Routes {
                 }
                 trajectorySequenceBuilder
                         .lineTo(new Vector2d(30, 9))
-                        .splineTo(new Vector2d(44, 36), Math.toRadians(0));
+                        .splineTo(targetVector, Math.toRadians(0));
             }
         }
 
