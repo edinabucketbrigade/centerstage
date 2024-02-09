@@ -195,17 +195,32 @@ public class MeepMeepTesting {
 
                                 //.splineToLinearHeading(new Pose2d(10,30),Math.toRadians(0))
 
-                            .lineToLinearHeading(new Pose2d(-37.5, -26.5, Math.toRadians(180)))
 
-                            .setReversed(true)
-                            .splineTo(new Vector2d(0,-12), Math.toRadians(0))
-                            .splineTo(new Vector2d(28,-12), Math.toRadians(0))
-                            .splineTo(new Vector2d(44,-36), Math.toRadians(0))
+//                                .lineToLinearHeading(new Pose2d(-37.5, -26.5, Math.toRadians(180)))
+//
+//                                .lineToLinearHeading(new Pose2d(-35,-13, Math.toRadians(180)))
 
-                            .setReversed(false)
-                            .splineTo(new Vector2d(28,-12), Math.toRadians(180))
-                            .splineTo(new Vector2d(0,-12), Math.toRadians(180))
-                            .splineTo(new Vector2d(-58,-10), Math.toRadians(180))
+
+
+                              //.lineToLinearHeading(new Pose2d(-36,-14, Math.toRadians(-90)))
+                                //.lineToLinearHeading(new Pose2d(-35,-16, Math.toRadians(0)))
+
+                        .lineToLinearHeading(new Pose2d(-37.5, -26.5, Math.toRadians(180)))
+                        .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(180)))
+
+                              .setReversed(true)
+
+//                              .splineToLinearHeading(new Pose2d(-37,-30),Math.toRadians(0))
+//                              .splineTo(new Vector2d(-30,-13), Math.toRadians(0))
+
+                              .splineTo(new Vector2d(0,-12), Math.toRadians(0))
+                              .splineTo(new Vector2d(28,-12), Math.toRadians(0))
+                              .splineTo(new Vector2d(44,-36), Math.toRadians(0))
+
+//                            .setReversed(false)
+//                            .splineTo(new Vector2d(28,-12), Math.toRadians(180))
+//                            .splineTo(new Vector2d(0,-12), Math.toRadians(180))
+//                            .splineTo(new Vector2d(-58,-10), Math.toRadians(180))
 
                             .build()
                 );
