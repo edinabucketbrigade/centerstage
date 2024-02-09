@@ -751,7 +751,7 @@ public class AutoF extends LinearOpMode {
                             .lineToLinearHeading(targetPose);
                 }
                 else {
-                    Pose2d targetPose = new Pose2d(-34.5, -29.5);
+                    Pose2d targetPose = new Pose2d(-34.5, -32.5);
                     double targetHeading = Math.toRadians(0);
                     trajectorySequenceBuilder
                             .setReversed(true)
@@ -761,7 +761,8 @@ public class AutoF extends LinearOpMode {
             else {
                 if (location == LEFT) {
                     trajectorySequenceBuilder
-                            .splineToLinearHeading(new Pose2d(13,-30), Math.toRadians(180));
+                            .setReversed(true)
+                            .splineToLinearHeading(new Pose2d(11,-27, Math.toRadians(180)), Math.toRadians(180));
                 }
                 else if (location == MIDDLE) {
                     trajectorySequenceBuilder
@@ -770,7 +771,7 @@ public class AutoF extends LinearOpMode {
                 else {
                     trajectorySequenceBuilder
                             .setReversed(true)
-                            .lineToLinearHeading(new Pose2d(10,-30, Math.toRadians(0)));
+                            .lineToLinearHeading(new Pose2d(13,-33, Math.toRadians(0)));
                 }
             }
         }
@@ -807,22 +808,39 @@ public class AutoF extends LinearOpMode {
     // Drives to the backdrop.
     public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location) {
 
-        if (location == LEFT) {
-            trajectorySequenceBuilder
-                    .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(180)));
-        } else if (location == MIDDLE) {
-
+        if (redAlliance) {
+            if (startLeft) {
+                if (location == LEFT) {
+                    trajectorySequenceBuilder
+                            .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(180)));
+                } else if (location == MIDDLE) {
+                } else {
+                    trajectorySequenceBuilder
+                            .setReversed(true)
+                            .splineTo(new Vector2d(-30, -13), Math.toRadians(0));
+                }
+                trajectorySequenceBuilder
+                        .setReversed(true)
+                        .splineTo(new Vector2d(0, -12), Math.toRadians(0))
+                        .splineTo(new Vector2d(28, -12), Math.toRadians(0))
+                        .splineTo(new Vector2d(44, -36), Math.toRadians(0));
+            } else {
+                trajectorySequenceBuilder
+                        .lineToLinearHeading(new Pose2d(44, -36, Math.toRadians(180)));
+            }
         } else {
-            trajectorySequenceBuilder
-                    .setReversed(true)
-                    .splineTo(new Vector2d(-30, -13), Math.toRadians(0));
+            if (startLeft) {
+                if (location == LEFT) {
+                } else if (location == MIDDLE) {
+                } else {
+                }
+            } else {
+                if (location == LEFT) {
+                } else if (location == MIDDLE) {
+                } else {
+                }
+            }
         }
-
-        trajectorySequenceBuilder
-                .setReversed(true)
-                .splineTo(new Vector2d(0, -12), Math.toRadians(0))
-                .splineTo(new Vector2d(28, -12), Math.toRadians(0))
-                .splineTo(new Vector2d(44, -36), Math.toRadians(0));
 
     }
 
