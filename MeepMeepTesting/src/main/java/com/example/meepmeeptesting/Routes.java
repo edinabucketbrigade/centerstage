@@ -68,9 +68,9 @@ public class Routes {
                             .lineToLinearHeading(new Pose2d(12,-14, Math.toRadians(-90)));
                 }
                 else {
+                    Vector2d targetVector = new Vector2d(22, -19);
                     trajectorySequenceBuilder
-                            .setReversed(true)
-                            .lineToLinearHeading(new Pose2d(13,-33, Math.toRadians(0)));
+                            .lineTo(targetVector);
                 }
             }
         }
@@ -110,10 +110,7 @@ public class Routes {
         if (redAlliance) {
             if (startLeft) {
                 trajectorySequenceBuilder.lineTo(new Vector2d(-36, -9));
-                if(location == LEFT) {
-                    trajectorySequenceBuilder.turn(Math.toRadians(-90));
-                }
-                else if(location == MIDDLE) {
+                if(location == LEFT || location == MIDDLE) {
                     trajectorySequenceBuilder.turn(Math.toRadians(-90));
                 }
                 else {
@@ -123,8 +120,13 @@ public class Routes {
                         .lineTo(new Vector2d(30, -9))
                         .splineTo(new Vector2d(44, -36), Math.toRadians(0));
             } else {
-                trajectorySequenceBuilder
-                        .lineToLinearHeading(new Pose2d(44, -36, Math.toRadians(180)));
+                if(location == MIDDLE) {
+                    trajectorySequenceBuilder.back(10);
+                }
+                else if(location == RIGHT) {
+                    trajectorySequenceBuilder.back(14);
+                }
+                trajectorySequenceBuilder.lineToLinearHeading(new Pose2d(44, -36, Math.toRadians(180)));
             }
         } else {
             if (startLeft) {

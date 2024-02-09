@@ -22,9 +22,9 @@ import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBui
 public class MeepMeepTesting {
 
     private static final boolean RED_ALLIANCE = true;
-    private static final boolean START_LEFT = true;
+    private static final boolean START_LEFT = false;
     private static final boolean PARK_LEFT = true;
-    private static final TeamPropLocation LOCATION = MIDDLE;
+    private static final TeamPropLocation LOCATION = RIGHT;
 
     public static final double MAXIMUM_VELOCITY = 60;
     public static final double MAXIMUM_ACCELERATION = 60;
