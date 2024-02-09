@@ -98,6 +98,8 @@ public class AutoF extends LinearOpMode {
     public static final double RED_BACKDROP_Y = -36;
     public static final double RED_PIXELS_X = -60;
     public static final double RED_PIXELS_Y = -10;
+    public static final double RED_DETOUR_MIDDLE_X = -35;
+    public static final double RED_DETOUR_MIDDLE_Y = -13;
     public static final double RED_TOWARDS_PIXELS_HEADING = 180;
 
     public static Boolean redAlliance;
@@ -1153,11 +1155,31 @@ public class AutoF extends LinearOpMode {
             // Set the trajectory sequence's start pose.
             TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
-            trajectorySequenceBuilder = trajectorySequenceBuilder
+            if(location == Left) {
+                trajectorySequenceBuilder = trajectorySequenceBuilder
+                    .lineToLinearHeading(new Pose2d(RED_START_LEFT_SPIKE_LEFT_X, RED_START_LEFT_SPIKE_LEFT_Y, RED_START_LEFT_SPIKE_LEFT_HEADING))
+                    .lineToLinearHeading(new Pose2d(RED_DETOUR_MIDDLE_X, RED_DETOUR_MIDDLE_Y, Math.toRadians(RED_TOWARDS_PIXELS_HEADING)));
+            }
+            else if (location == Middle) {
+                trajectorySequenceBuilder = trajectorySequenceBuilder
+                    .lineToLinearHeading(new Pose2d(-36,-14, Math.toRadians(-90)));
+            }
+            else {
+                trajectorySequenceBuilder = trajectorySequenceBuilder
                     .setReversed(true)
-                    .splineTo(new Vector2d(RED_MIDDLE_X, RED_MIDDLE_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING))
-                    .splineTo(new Vector2d(RED_DETOUR_BACKDROP_X, RED_DETOUR_BACKDROP_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING))
-                    .splineTo(new Vector2d(RED_BACKDROP_X, RED_BACKDROP_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING));
+                    .splineToLinearHeading(new Pose2d(-37,-30),Math.toRadians(0))
+                    .splineTo(new Vector2d(-30,-13), Math.toRadians(0));
+            }
+
+            trajectorySequenceBuilder = trajectorySequenceBuilder
+                .setReversed(true)
+                .splineTo(new Vector2d(RED_MIDDLE_X, RED_MIDDLE_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING))
+                .splineTo(new Vector2d(RED_DETOUR_BACKDROP_X, RED_DETOUR_BACKDROP_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING))
+                .splineTo(new Vector2d(RED_BACKDROP_X, RED_BACKDROP_Y), Math.toRadians(RED_TOWARDS_BACKDROP_HEADING));
+
+            TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
+
+            return trajectorySequence;
 
             // Add the appropriate maneuvers.
             /*if (redAlliance) {
@@ -1223,12 +1245,6 @@ public class AutoF extends LinearOpMode {
                     }
                 }
             }*/
-
-        // Build the trajectory sequence.
-        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
-
-        // Return the result.
-        return trajectorySequence;
 
     }
 
