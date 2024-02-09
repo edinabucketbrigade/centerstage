@@ -24,6 +24,7 @@ public class Lift {
     private DcMotor leftMotor;
     private DcMotor rightMotor;
     private TouchSensor touch;
+    private int targetPosition;
 
     // Initializes this.
     public Lift(RobotHardwareC robotHardware) {
@@ -61,24 +62,18 @@ public class Lift {
 
         }
 
-        // Determine whether the lift is down.
-        //boolean isDownPressed = touch.isPressed();
-
         // Get the lift's position.
         int leftPosition = leftMotor.getCurrentPosition();
         int rightPosition = rightMotor.getCurrentPosition();
-/*
-        // Determine whether the motors are running.
-        boolean isBusy = isBusy();
 
         // If we finished lowering the lift...
-        if (isBusy() && isDownPressed) {
+        if(targetPosition == DOWN_POSITION && touch.isPressed()) {
 
             // Reset the lift.
             reset();
 
         }
-*/
+
         // Get the lift's power.
         double leftPower = leftMotor.getPower();
         double rightPower = rightMotor.getPower();
@@ -115,6 +110,9 @@ public class Lift {
 
     // Sets the lift's position.
     public void setPosition(int targetPosition) {
+
+        // Remember the target position.
+        this.targetPosition = targetPosition;
 
         // Get the lift's current position.
         int currentPosition = leftMotor.getCurrentPosition();
@@ -215,11 +213,7 @@ public class Lift {
             return false;
         }
     }
-/*
-    public boolean isBusy() {
-        return leftMotor.isBusy() || rightMotor.isBusy();
-    }
-*/
+
     public int getLiftPosition() {
         return leftMotor.getCurrentPosition();
     }
