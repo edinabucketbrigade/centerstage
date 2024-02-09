@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.TeamPropLocation.LEFT;
 import static org.firstinspires.ftc.teamcode.TeamPropLocation.MIDDLE;
+import static org.firstinspires.ftc.teamcode.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -105,13 +106,19 @@ public class Routes {
     }
 
     // Drives to the backdrop.
-    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft) {
+    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location) {
 
         if (redAlliance) {
             if (startLeft) {
+                trajectorySequenceBuilder.lineTo(new Vector2d(-36, -10));
+                if(location == MIDDLE) {
+                    trajectorySequenceBuilder.turn(Math.toRadians(90));
+                }
+                else if(location == RIGHT) {
+                    trajectorySequenceBuilder.turn(Math.toRadians(180));
+                }
                 trajectorySequenceBuilder
-                        .splineToLinearHeading(new Pose2d(-30, -14, Math.toRadians(180)), Math.toRadians(0))
-                        .lineTo(new Vector2d(30, -14))
+                        .lineTo(new Vector2d(30, -10))
                         .splineTo(new Vector2d(44, -36), Math.toRadians(0));
             } else {
                 trajectorySequenceBuilder
@@ -122,9 +129,15 @@ public class Routes {
                 trajectorySequenceBuilder
                         .lineToLinearHeading(new Pose2d(44, 36, Math.toRadians(180)));
             } else {
+                trajectorySequenceBuilder.lineTo(new Vector2d(-36, 10));
+                if(location == MIDDLE) {
+                    trajectorySequenceBuilder.turn(Math.toRadians(90));
+                }
+                else if(location == LEFT) {
+                    trajectorySequenceBuilder.turn(Math.toRadians(180));
+                }
                 trajectorySequenceBuilder
-                        .splineToLinearHeading(new Pose2d(-30, 14, Math.toRadians(180)), Math.toRadians(0))
-                        .lineTo(new Vector2d(30, 14))
+                        .lineTo(new Vector2d(30, 10))
                         .splineTo(new Vector2d(44, 36), Math.toRadians(0));
             }
         }

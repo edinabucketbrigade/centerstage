@@ -6,7 +6,8 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.GRAB_OFF_STACK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.IDLE;
 import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_SPIKE_MARK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.PARK;
-import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_ARM_LIFT_AND_WRIST;
+import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_ARM_AND_LIFT;
+import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_WRIST;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PURPLE_PIXEL;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_WRIST;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_YELLOW_PIXEL;
@@ -61,7 +62,7 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
 
-    enum State {IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, APPROACH_BACKDROP, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RELEASE_WRIST, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK, PARK}
+    enum State {IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, RAISE_WRIST, APPROACH_BACKDROP, RAISE_ARM_AND_LIFT, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RELEASE_WRIST, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK, PARK}
 
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
@@ -196,6 +197,24 @@ public class AutoF extends LinearOpMode {
                 robotHardware.openLeftClawFully();
 
                 // Advance to the next step.
+                setState(RAISE_WRIST);
+
+                break;
+
+            case RAISE_WRIST:
+
+                // If we are waiting...
+                if (timer.milliseconds() > 500) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Raise the wrist so it does not bump the purple pixel when the robot starts moving.
+                robotHardware.setWristBackdrop();
+
+                // Advance to the next step.
                 setState(APPROACH_BACKDROP);
 
                 break;
@@ -213,11 +232,11 @@ public class AutoF extends LinearOpMode {
                 drive.followTrajectorySequenceAsync(approachTrajectorySequence);
 
                 // Advance to the next step.
-                setState(RAISE_ARM_LIFT_AND_WRIST);
+                setState(RAISE_ARM_AND_LIFT);
 
                 break;
 
-            case RAISE_ARM_LIFT_AND_WRIST:
+            case RAISE_ARM_AND_LIFT:
 
                 if (drive.isBusy()) {
                     return;
@@ -225,9 +244,6 @@ public class AutoF extends LinearOpMode {
 
                 // Raise the lift.
                 robotHardware.setLiftPosition(liftPosition);
-
-                // Move the wrist to the backdrop position.
-                robotHardware.setWristBackdrop();
 
                 // Raise the arm.
                 robotHardware.raiseArm();
@@ -662,7 +678,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Drive to the baackdrop.
-        driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft);
+        driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft, location);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();

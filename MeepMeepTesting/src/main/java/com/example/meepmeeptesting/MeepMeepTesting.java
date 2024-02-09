@@ -23,7 +23,7 @@ public class MeepMeepTesting {
 
     private static final boolean RED_ALLIANCE = false;
     private static final boolean START_LEFT = false;
-    private static final boolean PARK_LEFT = false;
+    private static final boolean PARK_LEFT = true;
     private static final TeamPropLocation LOCATION = LEFT;
 
     public static final double MAXIMUM_VELOCITY = 60;
@@ -72,7 +72,7 @@ public class MeepMeepTesting {
         trajectorySequenceBuilder.waitSeconds(1);
 
         // Drive to the backdrop.
-        driveToBackdrop(trajectorySequenceBuilder, RED_ALLIANCE, START_LEFT);
+        driveToBackdrop(trajectorySequenceBuilder, RED_ALLIANCE, START_LEFT, LOCATION);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
