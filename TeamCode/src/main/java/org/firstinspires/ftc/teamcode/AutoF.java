@@ -662,7 +662,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Drive to the baackdrop.
-        driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft, location);
+        driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -701,7 +701,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Park.
-        park(trajectorySequenceBuilder, parkLeft);
+        park(trajectorySequenceBuilder, redAlliance, parkLeft);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -779,26 +779,26 @@ public class AutoF extends LinearOpMode {
             if (startLeft) {
                 if (location == LEFT) {
                     trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(13,30, Math.toRadians(180)));
+                            .lineToLinearHeading(new Pose2d(13,27, Math.toRadians(0)));
                 } else if (location == MIDDLE) {
                     trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)));
                 } else {
                     trajectorySequenceBuilder
                             .setReversed(true)
-                            .splineToLinearHeading(new Pose2d(10,30), Math.toRadians(0));
+                            .splineToLinearHeading(new Pose2d(11,33, Math.toRadians(180)), Math.toRadians(180));
                 }
             } else {
                 if (location == LEFT) {
                     trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(-34,30, Math.toRadians(180)));
+                            .setReversed(true)
+                            .splineToLinearHeading(new Pose2d(-35,27),Math.toRadians(0));
                 } else if (location == MIDDLE) {
                     trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(-36,14, Math.toRadians(90)));
                 } else {
                     trajectorySequenceBuilder
-                            .setReversed(true)
-                            .splineToLinearHeading(new Pose2d(-37,30),Math.toRadians(0));
+                            .lineToLinearHeading(new Pose2d(-37,33, Math.toRadians(180)));
                 }
             }
         }
@@ -806,23 +806,13 @@ public class AutoF extends LinearOpMode {
     }
 
     // Drives to the backdrop.
-    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location) {
+    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft) {
 
         if (redAlliance) {
             if (startLeft) {
-                if (location == LEFT) {
-                    trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(180)));
-                } else if (location == MIDDLE) {
-                } else {
-                    trajectorySequenceBuilder
-                            .setReversed(true)
-                            .splineTo(new Vector2d(-30, -13), Math.toRadians(0));
-                }
                 trajectorySequenceBuilder
-                        .setReversed(true)
-                        .splineTo(new Vector2d(0, -12), Math.toRadians(0))
-                        .splineTo(new Vector2d(28, -12), Math.toRadians(0))
+                        .splineToLinearHeading(new Pose2d(-30, -14, Math.toRadians(180)), Math.toRadians(0))
+                        .lineTo(new Vector2d(30, -14))
                         .splineTo(new Vector2d(44, -36), Math.toRadians(0));
             } else {
                 trajectorySequenceBuilder
@@ -830,15 +820,13 @@ public class AutoF extends LinearOpMode {
             }
         } else {
             if (startLeft) {
-                if (location == LEFT) {
-                } else if (location == MIDDLE) {
-                } else {
-                }
+                trajectorySequenceBuilder
+                        .lineToLinearHeading(new Pose2d(44, 36, Math.toRadians(180)));
             } else {
-                if (location == LEFT) {
-                } else if (location == MIDDLE) {
-                } else {
-                }
+                trajectorySequenceBuilder
+                        .splineToLinearHeading(new Pose2d(-30, 14, Math.toRadians(180)), Math.toRadians(0))
+                        .lineTo(new Vector2d(30, 14))
+                        .splineTo(new Vector2d(44, 36), Math.toRadians(0));
             }
         }
 
@@ -856,18 +844,33 @@ public class AutoF extends LinearOpMode {
     }
 
     // Parks.
-    public static void park(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean parkLeft) {
+    public static void park(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean parkLeft) {
 
-        if (parkLeft) {
-            trajectorySequenceBuilder
-                    .setReversed(false)
-                    .lineTo(new Vector2d(44, -12))
-                    .lineTo(new Vector2d(60, -12));
-        } else {
-            trajectorySequenceBuilder
-                    .setReversed(false)
-                    .lineTo(new Vector2d(44, -60))
-                    .lineTo(new Vector2d(60, -60));
+        if(redAlliance) {
+            if (parkLeft) {
+                trajectorySequenceBuilder
+                        .setReversed(false)
+                        .lineTo(new Vector2d(44, -12))
+                        .lineTo(new Vector2d(60, -12));
+            } else {
+                trajectorySequenceBuilder
+                        .setReversed(false)
+                        .lineTo(new Vector2d(44, -60))
+                        .lineTo(new Vector2d(60, -60));
+            }
+        }
+        else {
+            if (parkLeft) {
+                trajectorySequenceBuilder
+                        .setReversed(false)
+                        .lineTo(new Vector2d(44, 60))
+                        .lineTo(new Vector2d(60, 60));
+            } else {
+                trajectorySequenceBuilder
+                        .setReversed(false)
+                        .lineTo(new Vector2d(44, 12))
+                        .lineTo(new Vector2d(60, 12));
+            }
         }
 
     }

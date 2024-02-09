@@ -18,10 +18,10 @@ import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBui
 
 public class MeepMeepTesting {
 
-    private static final boolean RED_ALLIANCE = true;
-    private static final boolean START_LEFT = true;
-    private static final boolean PARK_LEFT = true;
-    private static final TeamPropLocation LOCATION = RIGHT;
+    private static final boolean RED_ALLIANCE = false;
+    private static final boolean START_LEFT = false;
+    private static final boolean PARK_LEFT = false;
+    private static final TeamPropLocation LOCATION = LEFT;
 
     public static final double MAXIMUM_VELOCITY = 60;
     public static final double MAXIMUM_ACCELERATION = 60;
@@ -73,13 +73,13 @@ public class MeepMeepTesting {
         trajectorySequenceBuilder.waitSeconds(1);
 
         // Drive to the backdrop.
-        driveToBackdrop(trajectorySequenceBuilder, RED_ALLIANCE, START_LEFT, LOCATION);
+        driveToBackdrop(trajectorySequenceBuilder, RED_ALLIANCE, START_LEFT);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
 
         // Park.
-        park(trajectorySequenceBuilder, PARK_LEFT);
+        park(trajectorySequenceBuilder, RED_ALLIANCE, PARK_LEFT);
 
         // Drive to a white pixel stack.
         //driveToStack(trajectorySequenceBuilder);
@@ -163,26 +163,26 @@ public class MeepMeepTesting {
             if (startLeft) {
                 if (location == LEFT) {
                     trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(13,30, Math.toRadians(180)));
+                            .lineToLinearHeading(new Pose2d(13,27, Math.toRadians(0)));
                 } else if (location == MIDDLE) {
                     trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)));
                 } else {
                     trajectorySequenceBuilder
                             .setReversed(true)
-                            .splineToLinearHeading(new Pose2d(10,30), Math.toRadians(0));
+                            .splineToLinearHeading(new Pose2d(11,33, Math.toRadians(180)), Math.toRadians(180));
                 }
             } else {
                 if (location == LEFT) {
                     trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(-34,30, Math.toRadians(180)));
+                            .setReversed(true)
+                            .splineToLinearHeading(new Pose2d(-35,27),Math.toRadians(0));
                 } else if (location == MIDDLE) {
                     trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(-36,14, Math.toRadians(90)));
                 } else {
                     trajectorySequenceBuilder
-                            .setReversed(true)
-                            .splineToLinearHeading(new Pose2d(-37,30),Math.toRadians(0));
+                            .lineToLinearHeading(new Pose2d(-37,33, Math.toRadians(180)));
                 }
             }
         }
@@ -190,23 +190,13 @@ public class MeepMeepTesting {
     }
 
     // Drives to the backdrop.
-    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location) {
+    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft) {
 
         if (redAlliance) {
             if (startLeft) {
-                if (location == LEFT) {
-                    trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(180)));
-                } else if (location == MIDDLE) {
-                } else {
-                    trajectorySequenceBuilder
-                            .setReversed(true)
-                            .splineTo(new Vector2d(-30, -13), Math.toRadians(0));
-                }
                 trajectorySequenceBuilder
-                        .setReversed(true)
-                        .splineTo(new Vector2d(0, -12), Math.toRadians(0))
-                        .splineTo(new Vector2d(28, -12), Math.toRadians(0))
+                        .splineToLinearHeading(new Pose2d(-30, -14, Math.toRadians(180)), Math.toRadians(0))
+                        .lineTo(new Vector2d(30, -14))
                         .splineTo(new Vector2d(44, -36), Math.toRadians(0));
             } else {
                 trajectorySequenceBuilder
@@ -214,15 +204,13 @@ public class MeepMeepTesting {
             }
         } else {
             if (startLeft) {
-                if (location == LEFT) {
-                } else if (location == MIDDLE) {
-                } else {
-                }
+                trajectorySequenceBuilder
+                        .lineToLinearHeading(new Pose2d(44, 36, Math.toRadians(180)));
             } else {
-                if (location == LEFT) {
-                } else if (location == MIDDLE) {
-                } else {
-                }
+                trajectorySequenceBuilder
+                        .splineToLinearHeading(new Pose2d(-30, 14, Math.toRadians(180)), Math.toRadians(0))
+                        .lineTo(new Vector2d(30, 14))
+                        .splineTo(new Vector2d(44, 36), Math.toRadians(0));
             }
         }
 
@@ -240,18 +228,33 @@ public class MeepMeepTesting {
     }
 
     // Parks.
-    public static void park(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean parkLeft) {
+    public static void park(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean parkLeft) {
 
-        if (parkLeft) {
-            trajectorySequenceBuilder
-                    .setReversed(false)
-                    .lineTo(new Vector2d(44, -12))
-                    .lineTo(new Vector2d(60, -12));
-        } else {
-            trajectorySequenceBuilder
-                    .setReversed(false)
-                    .lineTo(new Vector2d(44, -60))
-                    .lineTo(new Vector2d(60, -60));
+        if(redAlliance) {
+            if (parkLeft) {
+                trajectorySequenceBuilder
+                        .setReversed(false)
+                        .lineTo(new Vector2d(44, -12))
+                        .lineTo(new Vector2d(60, -12));
+            } else {
+                trajectorySequenceBuilder
+                        .setReversed(false)
+                        .lineTo(new Vector2d(44, -60))
+                        .lineTo(new Vector2d(60, -60));
+            }
+        }
+        else {
+            if (parkLeft) {
+                trajectorySequenceBuilder
+                        .setReversed(false)
+                        .lineTo(new Vector2d(44, 60))
+                        .lineTo(new Vector2d(60, 60));
+            } else {
+                trajectorySequenceBuilder
+                        .setReversed(false)
+                        .lineTo(new Vector2d(44, 12))
+                        .lineTo(new Vector2d(60, 12));
+            }
         }
 
     }
