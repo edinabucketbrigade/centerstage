@@ -598,9 +598,6 @@ public class RobotHardwareC {
     // Waits for the user to lower the lift.
     public void waitForLiftDown() throws InterruptedException {
 
-        // Raise the wrist.
-        claw.setWristBackdrop();
-
         // Wait for the user to lower the lift.
         lift.waitForDown();
 

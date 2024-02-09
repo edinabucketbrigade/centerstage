@@ -1,11 +1,14 @@
 package com.example.meepmeeptesting;
 
+import static com.example.meepmeeptesting.Routes.driveToBackdrop;
+import static com.example.meepmeeptesting.Routes.driveToSpikeMark;
+import static com.example.meepmeeptesting.Routes.getStartPose;
+import static com.example.meepmeeptesting.Routes.park;
 import static com.example.meepmeeptesting.TeamPropLocation.LEFT;
 import static com.example.meepmeeptesting.TeamPropLocation.MIDDLE;
 import static com.example.meepmeeptesting.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
@@ -28,10 +31,6 @@ public class MeepMeepTesting {
     public static final double MAXIMUM_ANGULAR_VELOCITY = Math.toRadians(180);
     public static final double MAXIMUM_ANGULAR_ACCELERATION = Math.toRadians(180);
     public static final double TRACK_WIDTH = 15;
-    public static final Pose2d RED_LEFT_START = new Pose2d(-36, -61, Math.toRadians(-90));
-    public static final Pose2d RED_RIGHT_START = new Pose2d(12, -61, Math.toRadians(-90));
-    public static final Pose2d BLUE_LEFT_START = new Pose2d(12, 61, Math.toRadians(90));
-    public static final Pose2d BLUE_RIGHT_START = new Pose2d(-36, 61, Math.toRadians(90));
 
     // Runs the application.
     public static void main(String[] args) throws Exception {
@@ -92,170 +91,6 @@ public class MeepMeepTesting {
 
         // Return the robot.
         return robot;
-
-    }
-
-    // Gets a start pose.
-    private static Pose2d getStartPose(boolean redAlliance, boolean startLeft) {
-
-        // Return a start pose.
-        if(redAlliance) {
-            if(startLeft) {
-                return RED_LEFT_START;
-            }
-            else {
-                return RED_RIGHT_START;
-            }
-        }
-        else {
-            if(startLeft) {
-                return BLUE_LEFT_START;
-            }
-            else {
-                return BLUE_RIGHT_START;
-            }
-        }
-
-    }
-
-    // Drives to a spike mark.
-    public static void driveToSpikeMark(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location) {
-
-        // Add the appropriate maneuvers.
-        if (redAlliance) {
-            if (startLeft) {
-                if (location == LEFT) {
-                    Pose2d targetPose = new Pose2d(-37.5, -26.5, Math.toRadians(180));
-                    trajectorySequenceBuilder
-                            .lineToLinearHeading(targetPose);
-                }
-                else if (location == MIDDLE) {
-                    Pose2d targetPose = new Pose2d(-36, -14, Math.toRadians(-90));
-                    trajectorySequenceBuilder
-                            .lineToLinearHeading(targetPose);
-                }
-                else {
-                    Pose2d targetPose = new Pose2d(-34.5, -32.5);
-                    double targetHeading = Math.toRadians(0);
-                    trajectorySequenceBuilder
-                            .setReversed(true)
-                            .splineToLinearHeading(targetPose, targetHeading);
-                }
-            }
-            else {
-                if (location == LEFT) {
-                    trajectorySequenceBuilder
-                            .setReversed(true)
-                            .splineToLinearHeading(new Pose2d(11,-27, Math.toRadians(180)), Math.toRadians(180));
-                }
-                else if (location == MIDDLE) {
-                    trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(12,-14, Math.toRadians(-90)));
-                }
-                else {
-                    trajectorySequenceBuilder
-                            .setReversed(true)
-                            .lineToLinearHeading(new Pose2d(13,-33, Math.toRadians(0)));
-                }
-            }
-        }
-        else {
-            if (startLeft) {
-                if (location == LEFT) {
-                    trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(13,27, Math.toRadians(0)));
-                } else if (location == MIDDLE) {
-                    trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)));
-                } else {
-                    trajectorySequenceBuilder
-                            .setReversed(true)
-                            .splineToLinearHeading(new Pose2d(11,33, Math.toRadians(180)), Math.toRadians(180));
-                }
-            } else {
-                if (location == LEFT) {
-                    trajectorySequenceBuilder
-                            .setReversed(true)
-                            .splineToLinearHeading(new Pose2d(-35,27),Math.toRadians(0));
-                } else if (location == MIDDLE) {
-                    trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(-36,14, Math.toRadians(90)));
-                } else {
-                    trajectorySequenceBuilder
-                            .lineToLinearHeading(new Pose2d(-37,33, Math.toRadians(180)));
-                }
-            }
-        }
-
-    }
-
-    // Drives to the backdrop.
-    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft) {
-
-        if (redAlliance) {
-            if (startLeft) {
-                trajectorySequenceBuilder
-                        .splineToLinearHeading(new Pose2d(-30, -14, Math.toRadians(180)), Math.toRadians(0))
-                        .lineTo(new Vector2d(30, -14))
-                        .splineTo(new Vector2d(44, -36), Math.toRadians(0));
-            } else {
-                trajectorySequenceBuilder
-                        .lineToLinearHeading(new Pose2d(44, -36, Math.toRadians(180)));
-            }
-        } else {
-            if (startLeft) {
-                trajectorySequenceBuilder
-                        .lineToLinearHeading(new Pose2d(44, 36, Math.toRadians(180)));
-            } else {
-                trajectorySequenceBuilder
-                        .splineToLinearHeading(new Pose2d(-30, 14, Math.toRadians(180)), Math.toRadians(0))
-                        .lineTo(new Vector2d(30, 14))
-                        .splineTo(new Vector2d(44, 36), Math.toRadians(0));
-            }
-        }
-
-    }
-
-    // Drives to a white pixel stack.
-    public static void driveToStack(TrajectorySequenceBuilder trajectorySequenceBuilder) {
-
-        trajectorySequenceBuilder
-                .setReversed(false)
-                .splineTo(new Vector2d(28, -12), Math.toRadians(180))
-                .splineTo(new Vector2d(0, -12), Math.toRadians(180))
-                .splineTo(new Vector2d(-60, -10), Math.toRadians(180));
-
-    }
-
-    // Parks.
-    public static void park(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean parkLeft) {
-
-        if(redAlliance) {
-            if (parkLeft) {
-                trajectorySequenceBuilder
-                        .setReversed(false)
-                        .lineTo(new Vector2d(44, -12))
-                        .lineTo(new Vector2d(60, -12));
-            } else {
-                trajectorySequenceBuilder
-                        .setReversed(false)
-                        .lineTo(new Vector2d(44, -60))
-                        .lineTo(new Vector2d(60, -60));
-            }
-        }
-        else {
-            if (parkLeft) {
-                trajectorySequenceBuilder
-                        .setReversed(false)
-                        .lineTo(new Vector2d(44, 60))
-                        .lineTo(new Vector2d(60, 60));
-            } else {
-                trajectorySequenceBuilder
-                        .setReversed(false)
-                        .lineTo(new Vector2d(44, 12))
-                        .lineTo(new Vector2d(60, 12));
-            }
-        }
 
     }
 
