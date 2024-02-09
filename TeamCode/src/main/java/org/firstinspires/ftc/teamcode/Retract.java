@@ -45,7 +45,7 @@ public class Retract {
             case LOWER_LIFT_AND_ARM:
 
                 // Lower the lift.
-                robotHardware.lowerLift(DOWN_POSITION);
+                robotHardware.setLiftPosition(DOWN_POSITION);
 
                 // Lower the arm.
                 robotHardware.lowerArm();
@@ -58,7 +58,7 @@ public class Retract {
             case LOWER_WRIST_AND_OPEN_CLAW:
 
                 // If we are waiting...
-                if (!robotHardware.isArmDown() || !robotHardware.isLiftDown()) {
+                if (!robotHardware.isArmDown() || !robotHardware.isLiftInPosition(DOWN_POSITION)) {
 
                     // Exit the method.
                     return;

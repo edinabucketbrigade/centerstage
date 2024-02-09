@@ -211,6 +211,9 @@ public class AutoF extends LinearOpMode {
         // Update the robot's current pose.
         currentPose = robotHardware.getPose();
 
+        // Get a lift position.
+        int liftPosition = HeatSeekC.getTargetLiftPosition(FIRST_ROW);
+
         // Update the state machine.
         switch (state) {
 
@@ -272,11 +275,8 @@ public class AutoF extends LinearOpMode {
                     return;
                 }
 
-                // Get a lift position.
-                int liftPosition = HeatSeekC.getTargetLiftPosition(FIRST_ROW);
-
                 // Raise the lift.
-                robotHardware.raiseLift(liftPosition);
+                robotHardware.setLiftPosition(liftPosition);
 
                 // Move the wrist to the backdrop position.
                 robotHardware.setWristBackdrop();
@@ -291,7 +291,7 @@ public class AutoF extends LinearOpMode {
             case DRIVE_TO_PLACE_POSITION:
 
                 // If we are waiting...
-                if (!robotHardware.isArmUp() && !robotHardware.isLiftUp()) {
+                if (!robotHardware.isArmUp() && !robotHardware.isLiftInPosition(liftPosition)) {
 
                     // Exit the method.
                     return;

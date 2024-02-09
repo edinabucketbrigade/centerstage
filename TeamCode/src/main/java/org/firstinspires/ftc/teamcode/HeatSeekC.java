@@ -100,6 +100,9 @@ public class HeatSeekC {
         // Get the drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
+        // Get a lift position.
+        int liftPosition = getTargetLiftPosition(row);
+
         // Switch based on the state.
         switch (state) {
 
@@ -109,11 +112,11 @@ public class HeatSeekC {
                 robotHardware.closeClaw();
 
                 // Advance to the next step.
-                setState(RAISE_ARM_LIFT_AND_WRIST);
+                setState(DRIVE_TO_APPROACH_POSITION);
 
                 break;
 
-            case RAISE_ARM_LIFT_AND_WRIST:
+            case DRIVE_TO_APPROACH_POSITION:
 
                 // If we are waiting...
                 if (timer.milliseconds() < 500) {
@@ -123,32 +126,14 @@ public class HeatSeekC {
 
                 }
 
-                // Get a lift position.
-                int liftPosition = getTargetLiftPosition(row);
-
                 // Raise the lift.
-                robotHardware.raiseLift(liftPosition);
+                robotHardware.setLiftPosition(liftPosition);
 
                 // Set the wrist to the backdrop position.
                 robotHardware.setWristBackdrop();
 
                 // Raise the arm.
                 robotHardware.raiseArm();
-
-                // Advance to the next step.
-                setState(DRIVE_TO_APPROACH_POSITION);
-
-                break;
-
-            case DRIVE_TO_APPROACH_POSITION:
-
-                // If we are waiting...
-                if (!robotHardware.isArmUp() && !robotHardware.isLiftUp()) {
-
-                    // Exit the method.
-                    return;
-
-                }
 
                 // Drive to the approach position.
                 startDrivingToBackdrop(APPROACH_SPEED, APPROACH_TARGET_X);
@@ -160,8 +145,8 @@ public class HeatSeekC {
 
             case DRIVE_TO_PLACE_POSITION:
 
-                // If the robot is driving...
-                if (drive.isBusy()) {
+                // If we are waiting...
+                if (drive.isBusy() || !robotHardware.isArmUp() || !robotHardware.isLiftInPosition(liftPosition)) {
 
                     // Exit the method.
                     return;
@@ -179,14 +164,14 @@ public class HeatSeekC {
             case OPEN_CLAW:
 
                 // If we are waiting...
-                if (drive.isBusy() || !robotHardware.isArmUp() || !robotHardware.isLiftUp()) {
+                if (drive.isBusy()) {
 
                     // Exit the method.
                     return;
 
                 }
 
-                // Open the claw partially to release  the pixels.
+                // Open the claw partially to release the pixels.
                 robotHardware.openClawPartially();
 
                 // Advance to the next step.

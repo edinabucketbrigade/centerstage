@@ -31,6 +31,8 @@ public class TeleOpT extends LinearOpMode {
     - x = toggle left claw
     - b = toggle right claw
     - a = toggle both claws
+    - dpad up = raise lift for hanging
+    - dpad down = lift robot onto rigging
 
     Gamepad 2: Pixel Driver
 
@@ -39,7 +41,6 @@ public class TeleOpT extends LinearOpMode {
     - dpad = move pixels
     - a = start heat seek
     - y = stop heat seek
-    - x = retract
 
     Debug Mode (hold right trigger)
 
@@ -51,7 +52,7 @@ public class TeleOpT extends LinearOpMode {
     - dpad up = raise lift
      */
 
-    enum State { IDLE, HEAT_SEEKING, RETRACTING }
+    enum State { IDLE, HEAT_SEEKING, RETRACTING, HANGING }
 
     public static final String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
     public static double TRIGGER_THRESHOLD = 0.5;
@@ -156,6 +157,10 @@ public class TeleOpT extends LinearOpMode {
                     handleRetracting();
 
                     break;
+
+                case HANGING:
+
+                    handleHanging();
 
                 case IDLE:
 
@@ -384,16 +389,8 @@ public class TeleOpT extends LinearOpMode {
         // If the robot driver pressed dpad up...
         if(currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
 
-            // Raise the lift to its maximum height.
-            robotHardware.raiseLift(MAXIMUM_POSITION);
-
-        }
-
-        // If the robot driver pressed dpad down...
-        if(currentGamepad1.dpad_down && !previousGamepad1.dpad_up){
-
-            // Lower the lift to the hang position.
-            robotHardware.lowerLift(HANG_POSITION);
+            // Start hanging mode.
+            robotHardware.startHanging();
 
         }
 
@@ -407,7 +404,7 @@ public class TeleOpT extends LinearOpMode {
                 robotHardware.closeClaw();
 
                 // Lower the lift.
-                robotHardware.lowerLift(DOWN_POSITION);
+                robotHardware.setLiftPosition(DOWN_POSITION);
 
             }
 
@@ -418,7 +415,7 @@ public class TeleOpT extends LinearOpMode {
                 robotHardware.closeClaw();
 
                 // Raise the lift.
-                robotHardware.raiseLift(MAXIMUM_POSITION);
+                robotHardware.setLiftPosition(MAXIMUM_POSITION);
 
             }
 
@@ -525,6 +522,25 @@ public class TeleOpT extends LinearOpMode {
             }
 
         }
+
+    }
+
+    // Handles the hanging state.
+    private void handleHanging() {
+
+        // Determine whether we are actively hanging.
+        boolean isHanging = robotHardware.isHanging();
+
+        // If we are actively hanging...
+        if (isHanging) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Advance to the idle state.
+        state = IDLE;
 
     }
 

@@ -24,8 +24,6 @@ public class Lift {
     private DcMotor leftMotor;
     private DcMotor rightMotor;
     private TouchSensor touch;
-    private boolean isLowering;
-    private int targetPosition;
 
     // Initializes this.
     public Lift(RobotHardwareC robotHardware) {
@@ -64,23 +62,23 @@ public class Lift {
         }
 
         // Determine whether the lift is down.
-        boolean isDownPressed = touch.isPressed();
+        //boolean isDownPressed = touch.isPressed();
 
         // Get the lift's position.
         int leftPosition = leftMotor.getCurrentPosition();
         int rightPosition = rightMotor.getCurrentPosition();
+/*
+        // Determine whether the motors are running.
+        boolean isBusy = isBusy();
 
         // If we finished lowering the lift...
-        if (isLowering && isDownPressed) {
+        if (isBusy() && isDownPressed) {
 
             // Reset the lift.
             reset();
 
-            // Remember that we finished lowering the lift.
-            isLowering = false;
-
         }
-
+*/
         // Get the lift's power.
         double leftPower = leftMotor.getPower();
         double rightPower = rightMotor.getPower();
@@ -92,7 +90,7 @@ public class Lift {
         Telemetry telemetry = opMode.telemetry;
 
         // Add lift information to the telemetry.
-        telemetry.addData("Lift", "Lowering = %b, Position = %d/%d, Power = %.2f/%.2f", isLowering, leftPosition, rightPosition, leftPower, rightPower);
+        telemetry.addData("Lift", "Position = %d/%d, Power = %.2f/%.2f", leftPosition, rightPosition, leftPower, rightPower);
 
     }
 
@@ -115,26 +113,18 @@ public class Lift {
 
     }
 
-    // Raises the lift.
-    public void raise(int position) {
+    // Sets the lift's position.
+    public void setPosition(int targetPosition) {
 
-        // Set target position.
-        targetPosition = position;
+        // Get the lift's current position.
+        int currentPosition = leftMotor.getCurrentPosition();
 
-        // Raise the lift.
-        setPosition(leftMotor, position, RAISE_POWER);
-        setPosition(rightMotor, position, RAISE_POWER);
-        isLowering = false;
-
-    }
-
-    // Lowers the lift.
-    public void lower(int position) {
+        // Get the appropriate power.
+        double power = targetPosition > currentPosition ? RAISE_POWER : LOWER_POWER;
 
         // Lower the lift.
-        setPosition(leftMotor, position, LOWER_POWER);
-        setPosition(rightMotor, position, LOWER_POWER);
-        isLowering = true;
+        setPosition(leftMotor, targetPosition, power);
+        setPosition(rightMotor, targetPosition, power);
 
     }
 
@@ -213,15 +203,7 @@ public class Lift {
 
     }
 
-    public boolean isDown() {
-        return isInPosition(DOWN_POSITION);
-    }
-
-    public boolean isUp() {
-        return isInPosition(targetPosition);
-    }
-
-    private boolean isInPosition(int targetPosition) {
+    public boolean isInPosition(int targetPosition) {
         int leftPosition = leftMotor.getCurrentPosition();
         int rightPosition = rightMotor.getCurrentPosition();
         int leftDifference = Math.abs(leftPosition - targetPosition);
@@ -232,6 +214,14 @@ public class Lift {
         else {
             return false;
         }
+    }
+/*
+    public boolean isBusy() {
+        return leftMotor.isBusy() || rightMotor.isBusy();
+    }
+*/
+    public int getLiftPosition() {
+        return leftMotor.getCurrentPosition();
     }
 
 }
