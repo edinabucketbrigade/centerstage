@@ -41,7 +41,7 @@ public class Routes {
         if (redAlliance) {
             if (startLeft) {
                 if (location == LEFT) {
-                    Pose2d targetPose = new Pose2d(-37.5, -26.5, Math.toRadians(180));
+                    Pose2d targetPose = new Pose2d(-36.5, -26.5, Math.toRadians(180));
                     trajectorySequenceBuilder
                             .lineToLinearHeading(targetPose);
                 }
@@ -110,7 +110,7 @@ public class Routes {
 
         if (redAlliance) {
             if (startLeft) {
-                trajectorySequenceBuilder.lineTo(new Vector2d(-36, -10));
+                trajectorySequenceBuilder.lineTo(new Vector2d(-36, -9));
                 if(location == MIDDLE) {
                     trajectorySequenceBuilder.turn(Math.toRadians(90));
                 }
@@ -118,7 +118,7 @@ public class Routes {
                     trajectorySequenceBuilder.turn(Math.toRadians(180));
                 }
                 trajectorySequenceBuilder
-                        .lineTo(new Vector2d(30, -10))
+                        .lineTo(new Vector2d(30, -9))
                         .splineTo(new Vector2d(44, -36), Math.toRadians(0));
             } else {
                 trajectorySequenceBuilder
@@ -129,7 +129,7 @@ public class Routes {
                 trajectorySequenceBuilder
                         .lineToLinearHeading(new Pose2d(44, 36, Math.toRadians(180)));
             } else {
-                trajectorySequenceBuilder.lineTo(new Vector2d(-36, 10));
+                trajectorySequenceBuilder.lineTo(new Vector2d(-36, 9));
                 if(location == MIDDLE) {
                     trajectorySequenceBuilder.turn(Math.toRadians(90));
                 }
@@ -137,7 +137,7 @@ public class Routes {
                     trajectorySequenceBuilder.turn(Math.toRadians(180));
                 }
                 trajectorySequenceBuilder
-                        .lineTo(new Vector2d(30, 10))
+                        .lineTo(new Vector2d(30, 9))
                         .splineTo(new Vector2d(44, 36), Math.toRadians(0));
             }
         }
