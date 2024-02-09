@@ -68,6 +68,7 @@ public class AutoF extends LinearOpMode {
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
     private Pose2d lastEnd;
+    private Vector2d targetPosition;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -144,6 +145,14 @@ public class AutoF extends LinearOpMode {
 
             // Update the robot hardware.
             robotHardware.update();
+
+            // If there is a target position...
+            if(targetPosition != null) {
+
+                // Display the target position.
+                telemetry.addData("Target Position", targetPosition);
+
+            }
 
             // Update the telemetry.
             telemetry.update();
@@ -277,10 +286,10 @@ public class AutoF extends LinearOpMode {
                 TrajectoryAccelerationConstraint placeAccelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
 
                 // Construct a target position.
-                Vector2d placeTargetPosition = new Vector2d(HeatSeekC.PLACE_TARGET_X, targetY);
+                targetPosition = new Vector2d(HeatSeekC.PLACE_TARGET_X, targetY);
 
                 // Construct a target pose.
-                Pose2d targetPose = new Pose2d(placeTargetPosition, Math.toRadians(180));
+                Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
 
                 // Construct a trajectory sequence.
                 TrajectorySequence placeTrajectorySequence = drive.trajectorySequenceBuilder(lastEnd)
@@ -672,10 +681,10 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Construct an approach target position.
-        Vector2d approachTargetPosition = new Vector2d(BACKDROP_TARGET_X, targetY);
+        targetPosition = new Vector2d(BACKDROP_TARGET_X, targetY);
 
         // Drive to the baackdrop.
-        driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft, location, approachTargetPosition);
+        driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft, location, targetPosition);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();

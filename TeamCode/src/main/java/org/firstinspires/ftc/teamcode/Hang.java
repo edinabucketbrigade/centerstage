@@ -59,7 +59,7 @@ public class Hang {
         // Get the gamepad.
         Gamepad gamepad1 = opMode.gamepad1;
 
-        // Add hang information to the telemetry.
+        // Add the hang state to the telemetry.
         telemetry.addData("Hang State", state);
 
         // Switch based on the state.

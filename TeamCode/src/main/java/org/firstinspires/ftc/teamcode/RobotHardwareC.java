@@ -5,12 +5,14 @@ import android.util.Size;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -84,6 +86,7 @@ public class RobotHardwareC {
     private Lift lift;
     private Arm arm;
     private Claw claw;
+    private ElapsedTime localizationTimer;
 
     // Initializes this.
     public RobotHardwareC(LinearOpMode opMode) {
@@ -159,6 +162,9 @@ public class RobotHardwareC {
         // If there is a robot pose...
         if (pose != null) {
 
+            // Reset the localization timer.
+            localizationTimer = new ElapsedTime();
+
             // Update the driver interface.
             if (drive != null) drive.setPoseEstimate(pose);
 
@@ -185,8 +191,28 @@ public class RobotHardwareC {
         double leftBackMillimeters = leftBackDistance.getDistance(DistanceUnit.MM);
         double rightBackMillimeters = rightBackDistance.getDistance(DistanceUnit.MM);
 
+        // Initialize a localization status.
+        String localizationStatus = isLocalized ? GREEN_SQUARE : RED_SQUARE;
+
+        // If the localization timer exists...
+        if(localizationTimer != null) {
+
+            // Get the duration since the last localization.
+            int seconds = (int)localizationTimer.seconds();
+
+            // Add that information to the status.
+            localizationStatus += " (" + seconds + " seconds ago)";
+
+        }
+
+        // Get the heat seek target position.
+        Vector2d targetPosition = heatSeek.getTargetPosition();
+
         // Update the telemetry.
-        telemetry.addData("Localized", isLocalized ? GREEN_SQUARE : RED_SQUARE);
+        telemetry.addData("Localized", localizationStatus);
+        if(targetPosition != null) {
+            telemetry.addData("Target Position", targetPosition);
+        }
         telemetry.addData("Status", "Heat Seeking = %b, Retracting = %b, Hanging = %b, Turtle Mode = %b", heatSeek.isActive(), retract.isActive(), hang.isActive(), isTurtleMode);
         if(isLocalized) {
             telemetry.addData("Robot Pose", poseString);

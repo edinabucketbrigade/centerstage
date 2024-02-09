@@ -20,8 +20,11 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstra
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -43,6 +46,7 @@ public class HeatSeekC {
     public static double APPROACH_SPEED = 50;
     public static double PLACE_SPEED = 20;
     public static int MAXIMUM_ROW = (int)Math.floor((MAXIMUM_POSITION - FIRST_ROW_LIFT_POSITION) / LIFT_INCREMENT);
+    private Vector2d targetPosition;
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
@@ -101,6 +105,18 @@ public class HeatSeekC {
 
         // Get a lift position.
         int liftPosition = getTargetLiftPosition(row);
+
+        // Get the op mode.
+        OpMode opMode = robotHardware.getOpMode();
+
+        // Get the telementry.
+        Telemetry telemetry = opMode.telemetry;
+
+        // Get the gamepad.
+        Gamepad gamepad1 = opMode.gamepad1;
+
+        // Add the heat seek state to the telemetry.
+        telemetry.addData("Heat Seek State", state);
 
         // Switch based on the state.
         switch (state) {
@@ -311,7 +327,7 @@ public class HeatSeekC {
         double targetY = getTargetY(leftColumn, row, redAlliance);
 
         // Construct a target position.
-        Vector2d targetPosition = new Vector2d(targetX, targetY);
+        targetPosition = new Vector2d(targetX, targetY);
 
         // Construct a target pose.
         Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
@@ -325,6 +341,11 @@ public class HeatSeekC {
         // Execute the trajectory sequence.
         drive.followTrajectorySequenceAsync(sequence);
 
+    }
+
+    // Gets the target position.
+    public Vector2d getTargetPosition() {
+        return targetPosition;
     }
 
 }

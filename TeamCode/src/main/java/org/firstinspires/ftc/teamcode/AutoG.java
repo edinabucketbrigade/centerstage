@@ -67,6 +67,7 @@ public class AutoG extends LinearOpMode {
 
     // Position threshold in inches
     public static double POSITION_THRESHOLD = 2;
+    public static boolean SHOW_TELEMETRY = false;
 
     // Recent AprilTag detections
     private static LinkedList<AprilTagDetection> recentDetections = new LinkedList<>();
@@ -254,7 +255,9 @@ public class AutoG extends LinearOpMode {
         int recentCount = recentDetections.size();
 
         // Display the detection counts.
-        telemetry.addData("Detections", "matching = %d, recent = %d", matchingCount, recentCount);
+        if(SHOW_TELEMETRY) {
+            telemetry.addData("Detections", "matching = %d, recent = %d", matchingCount, recentCount);
+        }
 
         // If we do not have enough recent detections...
         if(recentCount < TAG_WINDOW) {
@@ -303,7 +306,9 @@ public class AutoG extends LinearOpMode {
         double averageY = averagePose.getY();
 
         // Display the average pose.
-        telemetry.addData("Average Pose", "x = %.1f, y = %.1f, heading = %.1f", averageX, averageY, averageHeadingDegrees);
+        if(SHOW_TELEMETRY) {
+            telemetry.addData("Average Pose", "x = %.1f, y = %.1f, heading = %.1f", averageX, averageY, averageHeadingDegrees);
+        }
 
         // For each recent pose...
         for(Pose2d recentPose : recentPoses) {
@@ -321,7 +326,9 @@ public class AutoG extends LinearOpMode {
             boolean isMatch = headingMatch && xMatch && yMatch;
 
             // Display the recent pose.
-            telemetry.addData("Recent Pose", "x = %.1f, y = %.1f, heading = %.1f, match = %b", recentX, recentY, recentHeadingDegrees, isMatch);
+            if(SHOW_TELEMETRY) {
+                telemetry.addData("Recent Pose", "x = %.1f, y = %.1f, heading = %.1f, match = %b", recentX, recentY, recentHeadingDegrees, isMatch);
+            }
 
             // If the poses do not match...
             if(!isMatch) {
@@ -423,12 +430,14 @@ public class AutoG extends LinearOpMode {
         Pose2d robotPose = new Pose2d(robotX, robotY, Math.toRadians(robotHeading));
 
         // Update the telemetry.
-        telemetry.addData("Tag ID", tagId);
-        telemetry.addData("Tag Position", fieldPosition);
-        telemetry.addData("Tag Orientation", fieldOrientation);
-        telemetry.addData("Tag Pose", "x %.2f, y %.2f, z %.2f, bearing %.2f, yaw %.2f, pitch %.2f, elevation %.2f, range %.2f, roll %.2f", tagPose.x, tagPose.y, tagPose.z, tagPose.bearing, tagPose.yaw, tagPose.pitch, tagPose.elevation, tagPose.range, tagPose.roll);
-        telemetry.addData("camera", "x %.2f, y %.2f, heading %.2f", cameraX, cameraY, cameraHeading);
-        telemetry.addData("robot", "x %.2f, y %.2f, heading %.2f", robotX, robotY, robotHeading);
+        if(SHOW_TELEMETRY) {
+            telemetry.addData("Tag ID", tagId);
+            telemetry.addData("Tag Position", fieldPosition);
+            telemetry.addData("Tag Orientation", fieldOrientation);
+            telemetry.addData("Tag Pose", "x %.2f, y %.2f, z %.2f, bearing %.2f, yaw %.2f, pitch %.2f, elevation %.2f, range %.2f, roll %.2f", tagPose.x, tagPose.y, tagPose.z, tagPose.bearing, tagPose.yaw, tagPose.pitch, tagPose.elevation, tagPose.range, tagPose.roll);
+            telemetry.addData("camera", "x %.2f, y %.2f, heading %.2f", cameraX, cameraY, cameraHeading);
+            telemetry.addData("robot", "x %.2f, y %.2f, heading %.2f", robotX, robotY, robotHeading);
+        }
 
         // Return the robot's pose.
         return robotPose;
