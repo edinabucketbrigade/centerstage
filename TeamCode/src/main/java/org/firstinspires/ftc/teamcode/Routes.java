@@ -76,7 +76,9 @@ public class Routes {
             if (startLeft) {
                 if (location == LEFT) {
                     trajectorySequenceBuilder
-                            .lineTo(new Vector2d(25, 19));
+                            //.lineTo(new Vector2d(25, 19));
+                            .setReversed(true)
+                            .splineTo(new Vector2d(32.5,30), Math.toRadians(0));
                 } else if (location == MIDDLE) {
                     trajectorySequenceBuilder
                             .lineToLinearHeading(new Pose2d(12,14, Math.toRadians(90)));
@@ -103,7 +105,7 @@ public class Routes {
     }
 
     // Drives to the backdrop.
-    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location, Vector2d targetVector) throws InterruptedException {
+    public static void driveToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, boolean startLeft, TeamPropLocation location, Vector2d targetVector) {
 
         // Construct a target pose.
         Pose2d targetPose = new Pose2d(targetVector, Math.toRadians(180));
@@ -134,9 +136,6 @@ public class Routes {
                 if(location == MIDDLE) {
                     trajectorySequenceBuilder.back(10);
                 }
-                else if(location == LEFT) {
-                    trajectorySequenceBuilder.back(14);
-                }
                 trajectorySequenceBuilder.lineToLinearHeading(targetPose);
             } else {
                 trajectorySequenceBuilder.lineTo(new Vector2d(-36, 9));
@@ -155,13 +154,17 @@ public class Routes {
     }
 
     // Drives to a white pixel stack.
-    public static void driveToStack(TrajectorySequenceBuilder trajectorySequenceBuilder) {
+    public static void driveToStack(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance) {
 
-        trajectorySequenceBuilder
-                .setReversed(false)
-                .splineTo(new Vector2d(28, -12), Math.toRadians(180))
-                .splineTo(new Vector2d(0, -12), Math.toRadians(180))
-                .splineTo(new Vector2d(-60, -10), Math.toRadians(180));
+        if(redAlliance) {
+
+        }
+        else {
+            trajectorySequenceBuilder
+                    .setTangent(Math.toRadians(-90))
+                    .splineToLinearHeading(new Pose2d(20,9, Math.toRadians(180)), Math.toRadians(180))
+                    .lineTo(new Vector2d(-57,9));
+        }
 
     }
 
@@ -195,6 +198,17 @@ public class Routes {
             }
         }
 
+    }
+
+    public static void returnToBackdrop(TrajectorySequenceBuilder trajectorySequenceBuilder, boolean redAlliance, Vector2d targetVector) {
+        if(redAlliance) {
+
+        }
+        else {
+            trajectorySequenceBuilder
+                    .lineTo(new Vector2d(20,9))
+                    .splineToLinearHeading(new Pose2d(targetVector.getX(),targetVector.getY(), Math.toRadians(180)), Math.toRadians(90));
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.AutoF.State.APPROACH_BACKDROP;
+import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_PIXEL_STACK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_PLACE_POSITION;
 import static org.firstinspires.ftc.teamcode.AutoF.State.GRAB_OFF_STACK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.IDLE;
@@ -12,11 +13,13 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PURPLE_PIXEL;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_WRIST;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_YELLOW_PIXEL;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
+import static org.firstinspires.ftc.teamcode.AutoF.State.RETURN_TO_BACKDROP;
 import static org.firstinspires.ftc.teamcode.AutoF.State.WAIT_FOR_RELEASE;
 import static org.firstinspires.ftc.teamcode.Routes.driveToBackdrop;
 import static org.firstinspires.ftc.teamcode.Routes.driveToSpikeMark;
 import static org.firstinspires.ftc.teamcode.Routes.driveToStack;
 import static org.firstinspires.ftc.teamcode.Routes.park;
+import static org.firstinspires.ftc.teamcode.Routes.returnToBackdrop;
 import static org.firstinspires.ftc.teamcode.TeamPropLocation.LEFT;
 import static org.firstinspires.ftc.teamcode.TeamPropLocation.MIDDLE;
 import static org.firstinspires.ftc.teamcode.TeamPropLocation.RIGHT;
@@ -63,7 +66,7 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
 
-    enum State {IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, RAISE_WRIST, APPROACH_BACKDROP, RAISE_ARM_AND_LIFT, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RELEASE_WRIST, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK, PARK}
+    enum State {IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, RAISE_WRIST, APPROACH_BACKDROP, RAISE_ARM_AND_LIFT, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RELEASE_WRIST, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK}
 
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
@@ -350,18 +353,8 @@ public class AutoF extends LinearOpMode {
                 // Start retracting.
                 robotHardware.startRetracting();
 
+                //setState(DRIVE_TO_PIXEL_STACK);
                 setState(PARK);
-
-                break;
-
-            case PARK:
-
-                TrajectorySequence parkTrajectorySequence = getParkTrajectorySequence();
-                lastEnd = parkTrajectorySequence.end();
-
-                drive.followTrajectorySequenceAsync(parkTrajectorySequence);
-
-                setState(IDLE);
 
                 break;
 
@@ -383,6 +376,32 @@ public class AutoF extends LinearOpMode {
                 }
 
                 robotHardware.closeLeftClaw();
+
+                setState(RETURN_TO_BACKDROP);
+
+                break;
+
+            case RETURN_TO_BACKDROP:
+
+                TrajectorySequence returnTrajectorySequence = getReturnTrajectorySequence();
+                lastEnd = returnTrajectorySequence.end();
+
+                drive.followTrajectorySequenceAsync(returnTrajectorySequence);
+
+                setState(PARK);
+
+                break;
+
+            case PARK:
+
+                if (drive.isBusy()) {
+                    return;
+                }
+
+                TrajectorySequence parkTrajectorySequence = getParkTrajectorySequence();
+                lastEnd = parkTrajectorySequence.end();
+
+                drive.followTrajectorySequenceAsync(parkTrajectorySequence);
 
                 setState(IDLE);
 
@@ -704,7 +723,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Drive to the stack.
-        driveToStack(trajectorySequenceBuilder);
+        driveToStack(trajectorySequenceBuilder, redAlliance);
 
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -726,6 +745,34 @@ public class AutoF extends LinearOpMode {
         park(trajectorySequenceBuilder, redAlliance, parkLeft);
 
         // Get a trajectory sequence.
+        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
+
+        // Return the result.
+        return trajectorySequence;
+
+    }
+
+    private TrajectorySequence getReturnTrajectorySequence() throws InterruptedException {
+
+        // Get a drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Construct a trajectory sequence builder.
+        TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
+
+        // Get the appropriate left column.
+        int leftColumn = getLeftColumn(location);
+
+        // Get a target y coordinate.
+        double targetY = HeatSeekC.getTargetY(leftColumn, FIRST_ROW, redAlliance);
+
+        // Construct an approach target position.
+        targetPosition = new Vector2d(BACKDROP_TARGET_X, targetY);
+
+        // Return to backdrop.
+        returnToBackdrop(trajectorySequenceBuilder, redAlliance, targetPosition);
+
+        // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
 
         // Return the result.

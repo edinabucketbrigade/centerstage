@@ -2,8 +2,10 @@ package com.example.meepmeeptesting;
 
 import static com.example.meepmeeptesting.Routes.driveToBackdrop;
 import static com.example.meepmeeptesting.Routes.driveToSpikeMark;
+import static com.example.meepmeeptesting.Routes.driveToStack;
 import static com.example.meepmeeptesting.Routes.getStartPose;
 import static com.example.meepmeeptesting.Routes.park;
+import static com.example.meepmeeptesting.Routes.returnToBackdrop;
 import static com.example.meepmeeptesting.TeamPropLocation.LEFT;
 import static com.example.meepmeeptesting.TeamPropLocation.MIDDLE;
 import static com.example.meepmeeptesting.TeamPropLocation.RIGHT;
@@ -22,10 +24,10 @@ import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBui
 
 public class MeepMeepTesting {
 
-    private static final boolean RED_ALLIANCE = true;
-    private static final boolean START_LEFT = false;
+    private static final boolean RED_ALLIANCE = false;
+    private static final boolean START_LEFT = true;
     private static final boolean PARK_LEFT = true;
-    private static final TeamPropLocation LOCATION = RIGHT;
+    private static final TeamPropLocation LOCATION = LEFT;
 
     public static final double MAXIMUM_VELOCITY = 60;
     public static final double MAXIMUM_ACCELERATION = 60;
@@ -81,6 +83,18 @@ public class MeepMeepTesting {
 
         // Drive to the backdrop.
         driveToBackdrop(trajectorySequenceBuilder, RED_ALLIANCE, START_LEFT, LOCATION, targetVector);
+
+        // Wait for a bit.
+        trajectorySequenceBuilder.waitSeconds(1);
+
+        // Drive to the pixel stack.
+        driveToStack(trajectorySequenceBuilder, RED_ALLIANCE);
+
+        // Wait for a bit.
+        trajectorySequenceBuilder.waitSeconds(1);
+
+        // Return to the backdrop.
+        returnToBackdrop(trajectorySequenceBuilder, RED_ALLIANCE, targetVector);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
