@@ -225,7 +225,7 @@ public class RobotHardwareC {
         Gamepad gamepad1 = opMode.gamepad1;
 
         double NORMAL_MULTIPLIER = 1;
-        double TURTLE_MULTIPLIER = 0.6;
+        double TURTLE_MULTIPLIER = 0.5;
 
         double leftFrontPower;
         double leftBackPower;
