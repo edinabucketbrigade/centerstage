@@ -38,9 +38,9 @@ public class HeatSeekC {
     public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
     public static int FIRST_ROW_LIFT_POSITION = 0;
     public static int LIFT_INCREMENT = 200;
-    public static double PIXEL_WIDTH = 3;
-    public static double TARGET_RED_Y = -27.5;
-    public static double TARGET_BLUE_Y = 42.5;
+    public static double PIXEL_WIDTH = 3.2;
+    public static double TARGET_RED_Y = -28;
+    public static double TARGET_BLUE_Y = 43;
     public static double APPROACH_SPEED = 50;
     public static double PLACE_SPEED = 20;
     public static int MAXIMUM_ROW = (int)Math.floor((MAXIMUM_POSITION - FIRST_ROW_LIFT_POSITION) / LIFT_INCREMENT);
