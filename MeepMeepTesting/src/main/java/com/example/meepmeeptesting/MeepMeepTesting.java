@@ -22,8 +22,6 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequence;
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 
-import bucketbrigade.carsonlibrary.Otherworld;
-
 public class MeepMeepTesting {
 
     private static final boolean RED_ALLIANCE = false;
@@ -52,8 +50,6 @@ public class MeepMeepTesting {
                 .setBackgroundAlpha(0.95f)
                 .addEntity(robot)
                 .start();
-
-        int test = Otherworld.MY_VALUE;
 
     }
 
