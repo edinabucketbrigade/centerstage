@@ -46,6 +46,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import bucketbrigade.carsonlibrary.Otherworld;
+
 @Config
 @Autonomous(preselectTeleOp = "TeleOpT")
 public class AutoF extends LinearOpMode {
@@ -81,6 +83,8 @@ public class AutoF extends LinearOpMode {
 
         // Remember that we last ran autonomous.
         lastRanAutonomous = true;
+
+        int test = Otherworld.MY_VALUE;
 
         // Get the robot hardware.
         robotHardware = new RobotHardwareC(this);
