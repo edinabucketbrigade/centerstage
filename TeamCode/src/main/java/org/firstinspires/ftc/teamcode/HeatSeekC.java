@@ -34,7 +34,7 @@ public class HeatSeekC {
 
     enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW, RELEASE_WRIST, WAIT_FOR_RELEASE }
 
-    public static double PLACE_TARGET_X = 44;
+    public static double PLACE_TARGET_X = 43.5;
     public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
     public static int FIRST_ROW_LIFT_POSITION = 0;
     public static int LIFT_INCREMENT = 200;
