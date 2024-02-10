@@ -36,7 +36,7 @@ public class TeleOpT extends LinearOpMode {
       1) raise arm and lift for hanging
       2) raise robot onto rigging
       3) lower robot from rigging (use when match ends)
-    - y = cancel hanging
+    - dpad down = cancel hanging
 
     Gamepad 2: Pixel Driver
 
@@ -540,8 +540,8 @@ public class TeleOpT extends LinearOpMode {
     // Handles the hanging state.
     private void handleHanging() {
 
-        // If the robot driver pressed y...
-        if(currentGamepad1.y && !previousGamepad1.y) {
+        // If the robot driver pressed dpad down...
+        if(currentGamepad1.dpad_down && !previousGamepad1.dpad_down) {
 
             // Stop hanging.
             robotHardware.stopHanging();
