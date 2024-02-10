@@ -25,7 +25,7 @@ public class Claw {
     public static double RIGHT_CLOSED = 0.6;
     public static double RIGHT_PARTIALLY_OPEN = 0.52;
     public static double RIGHT_FULLY_OPEN = 0.3;
-    public static double WRIST_GROUND_POSITION = 0.118;
+    public static double WRIST_GROUND_POSITION = 0.11;
     public static double WRIST_BACKDROP_POSITION = 0.76;
     public static double WRIST_RELEASE_POSITION = 0.88;
 
