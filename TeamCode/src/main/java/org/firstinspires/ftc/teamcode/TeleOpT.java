@@ -29,9 +29,10 @@ public class TeleOpT extends LinearOpMode {
     - left stick = move robot
     - right stick = rotate robot
     - right bumper = hold for turtle mode
+    - a = close both claws
+    - y = open both claws
     - x = toggle left claw
     - b = toggle right claw
-    - a = toggle both claws
     - dpad up = hang mode
       1) raise arm and lift for hanging
       2) raise robot onto rigging
@@ -390,8 +391,16 @@ public class TeleOpT extends LinearOpMode {
         // If the robot driver pressed a...
         if(currentGamepad1.a && !previousGamepad1.a) {
 
-            // Toggle the claws.
-            robotHardware.toggleClaws();
+            // Close the claws.
+            robotHardware.closeClaw();
+
+        }
+
+        // If the robot driver pressed y...
+        if(currentGamepad1.y && !previousGamepad1.y) {
+
+            // Open the claws.
+            robotHardware.openClawFully();
 
         }
 
