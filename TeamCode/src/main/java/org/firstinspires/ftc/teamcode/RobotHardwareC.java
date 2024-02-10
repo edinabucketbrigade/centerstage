@@ -174,7 +174,7 @@ public class RobotHardwareC {
         }
 
         // Initialize a pose string.
-        String poseString = "";
+        String poseString = "Unknown";
 
         // If the drive interface exists...
         if(drive != null) {
@@ -207,11 +207,7 @@ public class RobotHardwareC {
 
         // Update the telemetry.
         telemetry.addData("Localized", localizationStatus);
-        telemetry.addData("Status", "Heat Seeking = %b, Retracting = %b, Hanging = %b, Turtle Mode = %b", heatSeek.isActive(), retract.isActive(), hang.isActive(), isTurtleMode);
-        if(isLocalized) {
-            telemetry.addData("Robot Pose", poseString);
-        }
-        telemetry.addData("Back Distance", "Left = %.0f mm, Right = %.0f mm", leftBackMillimeters, rightBackMillimeters);
+        telemetry.addData("Status", "Heat Seek = %s, Retract = %s, Hang = %s, Turtle Mode = %b, Robot Pose = %s, Back Left = %.0f mm, Back Right = %.0f mm", heatSeek.getState(), retract.getState(), hang.getState(), isTurtleMode, poseString, leftBackMillimeters, rightBackMillimeters);
 
     }
 

@@ -20,11 +20,8 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstra
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -102,18 +99,6 @@ public class HeatSeekC {
 
         // Get a lift position.
         int liftPosition = getTargetLiftPosition(row);
-
-        // Get the op mode.
-        OpMode opMode = robotHardware.getOpMode();
-
-        // Get the telementry.
-        Telemetry telemetry = opMode.telemetry;
-
-        // Get the gamepad.
-        Gamepad gamepad1 = opMode.gamepad1;
-
-        // Add the heat seek state to the telemetry.
-        telemetry.addData("Heat Seek State", state);
 
         // Switch based on the state.
         switch (state) {
@@ -337,6 +322,14 @@ public class HeatSeekC {
 
         // Execute the trajectory sequence.
         drive.followTrajectorySequenceAsync(sequence);
+
+    }
+
+    // Gets the state.
+    public State getState() {
+
+        // Return the state.
+        return state;
 
     }
 

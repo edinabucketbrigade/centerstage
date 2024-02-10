@@ -53,14 +53,8 @@ public class Hang {
         // Get the op mode.
         OpMode opMode = robotHardware.getOpMode();
 
-        // Get the telementry.
-        Telemetry telemetry = opMode.telemetry;
-
         // Get the gamepad.
         Gamepad gamepad1 = opMode.gamepad1;
-
-        // Add the hang state to the telemetry.
-        telemetry.addData("Hang State", state);
 
         // Switch based on the state.
         switch (state) {
@@ -210,6 +204,14 @@ public class Hang {
 
         // Stops hanging.
         setState(IDLE);
+
+    }
+
+    // Gets the state.
+    public State getState() {
+
+        // Return the state.
+        return state;
 
     }
 

@@ -6,8 +6,6 @@ import static org.firstinspires.ftc.teamcode.Retract.State.LOWER_LIFT_AND_ARM;
 import static org.firstinspires.ftc.teamcode.Retract.State.LOWER_WRIST_AND_OPEN_CLAW;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -42,18 +40,6 @@ public class Retract {
 
     // Updates this.
     public void update() throws InterruptedException {
-
-        // Get the op mode.
-        OpMode opMode = robotHardware.getOpMode();
-
-        // Get the telementry.
-        Telemetry telemetry = opMode.telemetry;
-
-        // Get the gamepad.
-        Gamepad gamepad1 = opMode.gamepad1;
-
-        // Add the retract state to the telemetry.
-        telemetry.addData("Retract State", state);
 
         // Switch based on the state.
         switch (state) {
@@ -118,6 +104,14 @@ public class Retract {
 
         // Return indicating if this is active.
         return state != IDLE;
+
+    }
+
+    // Gets the state.
+    public State getState() {
+
+        // Return the state.
+        return state;
 
     }
 
