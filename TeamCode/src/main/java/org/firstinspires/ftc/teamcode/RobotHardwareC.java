@@ -205,14 +205,8 @@ public class RobotHardwareC {
 
         }
 
-        // Get the heat seek target position.
-        Vector2d targetPosition = heatSeek.getTargetPosition();
-
         // Update the telemetry.
         telemetry.addData("Localized", localizationStatus);
-        if(targetPosition != null) {
-            telemetry.addData("Target Position", targetPosition);
-        }
         telemetry.addData("Status", "Heat Seeking = %b, Retracting = %b, Hanging = %b, Turtle Mode = %b", heatSeek.isActive(), retract.isActive(), hang.isActive(), isTurtleMode);
         if(isLocalized) {
             telemetry.addData("Robot Pose", poseString);

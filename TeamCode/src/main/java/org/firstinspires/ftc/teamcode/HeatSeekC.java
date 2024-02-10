@@ -44,7 +44,6 @@ public class HeatSeekC {
     public static double APPROACH_SPEED = 50;
     public static double PLACE_SPEED = 20;
     public static int MAXIMUM_ROW = (int)Math.floor((MAXIMUM_POSITION - FIRST_ROW_LIFT_POSITION) / LIFT_INCREMENT);
-    private Vector2d targetPosition;
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
@@ -325,7 +324,7 @@ public class HeatSeekC {
         double targetY = getTargetY(leftColumn, row, redAlliance);
 
         // Construct a target position.
-        targetPosition = new Vector2d(targetX, targetY);
+        Vector2d targetPosition = new Vector2d(targetX, targetY);
 
         // Construct a target pose.
         Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
@@ -339,11 +338,6 @@ public class HeatSeekC {
         // Execute the trajectory sequence.
         drive.followTrajectorySequenceAsync(sequence);
 
-    }
-
-    // Gets the target position.
-    public Vector2d getTargetPosition() {
-        return targetPosition;
     }
 
 }

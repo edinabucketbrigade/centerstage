@@ -71,7 +71,6 @@ public class AutoF extends LinearOpMode {
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
     private Pose2d lastEnd;
-    private Vector2d targetPosition;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -148,14 +147,6 @@ public class AutoF extends LinearOpMode {
 
             // Update the robot hardware.
             robotHardware.update();
-
-            // If there is a target position...
-            if(targetPosition != null) {
-
-                // Display the target position.
-                telemetry.addData("Target Position", targetPosition);
-
-            }
 
             // Update the telemetry.
             telemetry.update();
@@ -289,7 +280,7 @@ public class AutoF extends LinearOpMode {
                 TrajectoryAccelerationConstraint placeAccelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
 
                 // Construct a target position.
-                targetPosition = new Vector2d(HeatSeekC.PLACE_TARGET_X, targetY);
+                Vector2d targetPosition = new Vector2d(HeatSeekC.PLACE_TARGET_X, targetY);
 
                 // Construct a target pose.
                 Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
@@ -700,7 +691,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Construct an approach target position.
-        targetPosition = new Vector2d(BACKDROP_TARGET_X, targetY);
+        Vector2d targetPosition = new Vector2d(BACKDROP_TARGET_X, targetY);
 
         // Drive to the baackdrop.
         driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft, location, targetPosition);
@@ -767,7 +758,7 @@ public class AutoF extends LinearOpMode {
         double targetY = HeatSeekC.getTargetY(leftColumn, FIRST_ROW, redAlliance);
 
         // Construct an approach target position.
-        targetPosition = new Vector2d(BACKDROP_TARGET_X, targetY);
+        Vector2d targetPosition = new Vector2d(BACKDROP_TARGET_X, targetY);
 
         // Return to backdrop.
         returnToBackdrop(trajectorySequenceBuilder, redAlliance, targetPosition);
