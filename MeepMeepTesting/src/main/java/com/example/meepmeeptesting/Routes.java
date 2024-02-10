@@ -174,12 +174,12 @@ public class Routes {
                 trajectorySequenceBuilder
                         .setReversed(false)
                         .lineTo(new Vector2d(44, -12))
-                        .lineTo(new Vector2d(60, -12));
+                        .lineTo(new Vector2d(58, -12));
             } else {
                 trajectorySequenceBuilder
                         .setReversed(false)
                         .lineTo(new Vector2d(44, -60))
-                        .lineTo(new Vector2d(60, -60));
+                        .lineTo(new Vector2d(58, -60));
             }
         }
         else {
@@ -187,12 +187,12 @@ public class Routes {
                 trajectorySequenceBuilder
                         .setReversed(false)
                         .lineTo(new Vector2d(44, 60))
-                        .lineTo(new Vector2d(60, 60));
+                        .lineTo(new Vector2d(58, 60));
             } else {
                 trajectorySequenceBuilder
                         .setReversed(false)
                         .lineTo(new Vector2d(44, 12))
-                        .lineTo(new Vector2d(60, 12));
+                        .lineTo(new Vector2d(58, 12));
             }
         }
 
