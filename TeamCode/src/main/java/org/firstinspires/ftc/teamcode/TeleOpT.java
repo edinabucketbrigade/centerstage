@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.AutoF.FIRST_ROW;
+import static org.firstinspires.ftc.teamcode.AutoF.getLeftColumn;
 import static org.firstinspires.ftc.teamcode.AutoF.lastRanAutonomous;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.Lift.DOWN_POSITION;
@@ -8,6 +10,9 @@ import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.getMaximumColumn;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.isEven;
+import static org.firstinspires.ftc.teamcode.TeamPropLocation.LEFT;
+import static org.firstinspires.ftc.teamcode.TeamPropLocation.MIDDLE;
+import static org.firstinspires.ftc.teamcode.TeamPropLocation.RIGHT;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.HANGING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.HEAT_SEEKING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.IDLE;
@@ -24,7 +29,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class TeleOpT extends LinearOpMode {
 
     /*
-    Gamepad 1: Robot Driver
+    Normal Mode
 
     - left stick = move robot
     - right stick = rotate robot
@@ -39,23 +44,19 @@ public class TeleOpT extends LinearOpMode {
       3) lower robot from rigging (use when match ends)
     - dpad down = cancel hanging
 
-    Gamepad 2: Pixel Driver
-
-    Normal Mode
-
-    - dpad = move pixels
-    - a = start heat seek
-    - y = cancel heat seek
-
     Debug Mode (hold right trigger)
 
+    - dpad left = start heat seeking left
+    - dpad down = start heat seeking middle
+    - dpad right = start heat seeking right
+    - dpad up = cancel heat seeking
     - x = lower wrist
     - b = raise wrist
     - a = lower arm
     - y = raise arm
-    - dpad down = lower lift
-    - dpad up = raise lift
-     */
+    - left bumper = lower lift
+    - right bumper = raise lift
+    */
 
     enum State { IDLE, HEAT_SEEKING, RETRACTING, HANGING }
 
@@ -65,14 +66,9 @@ public class TeleOpT extends LinearOpMode {
     public static int HANG_POSITION = 700;
 
     private RobotHardwareC robotHardware;
-    private Gamepad currentGamepad1 = new Gamepad();
-    private Gamepad previousGamepad1 = new Gamepad();
-    private Gamepad currentGamepad2 = new Gamepad();
-    private Gamepad previousGamepad2 = new Gamepad();
-
+    private Gamepad currentGamepad = new Gamepad();
+    private Gamepad previousGamepad = new Gamepad();
     private State state = IDLE;
-    private int leftColumn = MINIMUM_COLUMN;
-    private int leftRow = MINIMUM_ROW;
 
     // Runs the op mode.
     @Override
@@ -139,13 +135,11 @@ public class TeleOpT extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Update the gamepads.
-            previousGamepad1.copy(currentGamepad1);
-            currentGamepad1.copy(gamepad1);
-            previousGamepad2.copy(currentGamepad2);
-            currentGamepad2.copy(gamepad2);
+            previousGamepad.copy(currentGamepad);
+            currentGamepad.copy(gamepad1);
 
             // Determine whether the user is debugging.
-            boolean debugging = currentGamepad2.right_trigger > TRIGGER_THRESHOLD;
+            boolean debugging = currentGamepad.right_trigger > TRIGGER_THRESHOLD;
 
             // Switch based on the state.
             switch (state) {
@@ -164,7 +158,7 @@ public class TeleOpT extends LinearOpMode {
 
                 case HANGING:
 
-                    handleHanging();
+                    handleHanging(debugging);
 
                     break;
 
@@ -192,18 +186,9 @@ public class TeleOpT extends LinearOpMode {
             }
 
             // Set turtle mode.
-            robotHardware.setTurtleMode(currentGamepad1.right_bumper);
-
-            // Compute the right column and row.
-            int rightColumn = leftColumn + 1;
-            int rightRow = leftRow;
-
-            // Get the hex display.
-            String output = getHexDisplay(leftColumn,leftRow,rightColumn,rightRow);
+            robotHardware.setTurtleMode(currentGamepad.right_bumper && !debugging);
 
             // Add telemetry.
-            telemetry.addData("Pixel Placement", output);
-            telemetry.addData("Left Pixel", "Column = %d, Row = %d", leftColumn, leftRow);
             telemetry.addData("Red Alliance", AutoF.redAlliance);
             telemetry.addData("State", state);
             telemetry.addData("Debugging", debugging);
@@ -276,17 +261,17 @@ public class TeleOpT extends LinearOpMode {
         while (!isStopRequested()) {
 
             // Update the gamepads.
-            previousGamepad1.copy(currentGamepad1);
-            currentGamepad1.copy(gamepad1);
+            previousGamepad.copy(currentGamepad);
+            currentGamepad.copy(gamepad1);
 
             // If the user has not selected an alliance...
             if (AutoF.redAlliance == null) {
                 telemetry.addData("Alliance", "X = blue, B = red");
                 telemetry.update();
-                if (currentGamepad1.x && !previousGamepad1.x) {
+                if (currentGamepad.x && !previousGamepad.x) {
                     AutoF.redAlliance = false;
                 }
-                if (currentGamepad1.b && !previousGamepad1.b) {
+                if (currentGamepad.b && !previousGamepad.b) {
                     AutoF.redAlliance = true;
                 }
             }
@@ -314,8 +299,8 @@ public class TeleOpT extends LinearOpMode {
     // Handles the heat seeking state.
     private void handleHeatSeeking(boolean debugging) {
 
-        // If the pixel driver pressed y...
-        if(currentGamepad2.y && !previousGamepad2.y && !debugging) {
+        // If the driver pressed dpad up...
+        if(currentGamepad.dpad_up && !previousGamepad.dpad_up && debugging) {
 
             // Stop heat seeking.
             robotHardware.stopHeatSeeking();
@@ -372,54 +357,11 @@ public class TeleOpT extends LinearOpMode {
     // Handles the idle state.
     private void handleIdle(boolean debugging) throws InterruptedException {
 
-        // If the robot driver pressed x...
-        if(currentGamepad1.x && !previousGamepad1.x) {
-
-            // Toggle the left claw.
-            robotHardware.toggleLeftClaw();
-
-        }
-
-        // If the robot driver pressed b...
-        if(currentGamepad1.b && !previousGamepad1.b) {
-
-            // Toggle the right claw.
-            robotHardware.toggleRightClaw();
-
-        }
-
-        // If the robot driver pressed a...
-        if(currentGamepad1.a && !previousGamepad1.a) {
-
-            // Close the claws.
-            robotHardware.closeClaw();
-
-        }
-
-        // If the robot driver pressed y...
-        if(currentGamepad1.y && !previousGamepad1.y) {
-
-            // Open the claws.
-            robotHardware.openClawFully();
-
-        }
-
-        // If the robot driver pressed dpad up...
-        if(currentGamepad1.dpad_up && !previousGamepad1.dpad_up) {
-
-            // Start hanging mode.
-            robotHardware.startHanging();
-
-            // Advance to the hanging state.
-            state = HANGING;
-
-        }
-
         // If the user is debugging...
         if(debugging) {
 
-            // If the pixel driver pressed dpad down...
-            if(currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+            // If the driver pressed left bumper...
+            if(currentGamepad.left_bumper && !previousGamepad.left_bumper) {
 
                 // Close the claw so it does not catch when lowering the lift.
                 robotHardware.closeClaw();
@@ -429,8 +371,8 @@ public class TeleOpT extends LinearOpMode {
 
             }
 
-            // If the pixel driver pressed dpad up...
-            if(currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+            // If the driver pressed right bumper...
+            if(currentGamepad.right_bumper && !previousGamepad.right_bumper) {
 
                 // Close the claw so it does not catch when raising the lift.
                 robotHardware.closeClaw();
@@ -440,24 +382,24 @@ public class TeleOpT extends LinearOpMode {
 
             }
 
-            // If the pixel driver pressed x...
-            if(currentGamepad2.x && !previousGamepad2.x) {
+            // If the driver pressed x...
+            if(currentGamepad.x && !previousGamepad.x) {
 
                 // Move the wrist to the ground position.
                 robotHardware.setWristGround();
 
             }
 
-            // If the pixel driver pressed b...
-            if(currentGamepad2.b && !previousGamepad2.b) {
+            // If the driver pressed b...
+            if(currentGamepad.b && !previousGamepad.b) {
 
                 // Move the wrist to the backdrop position.
                 robotHardware.setWristBackdrop();
 
             }
 
-            // If the pixel driver pressed a...
-            if(currentGamepad2.a && !previousGamepad2.a) {
+            // If the driver pressed a...
+            if(currentGamepad.a && !previousGamepad.a) {
 
                 // Close the claw so it does not catch when lowering the arm.
                 robotHardware.closeClaw();
@@ -467,8 +409,8 @@ public class TeleOpT extends LinearOpMode {
 
             }
 
-            // If the pixel driver pressed y...
-            if(currentGamepad2.y && !previousGamepad2.y) {
+            // If the driver pressed y...
+            if(currentGamepad.y && !previousGamepad.y) {
 
                 // Close the claw so it does not catch when raising the arm.
                 robotHardware.closeClaw();
@@ -478,67 +420,101 @@ public class TeleOpT extends LinearOpMode {
 
             }
 
+            // Determine whether the robot is localized.
+            boolean localized = robotHardware.isLocalized();
+
+            // If the robot is localized...
+            if(localized) {
+
+                // If the driver pressed dpad left...
+                if(currentGamepad.dpad_left && !previousGamepad.dpad_left) {
+
+                    // Get the left pixel location.
+                    int leftColumn = getLeftColumn(LEFT);
+
+                    // Start heat seeking.
+                    robotHardware.startHeatSeeking(leftColumn, FIRST_ROW, AutoF.redAlliance);
+
+                    // Advance to the heat seeking state.
+                    state = HEAT_SEEKING;
+
+                }
+
+                // If the driver pressed dpad down...
+                if(currentGamepad.dpad_down && !previousGamepad.dpad_down) {
+
+                    // Get the middle pixel location.
+                    int leftColumn = getLeftColumn(MIDDLE);
+
+                    // Start heat seeking.
+                    robotHardware.startHeatSeeking(leftColumn, FIRST_ROW, AutoF.redAlliance);
+
+                    // Advance to the heat seeking state.
+                    state = HEAT_SEEKING;
+
+                }
+
+                // If the driver pressed dpad right...
+                if(currentGamepad.dpad_right && !previousGamepad.dpad_right) {
+
+                    // Get the right pixel location.
+                    int leftColumn = getLeftColumn(RIGHT);
+
+                    // Start heat seeking.
+                    robotHardware.startHeatSeeking(leftColumn, FIRST_ROW, AutoF.redAlliance);
+
+                    // Advance to the heat seeking state.
+                    state = HEAT_SEEKING;
+
+                }
+
+            }
+
         }
 
         // Otherwise (if the user is not debugging)...
         else {
 
-            // If the pixel driver pressed dpad right...
-            if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right) {
+            // If the driver pressed x...
+            if(currentGamepad.x && !previousGamepad.x) {
 
-                // Increment the left column.
-                int maximumColumn = getMaximumColumn(leftRow);
-                leftColumn = Math.min(leftColumn + 1, maximumColumn - 1);
-
-            }
-
-            // If the pixel driver pressed dpad left...
-            if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left) {
-
-                // Decrement the left column.
-                leftColumn = Math.max(leftColumn - 1, MINIMUM_COLUMN);
+                // Toggle the left claw.
+                robotHardware.toggleLeftClaw();
 
             }
 
-            // If the pixel driver pressed dpad up...
-            if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
+            // If the driver pressed b...
+            if(currentGamepad.b && !previousGamepad.b) {
 
-                // Increment the left row.
-                leftRow = Math.min(leftRow + 1, MAXIMUM_ROW);
-
-                // Update the left column if needed.
-                int maximumColumn = getMaximumColumn(leftRow);
-                if (leftColumn >= maximumColumn) {
-                    leftColumn = maximumColumn - 1;
-                }
+                // Toggle the right claw.
+                robotHardware.toggleRightClaw();
 
             }
 
-            // If the pixel driver pressed dpad down...
-            if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+            // If the driver pressed a...
+            if(currentGamepad.a && !previousGamepad.a) {
 
-                // Decrement the left row.
-                leftRow = Math.max(leftRow - 1, MINIMUM_ROW);
-
-                // Update the left column if needed.
-                int maximumColumn = getMaximumColumn(leftRow);
-                if (leftColumn >= maximumColumn) {
-                    leftColumn = maximumColumn - 1;
-                }
+                // Close the claws.
+                robotHardware.closeClaw();
 
             }
 
-            // Determine whether the robot is localized.
-            boolean localized = robotHardware.isLocalized();
+            // If the driver pressed y...
+            if(currentGamepad.y && !previousGamepad.y) {
 
-            // If the robot is localized and the pixel driver pressed a...
-            if(localized && currentGamepad2.a && !previousGamepad2.a) {
+                // Open the claws.
+                robotHardware.openClawFully();
 
-                // Start heat seeking.
-                robotHardware.startHeatSeeking(leftColumn, leftRow, AutoF.redAlliance);
+            }
 
-                // Advance to the heat seeking state.
-                state = HEAT_SEEKING;
+            // If the driver pressed dpad up...
+            if(currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+
+                // Start hanging mode.
+                robotHardware.startHanging();
+
+                // Advance to the hanging state.
+                state = HANGING;
 
             }
 
@@ -547,10 +523,10 @@ public class TeleOpT extends LinearOpMode {
     }
 
     // Handles the hanging state.
-    private void handleHanging() {
+    private void handleHanging(boolean debugging) {
 
-        // If the robot driver pressed dpad down...
-        if(currentGamepad1.dpad_down && !previousGamepad1.dpad_down) {
+        // If the driver pressed dpad down...
+        if(currentGamepad.dpad_down && !previousGamepad.dpad_down && !debugging) {
 
             // Stop hanging.
             robotHardware.stopHanging();

@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -142,32 +141,11 @@ public class Lift {
         // Get the op mode.
         LinearOpMode opMode = robotHardware.getOpMode();
 
-        // Get gamepad 1.
-        Gamepad gamepad1 = opMode.gamepad1;
-
         // While the lift is up...
         while (!opMode.isStopRequested() && !touch.isPressed()) {
 
             // Instruct the user to lower the lift.
-            log("Hold gamepad 1 back to lower lift...");
-
-            // If the user is pressing back...
-            if (gamepad1.back) {
-
-                // Lower the lift.
-                leftMotor.setPower(-LOWER_POWER);
-                rightMotor.setPower(-LOWER_POWER);
-
-            }
-
-            // Otherwise (if the user is not pressing back)...
-            else {
-
-                // Stop the lift.
-                leftMotor.setPower(0);
-                rightMotor.setPower(0);
-
-            }
+            log("Please manually lower the lift...");
 
         }
 

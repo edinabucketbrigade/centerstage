@@ -213,7 +213,7 @@ public class Arm {
         while (!opMode.isStopRequested() && !downTouch.isPressed()) {
 
             // Instruct the user to lower the arm.
-            log("Please lower the arm...");
+            log("Please manually lower the arm...");
 
         }
 
