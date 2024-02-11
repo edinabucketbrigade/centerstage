@@ -39,7 +39,8 @@ public class RobotRoutes {
                 actions.add(new SetReversedAction(true));
                 actions.add(new SplineToAction(32.5, 30, Math.toRadians(0)));
             } else if (outputLocation == MIDDLE) {
-                actions.add(new LineToLinearHeadingAction(12, 14, Math.toRadians(90)));
+                actions.add(new SetReversedAction(true));
+                actions.add(new SplineToAction(25, 27, Math.toRadians(0)));
             } else {
                 actions.add(new SetReversedAction(true));
                 actions.add(new SplineToLinearHeadingAction(11, 33, Math.toRadians(180), Math.toRadians(180)));
@@ -67,9 +68,6 @@ public class RobotRoutes {
         double targetHeading = Math.toRadians(180);
         List<Action> actions = new ArrayList<>();
         if (outputStartLeft) {
-            if (outputLocation == MIDDLE) {
-                actions.add(new BackAction(10));
-            }
             actions.add(new LineToLinearHeadingAction(targetX, targetY, targetHeading));
         } else {
             actions.add(new LineToAction(-36, 9));
