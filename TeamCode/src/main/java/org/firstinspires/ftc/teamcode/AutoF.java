@@ -58,6 +58,7 @@ import bucketbrigade.casperlibrary.RobotRoutes;
 import bucketbrigade.casperlibrary.SetReversedAction;
 import bucketbrigade.casperlibrary.SetTangentAction;
 import bucketbrigade.casperlibrary.SplineToAction;
+import bucketbrigade.casperlibrary.SplineToConstantHeadingAction;
 import bucketbrigade.casperlibrary.SplineToLinearHeadingAction;
 import bucketbrigade.casperlibrary.TeamPropLocation;
 import bucketbrigade.casperlibrary.TurnAction;
@@ -819,6 +820,10 @@ public class AutoF extends LinearOpMode {
             else if(inputAction instanceof SplineToAction) {
                 SplineToAction outputAction = (SplineToAction)inputAction;
                 trajectorySequenceBuilder.splineTo(new Vector2d(outputAction.x, outputAction.y), outputAction.heading);
+            }
+            else if(inputAction instanceof SplineToConstantHeadingAction) {
+                SplineToConstantHeadingAction outputAction = (SplineToConstantHeadingAction)inputAction;
+                trajectorySequenceBuilder.splineToConstantHeading(new Vector2d(outputAction.x, outputAction.y), outputAction.heading);
             }
             else if(inputAction instanceof SplineToLinearHeadingAction) {
                 SplineToLinearHeadingAction outputAction = (SplineToLinearHeadingAction)inputAction;
