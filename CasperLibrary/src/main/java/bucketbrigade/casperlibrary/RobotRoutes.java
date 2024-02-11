@@ -1,6 +1,7 @@
 package bucketbrigade.casperlibrary;
 
 import static bucketbrigade.casperlibrary.Action.mirrorActions;
+import static bucketbrigade.casperlibrary.Action.mirrorLocation;
 import static bucketbrigade.casperlibrary.Action.mirrorPose;
 import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
 import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
@@ -12,10 +13,11 @@ import java.util.List;
 public class RobotRoutes {
 
     // Gets a start pose.
-    public static RobotPose getStartPose(boolean redAlliance, boolean startLeft) {
+    public static RobotPose getStartPose(boolean redAlliance, boolean inputStartLeft) {
 
+        boolean outputStartLeft = redAlliance ? !inputStartLeft : inputStartLeft;
         RobotPose startPose;
-        if(startLeft) {
+        if(outputStartLeft) {
             startPose = new RobotPose(12, 61, Math.toRadians(90));
         }
         else {
@@ -27,24 +29,26 @@ public class RobotRoutes {
     }
 
     // Drives to a spike mark.
-    public static List<Action> driveToSpikeMark(boolean redAlliance, boolean startLeft, TeamPropLocation location) {
+    public static List<Action> driveToSpikeMark(boolean redAlliance, boolean inputStartLeft, TeamPropLocation inputLocation) {
 
+        boolean outputStartLeft = redAlliance ? !inputStartLeft : inputStartLeft;
+        TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
         List<Action> actions = new ArrayList<>();
-        if (startLeft) {
-            if (location == LEFT) {
+        if (outputStartLeft) {
+            if (outputLocation == LEFT) {
                 actions.add(new SetReversedAction(true));
                 actions.add(new SplineToAction(32.5, 30, Math.toRadians(0)));
-            } else if (location == MIDDLE) {
+            } else if (outputLocation == MIDDLE) {
                 actions.add(new LineToLinearHeadingAction(12, 14, Math.toRadians(90)));
             } else {
                 actions.add(new SetReversedAction(true));
                 actions.add(new SplineToLinearHeadingAction(11, 33, Math.toRadians(180), Math.toRadians(180)));
             }
         } else {
-            if (location == LEFT) {
+            if (outputLocation == LEFT) {
                 actions.add(new SetReversedAction(true));
                 actions.add(new SplineToLinearHeadingAction(-35, 27, Math.toRadians(0), Math.toRadians(0)));
-            } else if (location == MIDDLE) {
+            } else if (outputLocation == MIDDLE) {
                 actions.add(new LineToLinearHeadingAction(-36, 14, Math.toRadians(90)));
             } else {
                 actions.add(new LineToAction(-46.5, 19));
@@ -56,18 +60,20 @@ public class RobotRoutes {
     }
 
     // Drives to the backdrop.
-    public static List<Action> driveToBackdrop(boolean redAlliance, boolean startLeft, TeamPropLocation location, double targetX, double targetY) {
+    public static List<Action> driveToBackdrop(boolean redAlliance, boolean inputStartLeft, TeamPropLocation inputLocation, double targetX, double targetY) {
 
+        boolean outputStartLeft = redAlliance ? !inputStartLeft : inputStartLeft;
+        TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
         double targetHeading = Math.toRadians(180);
         List<Action> actions = new ArrayList<>();
-        if (startLeft) {
-            if (location == MIDDLE) {
+        if (outputStartLeft) {
+            if (outputLocation == MIDDLE) {
                 actions.add(new BackAction(10));
             }
             actions.add(new LineToLinearHeadingAction(targetX, targetY, targetHeading));
         } else {
             actions.add(new LineToAction(-36, 9));
-            if (location == MIDDLE || location == RIGHT) {
+            if (outputLocation == MIDDLE || outputLocation == RIGHT) {
                 actions.add(new TurnAction(Math.toRadians(90)));
             } else {
                 actions.add(new TurnAction(Math.toRadians(180)));
@@ -104,10 +110,11 @@ public class RobotRoutes {
     }
 
     // Parks.
-    public static List<Action> park(boolean redAlliance, boolean parkLeft) {
+    public static List<Action> park(boolean redAlliance, boolean inputParkLeft) {
 
+        boolean outputParkLeft = redAlliance ? !inputParkLeft : inputParkLeft;
         List<Action> actions = new ArrayList<>();
-        if (parkLeft) {
+        if (outputParkLeft) {
             actions.add(new SetReversedAction(false));
             actions.add(new LineToAction(44, 60));
             actions.add(new LineToAction(58, 60));

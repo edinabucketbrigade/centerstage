@@ -7,6 +7,8 @@ import static bucketbrigade.casperlibrary.RobotRoutes.getStartPose;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
 import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
 import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
+import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
+import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -38,8 +40,8 @@ public class MeepMeepTesting {
 
     private static final boolean RED_ALLIANCE = false;
     private static final boolean START_LEFT = true;
-    private static final boolean PARK_LEFT = true;
     private static final TeamPropLocation LOCATION = LEFT;
+    private static final boolean PARK_LEFT = true;
 
     public static final double MAXIMUM_VELOCITY = 60;
     public static final double MAXIMUM_ACCELERATION = 60;
@@ -89,7 +91,7 @@ public class MeepMeepTesting {
 
         // Construct a target position.
         double targetX = 40;
-        double targetY = RED_ALLIANCE ? -36 : 36;
+        double targetY = 36;
 
         // Drive to the backdrop.
         applyActions(driveToBackdrop(RED_ALLIANCE, START_LEFT, LOCATION, targetX, targetY), trajectorySequenceBuilder);

@@ -1,5 +1,9 @@
 package bucketbrigade.casperlibrary;
 
+import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
+import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
+import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
+
 import java.util.List;
 
 public abstract class Action {
@@ -14,6 +18,18 @@ public abstract class Action {
 
     public static double mirrorAngle(double angle) {
         return -angle;
+    }
+
+    public static TeamPropLocation mirrorLocation(TeamPropLocation location) {
+        if(location == LEFT) {
+            return RIGHT;
+        }
+        else if(location == RIGHT) {
+            return LEFT;
+        }
+        else {
+            return MIDDLE;
+        }
     }
 
     public static void mirrorPose(RobotPose pose) {
