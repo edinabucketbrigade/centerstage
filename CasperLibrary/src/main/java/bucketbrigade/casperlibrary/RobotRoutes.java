@@ -113,13 +113,13 @@ public class RobotRoutes {
         boolean outputParkLeft = redAlliance ? !inputParkLeft : inputParkLeft;
         List<Action> actions = new ArrayList<>();
         if (outputParkLeft) {
-            actions.add(new SetReversedAction(false));
-            actions.add(new LineToAction(44, 60));
-            actions.add(new LineToAction(58, 60));
+            actions.add(new SetTangentAction(Math.toRadians(90)));
+            actions.add(new SplineToConstantHeadingAction(44, 60, Math.toRadians(0)));
+            actions.add(new SplineToConstantHeadingAction(58, 60, Math.toRadians(0)));
         } else {
-            actions.add(new SetReversedAction(false));
-            actions.add(new LineToAction(44, 12));
-            actions.add(new LineToAction(58, 12));
+            actions.add(new SetTangentAction(Math.toRadians(-90)));
+            actions.add(new SplineToConstantHeadingAction(44, 12, Math.toRadians(0)));
+            actions.add(new SplineToConstantHeadingAction(58, 12, Math.toRadians(0)));
         }
         if(redAlliance) mirrorActions(actions);
         return actions;

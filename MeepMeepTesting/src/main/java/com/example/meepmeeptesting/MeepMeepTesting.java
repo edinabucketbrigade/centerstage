@@ -32,16 +32,17 @@ import bucketbrigade.casperlibrary.RobotPose;
 import bucketbrigade.casperlibrary.SetReversedAction;
 import bucketbrigade.casperlibrary.SetTangentAction;
 import bucketbrigade.casperlibrary.SplineToAction;
+import bucketbrigade.casperlibrary.SplineToConstantHeadingAction;
 import bucketbrigade.casperlibrary.SplineToLinearHeadingAction;
 import bucketbrigade.casperlibrary.TeamPropLocation;
 import bucketbrigade.casperlibrary.TurnAction;
 
 public class MeepMeepTesting {
 
-    private static final boolean RED_ALLIANCE = false;
-    private static final boolean START_LEFT = true;
-    private static final TeamPropLocation LOCATION = LEFT;
-    private static final boolean PARK_LEFT = true;
+    private static final boolean RED_ALLIANCE = true;
+    private static final boolean START_LEFT = false;
+    private static final TeamPropLocation LOCATION = RIGHT;
+    private static final boolean PARK_LEFT = false;
 
     public static final double MAXIMUM_VELOCITY = 60;
     public static final double MAXIMUM_ACCELERATION = 60;
@@ -150,6 +151,10 @@ public class MeepMeepTesting {
             else if(inputAction instanceof SplineToAction) {
                 SplineToAction outputAction = (SplineToAction)inputAction;
                 trajectorySequenceBuilder.splineTo(new Vector2d(outputAction.x, outputAction.y), outputAction.heading);
+            }
+            else if(inputAction instanceof SplineToConstantHeadingAction) {
+                SplineToConstantHeadingAction outputAction = (SplineToConstantHeadingAction)inputAction;
+                trajectorySequenceBuilder.splineToConstantHeading(new Vector2d(outputAction.x, outputAction.y), outputAction.heading);
             }
             else if(inputAction instanceof SplineToLinearHeadingAction) {
                 SplineToLinearHeadingAction outputAction = (SplineToLinearHeadingAction)inputAction;
