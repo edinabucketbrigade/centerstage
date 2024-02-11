@@ -220,7 +220,7 @@ public class AutoF extends LinearOpMode {
                 }
 
                 // Open the left claw.
-                robotHardware.openLeftClawFully();
+                robotHardware.openLeftClaw(true);
 
                 // Advance to the next step.
                 setState(RAISE_WRIST);
@@ -321,7 +321,7 @@ public class AutoF extends LinearOpMode {
                     return;
                 }
 
-                robotHardware.openClawPartially();
+                robotHardware.openClaw(false);
 
                 setState(RELEASE_WRIST);
 

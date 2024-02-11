@@ -169,7 +169,7 @@ public class HeatSeekC {
                 }
 
                 // Open the claw partially to release the pixels.
-                robotHardware.openClawPartially();
+                robotHardware.openClaw(false);
 
                 // Advance to the next step.
                 setState(RELEASE_WRIST);

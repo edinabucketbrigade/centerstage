@@ -54,7 +54,7 @@ public class Hang {
         OpMode opMode = robotHardware.getOpMode();
 
         // Get the gamepad.
-        Gamepad gamepad1 = opMode.gamepad1;
+        Gamepad gamepad = opMode.gamepad1;
 
         // Switch based on the state.
         switch (state) {
@@ -115,7 +115,7 @@ public class Hang {
                 }
 
                 // If the robot driver pressed dpad up...
-                if(gamepad1.dpad_up) {
+                if(gamepad.dpad_up) {
 
                     // Lower the lift to the hang position.
                     robotHardware.setLiftPosition(HANG_POSITION);
@@ -138,7 +138,7 @@ public class Hang {
                 }
 
                 // If the robot driver pressed dpad up...
-                if(gamepad1.dpad_up) {
+                if(gamepad.dpad_up) {
 
                     // Advance to the next step.
                     setState(LOWER_ROBOT);

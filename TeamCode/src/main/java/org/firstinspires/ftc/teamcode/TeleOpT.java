@@ -13,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.RobotHardwareC.isEven;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.HANGING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.HEAT_SEEKING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.IDLE;
+import static org.firstinspires.ftc.teamcode.TeleOpT.State.PLACING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.RETRACTING;
 
 import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
@@ -34,7 +35,7 @@ public class TeleOpT extends LinearOpMode {
 
     - left stick = move robot
     - right stick = rotate robot
-    - left bumper = raise arm to place pixels
+    - left bumper = start/stop placing
     - right bumper = hold for turtle mode
     - left trigger = lower lift (when arm is up)
     - right trigger = raise lift (when arm is up)
@@ -62,7 +63,7 @@ public class TeleOpT extends LinearOpMode {
     - right bumper = raise lift
     */
 
-    enum State { IDLE, HEAT_SEEKING, RETRACTING, HANGING }
+    enum State { IDLE, HEAT_SEEKING, RETRACTING, HANGING, PLACING }
 
     public static final String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
     public static double TRIGGER_THRESHOLD = 0.5;
@@ -163,6 +164,12 @@ public class TeleOpT extends LinearOpMode {
                 case HANGING:
 
                     handleHanging(debugging);
+
+                    break;
+
+                case PLACING:
+
+                    handlePlacing(debugging);
 
                     break;
 
@@ -483,7 +490,7 @@ public class TeleOpT extends LinearOpMode {
             if(currentGamepad.x && !previousGamepad.x) {
 
                 // Toggle the left claw.
-                robotHardware.toggleLeftClaw();
+                robotHardware.toggleLeftClaw(true);
 
             }
 
@@ -491,7 +498,7 @@ public class TeleOpT extends LinearOpMode {
             if(currentGamepad.b && !previousGamepad.b) {
 
                 // Toggle the right claw.
-                robotHardware.toggleRightClaw();
+                robotHardware.toggleRightClaw(true);
 
             }
 
@@ -507,7 +514,7 @@ public class TeleOpT extends LinearOpMode {
             if(currentGamepad.y && !previousGamepad.y) {
 
                 // Open the claws.
-                robotHardware.openClawFully();
+                robotHardware.openClaw(true);
 
             }
 
@@ -519,6 +526,17 @@ public class TeleOpT extends LinearOpMode {
 
                 // Advance to the hanging state.
                 state = HANGING;
+
+            }
+
+            // If the driver pressed the left bumper...
+            if(currentGamepad.left_bumper && !previousGamepad.left_bumper) {
+
+                // Start placing mode.
+                robotHardware.startPlacing();
+
+                // Advance to the placing state.
+                state = PLACING;
 
             }
 
@@ -551,6 +569,42 @@ public class TeleOpT extends LinearOpMode {
 
         // If we are actively hanging...
         if (isHanging) {
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Advance to the idle state.
+        state = IDLE;
+
+    }
+
+    // Handles the placing state.
+    private void handlePlacing(boolean debugging) {
+
+        // If the driver pressed the left bumper...
+        if(currentGamepad.left_bumper && !previousGamepad.left_bumper && !debugging) {
+
+            // Stop placing.
+            robotHardware.stopPlacing();
+
+            // Start retracting.
+            robotHardware.startRetracting();
+
+            // Advance to the retracting state.
+            state = RETRACTING;
+
+            // Exit the method.
+            return;
+
+        }
+
+        // Determine whether we are actively placing.
+        boolean isPlacing = robotHardware.isPlacing();
+
+        // If we are actively placing...
+        if (isPlacing) {
 
             // Exit the method.
             return;

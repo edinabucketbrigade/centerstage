@@ -19,14 +19,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Claw {
 
     public static double LEFT_CLOSED = 0.35;
-    public static double LEFT_PARTIALLY_OPEN = 0.44;
+    public static double LEFT_PARTIALLY_OPEN = 0.55;
     public static double LEFT_FULLY_OPEN = 0.67;
     public static double PIXEL_CAPTURE_THRESHOLD = 35;
     public static double RIGHT_CLOSED = 0.6;
-    public static double RIGHT_PARTIALLY_OPEN = 0.52;
+    public static double RIGHT_PARTIALLY_OPEN = 0.43;
     public static double RIGHT_FULLY_OPEN = 0.3;
     public static double WRIST_GROUND_POSITION = 0.11;
-    public static double WRIST_BACKDROP_POSITION = 0.76;
+    public static double WRIST_BACKDROP_POSITION = 0.77;
     public static double WRIST_RELEASE_POSITION = 0.88;
 
     private RobotHardwareC robotHardware;
@@ -162,36 +162,36 @@ public class Claw {
     }
 
     // Toggles the claws.
-    public void toggle() {
+    public void toggle(boolean fully) {
 
         // Toggle the left claw.
-        toggleLeft();
+        toggleLeft(fully);
 
         // Toggle the right claw.
-        toggleRight();
+        toggleRight(fully);
 
     }
 
     // Toggles the left claw.
-    public void toggleLeft() {
+    public void toggleLeft(boolean fully) {
 
         // Toggle the left claw.
         if (isLeftOpen) {
             closeLeft();
         } else {
-            openLeftFully();
+            openLeft(fully);
         }
 
     }
 
     // Toggles the right claw.
-    public void toggleRight() {
+    public void toggleRight(boolean fully) {
 
         // Toggle the right claw.
         if (isRightOpen) {
             closeRight();
         } else {
-            openRightFully();
+            openRight(fully);
         }
 
     }
@@ -210,22 +210,14 @@ public class Claw {
 
     }
 
-    public void openLeftPartially() {
-        setLedRed(greenLeftLed, redLeftLed);
-
-        leftServo.setPosition(LEFT_PARTIALLY_OPEN);
-
-        isLeftOpen = true;
-}
-
     // Opens the left claw.
-    public void openLeftFully() {
+    public void openLeft(boolean fully) {
 
         // Make the left LED red.
         setLedRed(greenLeftLed, redLeftLed);
 
         // Open the left claw.
-        leftServo.setPosition(LEFT_FULLY_OPEN);
+        leftServo.setPosition(fully ? LEFT_FULLY_OPEN : LEFT_PARTIALLY_OPEN);
 
         // Remember that the left claw is open.
         isLeftOpen = true;
@@ -246,22 +238,14 @@ public class Claw {
 
     }
 
-    public void openRightPartially() {
-        setLedRed(greenRightLed, redRightLed);
-
-        rightServo.setPosition(RIGHT_PARTIALLY_OPEN);
-
-        isRightOpen = true;
-    }
-
     // Opens the right claw.
-    public void openRightFully() {
+    public void openRight(boolean fully) {
 
         // Make the right LED red.
         setLedRed(greenRightLed, redRightLed);
 
         // Open the right claw.
-        rightServo.setPosition(RIGHT_FULLY_OPEN);
+        rightServo.setPosition(fully ? RIGHT_FULLY_OPEN : RIGHT_PARTIALLY_OPEN);
 
         // Remember that the right claw is open.
         isRightOpen = true;
@@ -279,20 +263,9 @@ public class Claw {
 
     }
 
-    // Opens the claw.
-    public void openFully() {
-
-        // Open the left claw.
-        openLeftFully();
-
-        // Open the right claw.
-        openRightFully();
-
-    }
-
-    public void openPartially(){
-        openLeftPartially();
-        openRightPartially();
+    public void open(boolean fully){
+        openLeft(fully);
+        openRight(fully);
     }
 
     // Toggles the wrist.
@@ -356,6 +329,10 @@ public class Claw {
         greenLed.setState(false);
         redLed.setState(true);
 
+    }
+
+    public boolean isOpen() {
+        return isLeftOpen && isRightOpen;
     }
 
 }

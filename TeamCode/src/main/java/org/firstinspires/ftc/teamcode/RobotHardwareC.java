@@ -67,6 +67,8 @@ public class RobotHardwareC {
     private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
+    public static double NORMAL_MULTIPLIER = 1;
+    public static double TURTLE_MULTIPLIER = 0.3;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -83,6 +85,7 @@ public class RobotHardwareC {
     private HeatSeekC heatSeek = new HeatSeekC(this);
     private Retract retract = new Retract(this);
     private Hang hang = new Hang(this);
+    private Place place = new Place(this);
     private Lift lift;
     private Arm arm;
     private Claw claw;
@@ -148,6 +151,9 @@ public class RobotHardwareC {
         // Update hang.
         hang.update();
 
+        // Update place.
+        place.update();
+
         // Update the hardware.
         arm.update();
         claw.update();
@@ -207,7 +213,7 @@ public class RobotHardwareC {
 
         // Update the telemetry.
         telemetry.addData("Localized", localizationStatus);
-        telemetry.addData("Status", "Heat Seek = %s, Retract = %s, Hang = %s, Turtle Mode = %b, Robot Pose = %s, Back Left = %.0f mm, Back Right = %.0f mm", heatSeek.getState(), retract.getState(), hang.getState(), isTurtleMode, poseString, leftBackMillimeters, rightBackMillimeters);
+        telemetry.addData("Status", "Heat Seek = %s, Retract = %s, Hang = %s, Place = %s, Turtle Mode = %b, Robot Pose = %s, Back Left = %.0f mm, Back Right = %.0f mm", heatSeek.getState(), retract.getState(), hang.getState(), place.getState(), isTurtleMode, poseString, leftBackMillimeters, rightBackMillimeters);
 
     }
 
@@ -223,9 +229,6 @@ public class RobotHardwareC {
     public void moveRobot() throws InterruptedException {
 
         Gamepad gamepad1 = opMode.gamepad1;
-
-        double NORMAL_MULTIPLIER = 1;
-        double TURTLE_MULTIPLIER = 0.5;
 
         double leftFrontPower;
         double leftBackPower;
@@ -371,7 +374,7 @@ public class RobotHardwareC {
         log("Initializing robot...");
 
         // Open the claw.
-        openClawFully();
+        openClaw(true);
 
         // Move the wrist to the ground position.
         setWristGround();
@@ -382,26 +385,26 @@ public class RobotHardwareC {
     }
 
     // Toggles the claws.
-    public void toggleClaws() {
+    public void toggleClaws(boolean fully) {
 
         // Toggle the claws.
-        claw.toggle();
+        claw.toggle(fully);
 
     }
 
     // Toggles the left claw.
-    public void toggleLeftClaw() {
+    public void toggleLeftClaw(boolean fully) {
 
         // Toggle the left claw.
-        claw.toggleLeft();
+        claw.toggleLeft(fully);
 
     }
 
     // Toggles the right claw.
-    public void toggleRightClaw() throws InterruptedException {
+    public void toggleRightClaw(boolean fully) throws InterruptedException {
 
         // Toggle the right claw.
-        claw.toggleRight();
+        claw.toggleRight(fully);
 
     }
 
@@ -508,6 +511,21 @@ public class RobotHardwareC {
 
     }
 
+    public boolean isPlacing() {
+
+        // Return indicating whether we are placing.
+        return place.isActive();
+
+    }
+
+    // Starts placing.
+    public void startPlacing() {
+
+        // Start placing.
+        place.start();
+
+    }
+
     // Closes the left claw.
     public void closeLeftClaw() {
 
@@ -517,10 +535,10 @@ public class RobotHardwareC {
     }
 
     // Opens the left claw.
-    public void openLeftClawFully() {
+    public void openLeftClaw(boolean fully) {
 
         // Open the left claw.
-        claw.openLeftFully();
+        claw.openLeft(fully);
 
     }
 
@@ -533,10 +551,10 @@ public class RobotHardwareC {
     }
 
     // Opens the right claw.
-    public void openRightClawFully() {
+    public void openRightClaw(boolean fully) {
 
         // Open the right claw.
-        claw.openRightFully();
+        claw.openRight(fully);
 
     }
 
@@ -548,18 +566,10 @@ public class RobotHardwareC {
 
     }
 
-    // Opens the claw.
-    public void openClawFully() {
+    public void openClaw(boolean fully) {
 
         // Open the claw.
-        claw.openFully();
-
-    }
-
-    public void openClawPartially() {
-
-        // Open the claw.
-        claw.openPartially();
+        claw.open(fully);
 
     }
 
@@ -714,6 +724,18 @@ public class RobotHardwareC {
         // Stop hanging.
         hang.stop();
 
+    }
+
+    // Stops placing.
+    public void stopPlacing() {
+
+        // Stop placing.
+        place.stop();
+
+    }
+
+    public boolean isClawOpen() {
+        return claw.isOpen();
     }
 
 }

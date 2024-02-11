@@ -71,7 +71,7 @@ public class Retract {
                 robotHardware.setWristGround();
 
                 // Open the claw.
-                robotHardware.openClawFully();
+                robotHardware.openClaw(true);
 
                 // Advance to the next step.
                 setState(IDLE);
