@@ -324,6 +324,10 @@ public class RobotHardwareC {
         this.isTurtleMode = isTurtleMode;
     }
 
+    public void toggleTurtleMode() {
+        this.isTurtleMode = !this.isTurtleMode;
+    }
+
     // Raises the arm.
     public void raiseArm() {
 

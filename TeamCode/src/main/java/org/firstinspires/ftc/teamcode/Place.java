@@ -164,11 +164,7 @@ public class Place {
 
             case LOWER_LIFT:
 
-//                if (timer.milliseconds() < 500) {
-//                    return;
-//                }
-
-                if (!robotHardware.isArmDown()) {
+                if (timer.milliseconds() < 500) {
                     return;
                 }
 

@@ -36,7 +36,7 @@ public class TeleOpT extends LinearOpMode {
     - left stick = move robot
     - right stick = rotate robot
     - left bumper = start/stop placing
-    - right bumper = hold for turtle mode
+    - right bumper = toggle turtle mode
     - left trigger = lower lift (when arm is up)
     - right trigger = raise lift (when arm is up)
     - a = close both claws
@@ -196,8 +196,13 @@ public class TeleOpT extends LinearOpMode {
 
             }
 
-            // Set turtle mode.
-            robotHardware.setTurtleMode(currentGamepad.right_bumper && !debugging);
+            // If the driver pressed right bumper...
+            if(currentGamepad.right_bumper && !previousGamepad.right_bumper && !debugging) {
+
+                // Toggle turtle mode.
+                robotHardware.toggleTurtleMode();
+
+            }
 
             // Add telemetry.
             telemetry.addData("Red Alliance", AutoF.redAlliance);

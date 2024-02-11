@@ -133,6 +133,18 @@ public class Arm {
             // Stop the arm motor.
             armMotor.setPower(0);
 
+            // Determine whether the down touch sensor is pressed.
+            boolean isDownPressed = downTouch.isPressed();
+
+            // If the down touch sensor is pressed...
+            if(isDownPressed) {
+
+                // Reset the arm motor.
+                armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            }
+
         }
 
         // If the robot is automatically driving...
@@ -140,28 +152,6 @@ public class Arm {
 
             // Exit the method.
             return;
-
-        }
-
-        // Determine whether the down touch sensor is pressed.
-        boolean isDownPressed = downTouch.isPressed();
-
-        // If the down touch sensor is pressed...
-        if(isDownPressed) {
-
-            // Reset the arm.
-            reset();
-
-        }
-
-        // Determine whether the up touch sensor is pressed.
-        boolean isUpPressed = upTouch.isPressed();
-
-        // If the up touch sensor is pressed...
-        if(isUpPressed) {
-
-            // Stop the arm motor.
-            armMotor.setPower(0);
 
         }
 
@@ -245,16 +235,6 @@ public class Arm {
 
         // Show the message.
         Utilities.log(message, telemetry);
-
-    }
-
-    // Resets the arm.
-    private void reset() {
-
-        // Reset the arm motor.
-        armMotor.setPower(0);
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
