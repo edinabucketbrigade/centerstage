@@ -15,14 +15,15 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_YELLOW_PIXEL;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETURN_TO_BACKDROP;
 import static org.firstinspires.ftc.teamcode.AutoF.State.WAIT_FOR_RELEASE;
-import static org.firstinspires.ftc.teamcode.Routes.driveToBackdrop;
-import static org.firstinspires.ftc.teamcode.Routes.driveToSpikeMark;
-import static org.firstinspires.ftc.teamcode.Routes.driveToStack;
-import static org.firstinspires.ftc.teamcode.Routes.park;
-import static org.firstinspires.ftc.teamcode.Routes.returnToBackdrop;
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.LEFT;
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.MIDDLE;
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.RIGHT;
+
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToStack;
+import static bucketbrigade.casperlibrary.RobotRoutes.park;
+import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
+import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
+import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
+import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -45,6 +46,21 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
+
+import java.util.List;
+
+import bucketbrigade.casperlibrary.Action;
+import bucketbrigade.casperlibrary.BackAction;
+import bucketbrigade.casperlibrary.LineToAction;
+import bucketbrigade.casperlibrary.LineToLinearHeadingAction;
+import bucketbrigade.casperlibrary.RobotPose;
+import bucketbrigade.casperlibrary.RobotRoutes;
+import bucketbrigade.casperlibrary.SetReversedAction;
+import bucketbrigade.casperlibrary.SetTangentAction;
+import bucketbrigade.casperlibrary.SplineToAction;
+import bucketbrigade.casperlibrary.SplineToLinearHeadingAction;
+import bucketbrigade.casperlibrary.TeamPropLocation;
+import bucketbrigade.casperlibrary.TurnAction;
 
 @Config
 @Autonomous(preselectTeleOp = "TeleOpT")
@@ -634,10 +650,11 @@ public class AutoF extends LinearOpMode {
         }
 
         // Get a start pose.
-        Pose2d startPose = Routes.getStartPose(redAlliance, startLeft);
+        RobotPose inputStartPose = RobotRoutes.getStartPose(redAlliance, startLeft);
+        Pose2d outputStartPose = new Pose2d(inputStartPose.x, inputStartPose.y, inputStartPose.heading);
 
         // Return the result.
-        return startPose;
+        return outputStartPose;
 
     }
 
@@ -671,7 +688,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(startPose);
 
         // Drive to the spike mark.
-        driveToSpikeMark(trajectorySequenceBuilder, redAlliance, startLeft, location);
+        applyActions(driveToSpikeMark(redAlliance, startLeft, location), trajectorySequenceBuilder);
 
         // Build the trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -690,11 +707,8 @@ public class AutoF extends LinearOpMode {
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
-        // Construct an approach target position.
-        Vector2d targetPosition = new Vector2d(BACKDROP_TARGET_X, targetY);
-
         // Drive to the baackdrop.
-        driveToBackdrop(trajectorySequenceBuilder, redAlliance, startLeft, location, targetPosition);
+        applyActions(driveToBackdrop(redAlliance, startLeft, location, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -714,7 +728,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Drive to the stack.
-        driveToStack(trajectorySequenceBuilder, redAlliance);
+        applyActions(driveToStack(redAlliance), trajectorySequenceBuilder);
 
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -733,7 +747,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Park.
-        park(trajectorySequenceBuilder, redAlliance, parkLeft);
+        applyActions(park(redAlliance, parkLeft), trajectorySequenceBuilder);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -757,11 +771,8 @@ public class AutoF extends LinearOpMode {
         // Get a target y coordinate.
         double targetY = HeatSeekC.getTargetY(leftColumn, FIRST_ROW, redAlliance);
 
-        // Construct an approach target position.
-        Vector2d targetPosition = new Vector2d(BACKDROP_TARGET_X, targetY);
-
         // Return to backdrop.
-        returnToBackdrop(trajectorySequenceBuilder, redAlliance, targetPosition);
+        applyActions(returnToBackdrop(redAlliance, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);
 
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -780,6 +791,47 @@ public class AutoF extends LinearOpMode {
             return 5;
         } else {
             throw new InterruptedException("The location is missing.");
+        }
+    }
+
+    public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder) throws InterruptedException {
+        for(Action inputAction : actions) {
+            if(inputAction instanceof BackAction) {
+                BackAction outputAction = (BackAction)inputAction;
+                trajectorySequenceBuilder.back(outputAction.distance);
+            }
+            else if(inputAction instanceof LineToAction) {
+                LineToAction outputAction = (LineToAction)inputAction;
+                trajectorySequenceBuilder.lineTo(new Vector2d(outputAction.x, outputAction.y));
+            }
+            else if(inputAction instanceof LineToLinearHeadingAction) {
+                LineToLinearHeadingAction outputAction = (LineToLinearHeadingAction)inputAction;
+                trajectorySequenceBuilder.lineToLinearHeading(new Pose2d(outputAction.x, outputAction.y, outputAction.heading));
+            }
+            else if(inputAction instanceof SetReversedAction) {
+                SetReversedAction outputAction = (SetReversedAction)inputAction;
+                trajectorySequenceBuilder.setReversed(outputAction.reversed);
+            }
+            else if(inputAction instanceof SetTangentAction) {
+                SetTangentAction outputAction = (SetTangentAction)inputAction;
+                trajectorySequenceBuilder.setTangent(outputAction.tangent);
+            }
+            else if(inputAction instanceof SplineToAction) {
+                SplineToAction outputAction = (SplineToAction)inputAction;
+                trajectorySequenceBuilder.splineTo(new Vector2d(outputAction.x, outputAction.y), outputAction.heading);
+            }
+            else if(inputAction instanceof SplineToLinearHeadingAction) {
+                SplineToLinearHeadingAction outputAction = (SplineToLinearHeadingAction)inputAction;
+                trajectorySequenceBuilder.splineToLinearHeading(new Pose2d(outputAction.x, outputAction.y, outputAction.heading), outputAction.tangent);
+            }
+            else if(inputAction instanceof TurnAction) {
+                TurnAction outputAction = (TurnAction)inputAction;
+                trajectorySequenceBuilder.turn(outputAction.angle);
+            }
+            else {
+                throw new InterruptedException("The action type is unrecognized.");
+            }
+
         }
     }
 

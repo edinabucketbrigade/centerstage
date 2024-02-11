@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.LEFT;
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.MIDDLE;
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.RIGHT;
+import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
+import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
+import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -16,6 +16,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
+
+import bucketbrigade.casperlibrary.TeamPropLocation;
 
 @Config
 @Autonomous(preselectTeleOp = "TeleOpM")

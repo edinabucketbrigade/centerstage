@@ -10,13 +10,14 @@ import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.getMaximumColumn;
 import static org.firstinspires.ftc.teamcode.RobotHardwareC.isEven;
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.LEFT;
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.MIDDLE;
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.RIGHT;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.HANGING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.HEAT_SEEKING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.IDLE;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.RETRACTING;
+
+import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
+import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
+import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -33,7 +34,10 @@ public class TeleOpT extends LinearOpMode {
 
     - left stick = move robot
     - right stick = rotate robot
+    - left bumper = raise arm to place pixels
     - right bumper = hold for turtle mode
+    - left trigger = lower lift (when arm is up)
+    - right trigger = raise lift (when arm is up)
     - a = close both claws
     - y = open both claws
     - x = toggle left claw

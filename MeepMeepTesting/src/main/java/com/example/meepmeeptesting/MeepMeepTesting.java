@@ -1,14 +1,12 @@
 package com.example.meepmeeptesting;
 
-import static com.example.meepmeeptesting.Routes.driveToBackdrop;
-import static com.example.meepmeeptesting.Routes.driveToSpikeMark;
-import static com.example.meepmeeptesting.Routes.driveToStack;
-import static com.example.meepmeeptesting.Routes.getStartPose;
-import static com.example.meepmeeptesting.Routes.park;
-import static com.example.meepmeeptesting.Routes.returnToBackdrop;
-import static com.example.meepmeeptesting.TeamPropLocation.LEFT;
-import static com.example.meepmeeptesting.TeamPropLocation.MIDDLE;
-import static com.example.meepmeeptesting.TeamPropLocation.RIGHT;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToStack;
+import static bucketbrigade.casperlibrary.RobotRoutes.getStartPose;
+import static bucketbrigade.casperlibrary.RobotRoutes.park;
+import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
+import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -21,6 +19,20 @@ import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequence;
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
+
+import java.util.List;
+
+import bucketbrigade.casperlibrary.Action;
+import bucketbrigade.casperlibrary.BackAction;
+import bucketbrigade.casperlibrary.LineToAction;
+import bucketbrigade.casperlibrary.LineToLinearHeadingAction;
+import bucketbrigade.casperlibrary.RobotPose;
+import bucketbrigade.casperlibrary.SetReversedAction;
+import bucketbrigade.casperlibrary.SetTangentAction;
+import bucketbrigade.casperlibrary.SplineToAction;
+import bucketbrigade.casperlibrary.SplineToLinearHeadingAction;
+import bucketbrigade.casperlibrary.TeamPropLocation;
+import bucketbrigade.casperlibrary.TurnAction;
 
 public class MeepMeepTesting {
 
@@ -54,10 +66,11 @@ public class MeepMeepTesting {
     }
 
     // Gets a robot.
-    private static RoadRunnerBotEntity getRobot(MeepMeep meepMeep) {
+    private static RoadRunnerBotEntity getRobot(MeepMeep meepMeep) throws Exception {
 
         // Get a start pose.
-        Pose2d startPose = getStartPose(RED_ALLIANCE, START_LEFT);
+        RobotPose inputStartPose = getStartPose(RED_ALLIANCE, START_LEFT);
+        Pose2d outputStartPose = new Pose2d(inputStartPose.x, inputStartPose.y, inputStartPose.heading);
 
         // Construct a velocity constraint.
         TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY, TRACK_WIDTH);
@@ -66,10 +79,10 @@ public class MeepMeepTesting {
         TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
 
         // Construct a trajectory sequence builder.
-        TrajectorySequenceBuilder trajectorySequenceBuilder = new TrajectorySequenceBuilder(startPose, null, velocityConstraint, accelerationConstraint, MAXIMUM_ANGULAR_VELOCITY, MAXIMUM_ANGULAR_ACCELERATION);
+        TrajectorySequenceBuilder trajectorySequenceBuilder = new TrajectorySequenceBuilder(outputStartPose, null, velocityConstraint, accelerationConstraint, MAXIMUM_ANGULAR_VELOCITY, MAXIMUM_ANGULAR_ACCELERATION);
 
         // Drive to the spike mark.
-        driveToSpikeMark(trajectorySequenceBuilder, RED_ALLIANCE, START_LEFT, LOCATION);
+        applyActions(driveToSpikeMark(RED_ALLIANCE, START_LEFT, LOCATION), trajectorySequenceBuilder);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
@@ -78,32 +91,26 @@ public class MeepMeepTesting {
         double targetX = 40;
         double targetY = RED_ALLIANCE ? -36 : 36;
 
-        // Construct a target vector.
-        Vector2d targetVector = new Vector2d(targetX, targetY);
-
         // Drive to the backdrop.
-        driveToBackdrop(trajectorySequenceBuilder, RED_ALLIANCE, START_LEFT, LOCATION, targetVector);
+        applyActions(driveToBackdrop(RED_ALLIANCE, START_LEFT, LOCATION, targetX, targetY), trajectorySequenceBuilder);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
 
         // Drive to the pixel stack.
-        driveToStack(trajectorySequenceBuilder, RED_ALLIANCE);
+        applyActions(driveToStack(RED_ALLIANCE), trajectorySequenceBuilder);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
 
         // Return to the backdrop.
-        returnToBackdrop(trajectorySequenceBuilder, RED_ALLIANCE, targetVector);
+        applyActions(returnToBackdrop(RED_ALLIANCE, targetX, targetY), trajectorySequenceBuilder);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
 
         // Park.
-        park(trajectorySequenceBuilder, RED_ALLIANCE, PARK_LEFT);
-
-        // Drive to a white pixel stack.
-        //driveToStack(trajectorySequenceBuilder);
+        applyActions(park(RED_ALLIANCE, PARK_LEFT), trajectorySequenceBuilder);
 
         // Build a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -114,6 +121,47 @@ public class MeepMeepTesting {
         // Return the robot.
         return robot;
 
+    }
+
+    public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder) throws Exception {
+        for(Action inputAction : actions) {
+            if(inputAction instanceof BackAction) {
+                BackAction outputAction = (BackAction)inputAction;
+                trajectorySequenceBuilder.back(outputAction.distance);
+            }
+            else if(inputAction instanceof LineToAction) {
+                LineToAction outputAction = (LineToAction)inputAction;
+                trajectorySequenceBuilder.lineTo(new Vector2d(outputAction.x, outputAction.y));
+            }
+            else if(inputAction instanceof LineToLinearHeadingAction) {
+                LineToLinearHeadingAction outputAction = (LineToLinearHeadingAction)inputAction;
+                trajectorySequenceBuilder.lineToLinearHeading(new Pose2d(outputAction.x, outputAction.y, outputAction.heading));
+            }
+            else if(inputAction instanceof SetReversedAction) {
+                SetReversedAction outputAction = (SetReversedAction)inputAction;
+                trajectorySequenceBuilder.setReversed(outputAction.reversed);
+            }
+            else if(inputAction instanceof SetTangentAction) {
+                SetTangentAction outputAction = (SetTangentAction)inputAction;
+                trajectorySequenceBuilder.setTangent(outputAction.tangent);
+            }
+            else if(inputAction instanceof SplineToAction) {
+                SplineToAction outputAction = (SplineToAction)inputAction;
+                trajectorySequenceBuilder.splineTo(new Vector2d(outputAction.x, outputAction.y), outputAction.heading);
+            }
+            else if(inputAction instanceof SplineToLinearHeadingAction) {
+                SplineToLinearHeadingAction outputAction = (SplineToLinearHeadingAction)inputAction;
+                trajectorySequenceBuilder.splineToLinearHeading(new Pose2d(outputAction.x, outputAction.y, outputAction.heading), outputAction.tangent);
+            }
+            else if(inputAction instanceof TurnAction) {
+                TurnAction outputAction = (TurnAction)inputAction;
+                trajectorySequenceBuilder.turn(outputAction.angle);
+            }
+            else {
+                throw new Exception("The action type is unrecognized.");
+            }
+
+        }
     }
 
 }

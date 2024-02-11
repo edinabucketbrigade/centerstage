@@ -1,4 +1,4 @@
-package com.example.meepmeeptesting;
+package bucketbrigade.casperlibrary;
 
 public enum TeamPropLocation {
     LEFT,

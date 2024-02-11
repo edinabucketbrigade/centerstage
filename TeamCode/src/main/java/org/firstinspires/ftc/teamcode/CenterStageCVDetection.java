@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.LEFT;
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.MIDDLE;
-import static org.firstinspires.ftc.teamcode.TeamPropLocation.RIGHT;
+import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
+import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
+import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.dashboard.config.Config;
 
@@ -13,6 +13,9 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
+
+import bucketbrigade.casperlibrary.TeamPropLocation;
+
 @Config
 public class CenterStageCVDetection extends OpenCvPipeline {
     public static double MINIMUM_BLUE_VALUES = 40;
