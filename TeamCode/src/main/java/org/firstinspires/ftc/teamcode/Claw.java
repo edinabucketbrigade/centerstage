@@ -42,8 +42,6 @@ public class Claw {
     private DigitalChannel redLeftLed;
     private DigitalChannel greenRightLed;
     private DigitalChannel redRightLed;
-    private boolean automaticallyCaptureLeft = true;
-    private boolean automaticallyCaptureRight = true;
 
     // Initializes this.
     public Claw(RobotHardwareC robotHardware) {
@@ -98,57 +96,34 @@ public class Claw {
         // If there is a pixel in the left claw...
         if(leftMillimeters < PIXEL_CAPTURE_THRESHOLD) {
 
-            // If we are automatically capturing left pixels...
-            if(automaticallyCaptureLeft) {
-
-                // Close the left claw.
-                closeLeft();
-
-                // Disable automatically capturing left pixels for now.
-                automaticallyCaptureLeft = false;
-
-            }
+            // Make the left LED green.
+            setLedGreen(greenLeftLed, redLeftLed);
 
         }
 
         // Otherwise (if there is no pixel in the left claw)...
         else {
 
-            // Enable automatically capturing left pixels.
-            automaticallyCaptureLeft = true;
-
-            // Open the left claw.
-            //openLeftFully();
+            // Make the left LED red.
+            setLedRed(greenLeftLed, redLeftLed);
 
         }
 
         // If there is a pixel in the right claw...
         if(rightMillimeters < PIXEL_CAPTURE_THRESHOLD) {
 
-            // If we are automatically capturing right pixels...
-            if(automaticallyCaptureRight) {
-
-                // Close the right claw.
-                closeRight();
-
-                // Disable automatically capturing right pixels for now.
-                automaticallyCaptureRight = false;
-
-            }
+            // Make the right LED green.
+            setLedGreen(greenRightLed, redRightLed);
 
         }
 
         // Otherwise (if there is no pixel in the right claw)...
         else {
 
-            // Enable automatically capturing right pixels.
-            automaticallyCaptureRight = true;
-
-            // Open the right claw.
-            //openRightFully();
+            // Make the right LED red.
+            setLedRed(greenRightLed, redRightLed);
 
         }
-
 
         // Get the op mode.
         LinearOpMode opMode = robotHardware.getOpMode();
@@ -157,7 +132,7 @@ public class Claw {
         Telemetry telemetry = opMode.telemetry;
 
         // Add claw information to the telemetry.
-        telemetry.addData("Claw", "Left Open = %b, Right Open = %b, Wrist Position = %s, Left Distance = %.0f mm, Right Distance = %.0f mm, Capture Left = %b, Capture Right = %b", isLeftOpen, isRightOpen, wristPosition, leftMillimeters, rightMillimeters, automaticallyCaptureLeft, automaticallyCaptureRight);
+        telemetry.addData("Claw", "Left Open = %b, Right Open = %b, Wrist Position = %s, Left Distance = %.0f mm, Right Distance = %.0f mm", isLeftOpen, isRightOpen, wristPosition, leftMillimeters, rightMillimeters);
 
     }
 
@@ -199,9 +174,6 @@ public class Claw {
     // Closes the left claw.
     public void closeLeft() {
 
-        // Make the left LED green.
-        setLedGreen(greenLeftLed, redLeftLed);
-
         // Close the left claw.
         leftServo.setPosition(LEFT_CLOSED);
 
@@ -212,9 +184,6 @@ public class Claw {
 
     // Opens the left claw.
     public void openLeft(boolean fully) {
-
-        // Make the left LED red.
-        setLedRed(greenLeftLed, redLeftLed);
 
         // Open the left claw.
         leftServo.setPosition(fully ? LEFT_FULLY_OPEN : LEFT_PARTIALLY_OPEN);
@@ -227,9 +196,6 @@ public class Claw {
     // Closes the right claw.
     public void closeRight() {
 
-        // Make the right LED green.
-        setLedGreen(greenRightLed, redRightLed);
-
         // Close the right claw.
         rightServo.setPosition(RIGHT_CLOSED);
 
@@ -240,9 +206,6 @@ public class Claw {
 
     // Opens the right claw.
     public void openRight(boolean fully) {
-
-        // Make the right LED red.
-        setLedRed(greenRightLed, redRightLed);
 
         // Open the right claw.
         rightServo.setPosition(fully ? RIGHT_FULLY_OPEN : RIGHT_PARTIALLY_OPEN);
