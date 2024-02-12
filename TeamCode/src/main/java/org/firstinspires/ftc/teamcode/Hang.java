@@ -21,7 +21,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Hang {
     enum State {IDLE, CLOSE_CLAW, RAISE_WRIST, RAISE_ARM_AND_LIFT, RAISE_ROBOT, WAIT_FOR_USER, LOWER_ROBOT}
 
-    public static int LOWER_ROBOT_SPEED = 100;
+    public static int LOWER_ROBOT_SPEED = 50;
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
