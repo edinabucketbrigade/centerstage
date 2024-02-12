@@ -68,7 +68,9 @@ public class RobotHardwareC {
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
     public static double NORMAL_MULTIPLIER = 1;
-    public static double TURTLE_MULTIPLIER = 0.3;
+    public static double TURTLE_MULTIPLIER = 0.5;
+    public static double POWER_EPSILON = 0.001;
+    public static double DRIVE_POWER_RAMP_MILLISECONDS = 500;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -90,9 +92,10 @@ public class RobotHardwareC {
     private Arm arm;
     private Claw claw;
     private ElapsedTime localizationTimer;
+    private Ramp drivePowerRamp = new Ramp(DRIVE_POWER_RAMP_MILLISECONDS);
 
     // Initializes this.
-    public RobotHardwareC(LinearOpMode opMode) {
+    public RobotHardwareC(LinearOpMode opMode) throws InterruptedException {
 
         // Initialize the FTC dashboard.
         ftcDashboard = FtcDashboard.getInstance();
@@ -275,6 +278,20 @@ public class RobotHardwareC {
         else {
             multiplier = NORMAL_MULTIPLIER;
         }
+
+        // Determine whether the robot is stopped.
+        boolean isRobotStopped = isRobotStopped(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+
+        // If the robot is stopped...
+        if(isRobotStopped) {
+
+            // Reset the drive power ramp.
+            drivePowerRamp.reset();
+
+        }
+
+        // Apply the drive power ramp to the multiplier.
+        multiplier = drivePowerRamp.apply(multiplier);
 
         leftFrontPower *= multiplier;
         leftBackPower *= multiplier;
@@ -751,6 +768,19 @@ public class RobotHardwareC {
 
     public boolean isClawOpen() {
         return claw.isOpen();
+    }
+
+    private boolean isRobotStopped(double leftFrontPower, double leftBackPower, double rightFrontPower, double rightBackPower) {
+        boolean isLeftFrontStopped = areEqual(leftFrontPower, 0, POWER_EPSILON);
+        boolean isLeftBackStopped = areEqual(leftBackPower, 0, POWER_EPSILON);
+        boolean isRightFrontStopped = areEqual(rightFrontPower, 0, POWER_EPSILON);
+        boolean isRightBackStopped = areEqual(rightBackPower, 0, POWER_EPSILON);
+        boolean isRobotStopped = isLeftFrontStopped && isLeftBackStopped && isRightFrontStopped && isRightBackStopped;
+        return isRobotStopped;
+    }
+
+    private static boolean areEqual(double a, double b, double epsilon) {
+        return Math.abs(a - b) <= epsilon;
     }
 
 }
