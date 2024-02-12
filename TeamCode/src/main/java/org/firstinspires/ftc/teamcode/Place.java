@@ -106,7 +106,7 @@ public class Place {
 
                 }
 
-                if (currentGamepad.left_trigger > TRIGGER_THRESHOLD) {
+                if (currentGamepad.right_trigger > TRIGGER_THRESHOLD) {
                     int liftIncrement = (int)Math.round(lowerLiftRamp.apply(LIFT_INCREMENT));
                     liftPosition = Math.max(liftPosition - liftIncrement, DOWN_POSITION);
                     robotHardware.setLiftPosition(liftPosition);
@@ -115,7 +115,7 @@ public class Place {
                     lowerLiftRamp.reset();
                 }
 
-                if (currentGamepad.right_trigger > TRIGGER_THRESHOLD) {
+                if (currentGamepad.left_trigger > TRIGGER_THRESHOLD) {
                     int liftIncrement = (int)Math.round(raiseLiftRamp.apply(LIFT_INCREMENT));
                     liftPosition = Math.min(liftPosition + liftIncrement, MAXIMUM_POSITION);
                     robotHardware.setLiftPosition(liftPosition);
@@ -143,16 +143,8 @@ public class Place {
                 // If the driver pressed a...
                 if(currentGamepad.a && !previousGamepad.a) {
 
-                    // Close the claws.
-                    robotHardware.closeClaw();
-
-                }
-
-                // If the driver pressed y...
-                if(currentGamepad.y && !previousGamepad.y) {
-
-                    // Open the claws.
-                    robotHardware.openClaw(false);
+                    // Toggle the claws.
+                    robotHardware.toggleClaws(false);
 
                 }
 
