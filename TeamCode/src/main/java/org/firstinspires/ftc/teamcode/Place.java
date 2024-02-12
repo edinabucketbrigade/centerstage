@@ -20,17 +20,19 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Place {
     enum State {IDLE, CLOSE_CLAW_AND_RAISE_WRIST, RAISE_WRIST, RAISE_ARM_AND_LIFT, WAIT_FOR_DROP, LOWER_ARM, LOWER_LIFT, LOWER_WRIST_AND_OPEN_CLAW }
 
-    public static int LIFT_INCREMENT = 50;
+    public static int LIFT_INCREMENT = 70;
+    public static double LIFT_RAMP_MILLISECONDS = 500;
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
     private int liftPosition = DOWN_POSITION;
-
     private Gamepad currentGamepad = new Gamepad();
     private Gamepad previousGamepad = new Gamepad();
+    private Ramp raiseLiftRamp = new Ramp(LIFT_RAMP_MILLISECONDS);
+    private Ramp lowerLiftRamp = new Ramp(LIFT_RAMP_MILLISECONDS);
 
-    public Place(RobotHardwareC robotHardware) {
+    public Place(RobotHardwareC robotHardware) throws InterruptedException {
         this.robotHardware = robotHardware;
     }
 
@@ -105,13 +107,21 @@ public class Place {
                 }
 
                 if (currentGamepad.left_trigger > TRIGGER_THRESHOLD) {
-                    liftPosition = Math.max(liftPosition - LIFT_INCREMENT, DOWN_POSITION);
+                    int liftIncrement = (int)Math.round(lowerLiftRamp.apply(LIFT_INCREMENT));
+                    liftPosition = Math.max(liftPosition - liftIncrement, DOWN_POSITION);
                     robotHardware.setLiftPosition(liftPosition);
+                }
+                else {
+                    lowerLiftRamp.reset();
                 }
 
                 if (currentGamepad.right_trigger > TRIGGER_THRESHOLD) {
-                    liftPosition = Math.min(liftPosition + LIFT_INCREMENT, MAXIMUM_POSITION);
+                    int liftIncrement = (int)Math.round(raiseLiftRamp.apply(LIFT_INCREMENT));
+                    liftPosition = Math.min(liftPosition + liftIncrement, MAXIMUM_POSITION);
                     robotHardware.setLiftPosition(liftPosition);
+                }
+                else {
+                    raiseLiftRamp.reset();
                 }
 
                 // If the driver pressed x...

@@ -205,7 +205,7 @@ public class TeleOpT extends LinearOpMode {
             }
 
             // Add telemetry.
-            telemetry.addData("Red Alliance", AutoF.redAlliance);
+            telemetry.addData("Alliance", AutoF.redAlliance ? "Red" : "Blue");
             telemetry.addData("State", state);
             telemetry.addData("Debugging", debugging);
 
