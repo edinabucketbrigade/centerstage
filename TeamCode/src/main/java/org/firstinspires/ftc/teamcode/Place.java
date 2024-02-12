@@ -117,16 +117,16 @@ public class Place {
                 // If the driver pressed x...
                 if(currentGamepad.x && !previousGamepad.x) {
 
-                    // Toggle the left claw.
-                    robotHardware.toggleLeftClaw(false);
+                    // Toggle the right claw.
+                    robotHardware.toggleRightClaw(false);
 
                 }
 
                 // If the driver pressed b...
                 if(currentGamepad.b && !previousGamepad.b) {
 
-                    // Toggle the right claw.
-                    robotHardware.toggleRightClaw(false);
+                    // Toggle the left claw.
+                    robotHardware.toggleLeftClaw(false);
 
                 }
 

@@ -239,6 +239,12 @@ public class RobotHardwareC {
         double lateral = gamepad1.left_stick_x;
         double yaw = gamepad1.right_stick_x;
 
+        boolean reverse = claw.isClosed() || (place.isActive() && (claw.isLeftClosed() || claw.isRightClosed()));
+
+        if(reverse) {
+            yaw = -yaw;
+        }
+
         double max;
 
         // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -290,7 +296,12 @@ public class RobotHardwareC {
         //rightFrontPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
 
         // Send calculated power to wheels
-        moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+        if (reverse) {
+            moveRobot(-leftFrontPower, -rightFrontPower, -leftBackPower, -rightBackPower);
+        }
+        else {
+            moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+        }
 
     }
 

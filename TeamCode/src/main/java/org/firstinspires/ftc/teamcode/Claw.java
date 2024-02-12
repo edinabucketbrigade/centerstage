@@ -56,8 +56,8 @@ public class Claw {
         HardwareMap hardwareMap = opMode.hardwareMap;
 
         // Get the hardware.
-        leftServo = hardwareMap.get(Servo.class,"left_claw_servo");
-        rightServo = hardwareMap.get(Servo.class,"right_claw_servo");
+        leftServo = hardwareMap.get(Servo.class, "left_claw_servo");
+        rightServo = hardwareMap.get(Servo.class, "right_claw_servo");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
         leftColor = hardwareMap.get(NormalizedColorSensor.class, "left_claw_color");
         rightColor = hardwareMap.get(NormalizedColorSensor.class, "right_claw_color");
@@ -78,7 +78,7 @@ public class Claw {
     public void update() {
 
         // If the robot is automatically driving...
-        if(robotHardware.isAutomaticallyDriving()) {
+        if (robotHardware.isAutomaticallyDriving()) {
 
             // Exit the method.
             return;
@@ -94,7 +94,7 @@ public class Claw {
         double rightMillimeters = rightDistance.getDistance(DistanceUnit.MM);
 
         // If there is a pixel in the left claw...
-        if(leftMillimeters < PIXEL_CAPTURE_THRESHOLD) {
+        if (leftMillimeters < PIXEL_CAPTURE_THRESHOLD) {
 
             // Make the left LED green.
             setLedGreen(greenLeftLed, redLeftLed);
@@ -110,7 +110,7 @@ public class Claw {
         }
 
         // If there is a pixel in the right claw...
-        if(rightMillimeters < PIXEL_CAPTURE_THRESHOLD) {
+        if (rightMillimeters < PIXEL_CAPTURE_THRESHOLD) {
 
             // Make the right LED green.
             setLedGreen(greenRightLed, redRightLed);
@@ -226,7 +226,7 @@ public class Claw {
 
     }
 
-    public void open(boolean fully){
+    public void open(boolean fully) {
         openLeft(fully);
         openRight(fully);
     }
@@ -296,6 +296,18 @@ public class Claw {
 
     public boolean isOpen() {
         return isLeftOpen && isRightOpen;
+    }
+
+    public boolean isClosed() {
+        return !isLeftOpen && !isRightOpen;
+    }
+
+    public boolean isLeftClosed() {
+        return !isLeftOpen;
+    }
+
+    public boolean isRightClosed() {
+        return !isRightOpen;
     }
 
 }
