@@ -13,11 +13,10 @@ import java.util.List;
 public class RobotRoutes {
 
     // Gets a start pose.
-    public static RobotPose getStartPose(boolean redAlliance, boolean inputStartLeft) {
+    public static RobotPose getStartPose(boolean redAlliance, boolean startClose) {
 
-        boolean outputStartLeft = redAlliance ? !inputStartLeft : inputStartLeft;
         RobotPose startPose;
-        if(outputStartLeft) {
+        if(startClose) {
             startPose = new RobotPose(12, 61, Math.toRadians(90));
         }
         else {
@@ -29,12 +28,11 @@ public class RobotRoutes {
     }
 
     // Drives to a spike mark.
-    public static List<Action> driveToSpikeMark(boolean redAlliance, boolean inputStartLeft, TeamPropLocation inputLocation) {
+    public static List<Action> driveToSpikeMark(boolean redAlliance, boolean startClose, TeamPropLocation inputLocation) {
 
-        boolean outputStartLeft = redAlliance ? !inputStartLeft : inputStartLeft;
         TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
         List<Action> actions = new ArrayList<>();
-        if (outputStartLeft) {
+        if (startClose) {
             actions.add(new SetReversedAction(true));
             if (outputLocation == LEFT) {
                 actions.add(new SplineToAction(32.5, 30, Math.toRadians(0)));
@@ -59,13 +57,12 @@ public class RobotRoutes {
     }
 
     // Drives to the backdrop.
-    public static List<Action> driveToBackdrop(boolean redAlliance, boolean inputStartLeft, TeamPropLocation inputLocation, double targetX, double targetY) {
+    public static List<Action> driveToBackdrop(boolean redAlliance, boolean startClose, TeamPropLocation inputLocation, double targetX, double targetY) {
 
-        boolean outputStartLeft = redAlliance ? !inputStartLeft : inputStartLeft;
         TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
         double targetHeading = Math.toRadians(180);
         List<Action> actions = new ArrayList<>();
-        if (outputStartLeft) {
+        if (startClose) {
             actions.add(new LineToLinearHeadingAction(targetX, targetY, targetHeading));
         } else {
             actions.add(new SetReversedAction(true));

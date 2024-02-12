@@ -73,7 +73,7 @@ public class AutoF extends LinearOpMode {
     public static Boolean redAlliance;
     public static Pose2d currentPose;
     public static boolean lastRanAutonomous;
-    private Boolean startLeft;
+    private Boolean startClose;
     private Boolean parkLeft;
     private OpenCvWebcam camera;
     private boolean startedStreaming;
@@ -477,14 +477,14 @@ public class AutoF extends LinearOpMode {
             }
 
             // Otherwise, if the user has not selected a starting location...
-            else if (startLeft == null) {
-                telemetry.addData("Start", "X = left, B = right");
+            else if (startClose == null) {
+                telemetry.addData("Start", "X = close, B = far");
                 telemetry.update();
                 if (currentGamepad.x && !previousGamepad.x) {
-                    startLeft = true;
+                    startClose = true;
                 }
                 if (currentGamepad.b && !previousGamepad.b) {
-                    startLeft = false;
+                    startClose = false;
                 }
             }
 
@@ -525,8 +525,8 @@ public class AutoF extends LinearOpMode {
         if (redAlliance == null) {
             throw new InterruptedException("The red alliance value is missing.");
         }
-        if (startLeft == null) {
-            throw new InterruptedException("The start left value is missing.");
+        if (startClose == null) {
+            throw new InterruptedException("The start close value is missing.");
         }
         if (telemetry == null) {
             throw new InterruptedException("The telemetry is missing.");
@@ -544,7 +544,7 @@ public class AutoF extends LinearOpMode {
         log("Initializing camera...");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry, true);
+        teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startClose, telemetry, true);
         camera.setPipeline(teamPropDetector);
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
 
@@ -646,12 +646,12 @@ public class AutoF extends LinearOpMode {
         if (redAlliance == null) {
             throw new InterruptedException("The red alliance value is missing.");
         }
-        if (startLeft == null) {
-            throw new InterruptedException("The start left value is missing.");
+        if (startClose == null) {
+            throw new InterruptedException("The start close value is missing.");
         }
 
         // Get a start pose.
-        RobotPose inputStartPose = RobotRoutes.getStartPose(redAlliance, startLeft);
+        RobotPose inputStartPose = RobotRoutes.getStartPose(redAlliance, startClose);
         Pose2d outputStartPose = new Pose2d(inputStartPose.x, inputStartPose.y, inputStartPose.heading);
 
         // Return the result.
@@ -675,8 +675,8 @@ public class AutoF extends LinearOpMode {
         if (redAlliance == null) {
             throw new InterruptedException("The red alliance value is missing.");
         }
-        if (startLeft == null) {
-            throw new InterruptedException("The start left value is missing.");
+        if (startClose == null) {
+            throw new InterruptedException("The start close value is missing.");
         }
 
         // Get a start pose.
@@ -689,7 +689,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(startPose);
 
         // Drive to the spike mark.
-        applyActions(driveToSpikeMark(redAlliance, startLeft, location), trajectorySequenceBuilder);
+        applyActions(driveToSpikeMark(redAlliance, startClose, location), trajectorySequenceBuilder);
 
         // Build the trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -709,7 +709,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Drive to the baackdrop.
-        applyActions(driveToBackdrop(redAlliance, startLeft, location, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);
+        applyActions(driveToBackdrop(redAlliance, startClose, location, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();

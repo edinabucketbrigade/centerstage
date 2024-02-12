@@ -40,8 +40,8 @@ import bucketbrigade.casperlibrary.TurnAction;
 public class MeepMeepTesting {
 
     private static final boolean RED_ALLIANCE = true;
-    private static final boolean START_LEFT = false;
-    private static final TeamPropLocation LOCATION = RIGHT;
+    private static final boolean START_CLOSE = false;
+    private static final TeamPropLocation LOCATION = LEFT;
     private static final boolean PARK_LEFT = false;
 
     public static final double MAXIMUM_VELOCITY = 60;
@@ -72,7 +72,7 @@ public class MeepMeepTesting {
     private static RoadRunnerBotEntity getRobot(MeepMeep meepMeep) throws Exception {
 
         // Get a start pose.
-        RobotPose inputStartPose = getStartPose(RED_ALLIANCE, START_LEFT);
+        RobotPose inputStartPose = getStartPose(RED_ALLIANCE, START_CLOSE);
         Pose2d outputStartPose = new Pose2d(inputStartPose.x, inputStartPose.y, inputStartPose.heading);
 
         // Construct a velocity constraint.
@@ -85,7 +85,7 @@ public class MeepMeepTesting {
         TrajectorySequenceBuilder trajectorySequenceBuilder = new TrajectorySequenceBuilder(outputStartPose, null, velocityConstraint, accelerationConstraint, MAXIMUM_ANGULAR_VELOCITY, MAXIMUM_ANGULAR_ACCELERATION);
 
         // Drive to the spike mark.
-        applyActions(driveToSpikeMark(RED_ALLIANCE, START_LEFT, LOCATION), trajectorySequenceBuilder);
+        applyActions(driveToSpikeMark(RED_ALLIANCE, START_CLOSE, LOCATION), trajectorySequenceBuilder);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
@@ -95,7 +95,7 @@ public class MeepMeepTesting {
         double targetY = 36;
 
         // Drive to the backdrop.
-        applyActions(driveToBackdrop(RED_ALLIANCE, START_LEFT, LOCATION, targetX, targetY), trajectorySequenceBuilder);
+        applyActions(driveToBackdrop(RED_ALLIANCE, START_CLOSE, LOCATION, targetX, targetY), trajectorySequenceBuilder);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
