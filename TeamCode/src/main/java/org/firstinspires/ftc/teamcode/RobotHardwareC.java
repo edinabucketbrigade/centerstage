@@ -70,7 +70,7 @@ public class RobotHardwareC {
     public static double NORMAL_MULTIPLIER = 1;
     public static double TURTLE_MULTIPLIER = 0.5;
     public static double POWER_EPSILON = 0.001;
-    public static double DRIVE_POWER_RAMP_MILLISECONDS = 500;
+    public static double DRIVE_POWER_RAMP_MILLISECONDS = 800;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
