@@ -35,14 +35,12 @@ public class RobotRoutes {
         TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
         List<Action> actions = new ArrayList<>();
         if (outputStartLeft) {
+            actions.add(new SetReversedAction(true));
             if (outputLocation == LEFT) {
-                actions.add(new SetReversedAction(true));
                 actions.add(new SplineToAction(32.5, 30, Math.toRadians(0)));
             } else if (outputLocation == MIDDLE) {
-                actions.add(new SetReversedAction(true));
                 actions.add(new SplineToAction(25, 27, Math.toRadians(0)));
             } else {
-                actions.add(new SetReversedAction(true));
                 actions.add(new SplineToLinearHeadingAction(11, 33, Math.toRadians(180), Math.toRadians(180)));
             }
         } else {
@@ -70,11 +68,15 @@ public class RobotRoutes {
         if (outputStartLeft) {
             actions.add(new LineToLinearHeadingAction(targetX, targetY, targetHeading));
         } else {
-            actions.add(new LineToAction(-36, 9));
-            if (outputLocation == MIDDLE || outputLocation == RIGHT) {
-                actions.add(new TurnAction(Math.toRadians(90)));
-            } else {
-                actions.add(new TurnAction(Math.toRadians(180)));
+            actions.add(new SetReversedAction(true));
+            if(outputLocation == LEFT) {
+                actions.add(new SplineToAction(-46, 9, Math.toRadians(0)));
+            }
+            else if(outputLocation == MIDDLE) {
+                actions.add(new SplineToAction(-33, 9, Math.toRadians(0)));
+            }
+            else {
+                actions.add(new SplineToAction(-36, 9, Math.toRadians(0)));
             }
             actions.add(new LineToAction(30, 9));
             actions.add(new SplineToAction(targetX, targetY, Math.toRadians(0)));
