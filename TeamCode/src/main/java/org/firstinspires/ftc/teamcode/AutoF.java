@@ -10,11 +10,10 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.PARK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_ARM_AND_LIFT;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_WRIST;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PURPLE_PIXEL;
-import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_WRIST;
-import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_YELLOW_PIXEL;
+import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PIXEL_ON_BACKDROP;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETURN_TO_BACKDROP;
-import static org.firstinspires.ftc.teamcode.AutoF.State.WAIT_FOR_RELEASE;
+import static org.firstinspires.ftc.teamcode.AutoF.State.WAIT_FOR_CLAW_TO_OPEN;
 
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
@@ -67,7 +66,9 @@ import bucketbrigade.casperlibrary.TurnAction;
 @Autonomous(preselectTeleOp = "TeleOpT")
 public class AutoF extends LinearOpMode {
 
-    public static final int FIRST_ROW = 1;
+    public static final int YELLOW_PIXEL_ROW = 1;
+    public static final int WHITE_PIXEL_ROW = 2;
+    public static final int WHITE_PIXEL_LEFT_COLUMN = 4;
     public static final double BACKDROP_TARGET_X = 40;
 
     public static Boolean redAlliance;
@@ -83,11 +84,12 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
 
-    enum State {IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, RAISE_WRIST, APPROACH_BACKDROP, RAISE_ARM_AND_LIFT, DRIVE_TO_PLACE_POSITION, RELEASE_YELLOW_PIXEL, RELEASE_WRIST, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK}
+    enum State {IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, RAISE_WRIST, APPROACH_BACKDROP, RAISE_ARM_AND_LIFT, DRIVE_TO_PLACE_POSITION, RELEASE_PIXEL_ON_BACKDROP, WAIT_FOR_CLAW_TO_OPEN, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK}
 
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
     private Pose2d lastEnd;
+    private boolean placingYellowPixel = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -181,14 +183,33 @@ public class AutoF extends LinearOpMode {
         // Update the robot's current pose.
         currentPose = robotHardware.getPose();
 
-        // Get a lift position.
-        int liftPosition = HeatSeekC.getTargetLiftPosition(FIRST_ROW);
+        int liftPosition;
+        double targetY;
 
-        // Get the appropriate left column.
-        int leftColumn = getLeftColumn(location);
+        // If we are placing a yellow pixel...
+        if(placingYellowPixel) {
 
-        // Get a target y coordinate.
-        double targetY = HeatSeekC.getTargetY(leftColumn, FIRST_ROW, redAlliance);
+            // Get a lift position.
+            liftPosition = HeatSeekC.getTargetLiftPosition(YELLOW_PIXEL_ROW);
+
+            // Get the appropriate yellow pixel left column.
+            int yellowPixelLeftColumn = getLeftColumn(location);
+
+            // Get a target y coordinate.
+            targetY = HeatSeekC.getTargetY(yellowPixelLeftColumn, YELLOW_PIXEL_ROW, redAlliance);
+
+        }
+
+        // Otherwise (if we are placing a white pixel)...
+        else {
+
+            // Get a lift position.
+            liftPosition = HeatSeekC.getTargetLiftPosition(WHITE_PIXEL_ROW);
+
+            // Get a target y coordinate.
+            targetY = HeatSeekC.getTargetY(WHITE_PIXEL_LEFT_COLUMN, WHITE_PIXEL_ROW, redAlliance);
+
+        }
 
         // Update the state machine.
         switch (state) {
@@ -276,6 +297,9 @@ public class AutoF extends LinearOpMode {
                 // Raise the arm.
                 robotHardware.raiseArm();
 
+                // Move the wrist to the backdrop position.
+                robotHardware.setWristBackdrop();
+
                 setState(DRIVE_TO_PLACE_POSITION);
 
                 break;
@@ -312,11 +336,11 @@ public class AutoF extends LinearOpMode {
                 // Execute the trajectory sequence.
                 drive.followTrajectorySequenceAsync(placeTrajectorySequence);
 
-                setState(RELEASE_YELLOW_PIXEL);
+                setState(RELEASE_PIXEL_ON_BACKDROP);
 
                 break;
 
-            case RELEASE_YELLOW_PIXEL:
+            case RELEASE_PIXEL_ON_BACKDROP:
 
                 if (drive.isBusy()) {
                     return;
@@ -324,29 +348,11 @@ public class AutoF extends LinearOpMode {
 
                 robotHardware.openClaw(false);
 
-                setState(RELEASE_WRIST);
+                setState(WAIT_FOR_CLAW_TO_OPEN);
 
                 break;
 
-            case RELEASE_WRIST:
-
-                // If we are waiting...
-                if (timer.milliseconds() < 500) {
-
-                    // Exit the method.
-                    return;
-
-                }
-
-                // Set the wrist to the release position.
-                robotHardware.setWristRelease();
-
-                //Advance to the next step.
-                setState(WAIT_FOR_RELEASE);
-
-                break;
-
-            case WAIT_FOR_RELEASE:
+            case WAIT_FOR_CLAW_TO_OPEN:
 
                 if (timer.milliseconds() < 500) {
                     return;
@@ -361,8 +367,17 @@ public class AutoF extends LinearOpMode {
                 // Start retracting.
                 robotHardware.startRetracting();
 
-                //setState(DRIVE_TO_PIXEL_STACK);
-                setState(PARK);
+                if(placingYellowPixel) {
+
+                    setState(DRIVE_TO_PIXEL_STACK);
+
+                }
+
+                else {
+
+                    setState(PARK);
+
+                }
 
                 break;
 
@@ -391,12 +406,15 @@ public class AutoF extends LinearOpMode {
 
             case RETURN_TO_BACKDROP:
 
-                TrajectorySequence returnTrajectorySequence = getReturnTrajectorySequence();
+                TrajectorySequence returnTrajectorySequence = getReturnTrajectorySequence(targetY);
                 lastEnd = returnTrajectorySequence.end();
 
                 drive.followTrajectorySequenceAsync(returnTrajectorySequence);
 
-                setState(PARK);
+                placingYellowPixel = false;
+
+                // Advance to the next step.
+                setState(RAISE_ARM_AND_LIFT);
 
                 break;
 
@@ -758,19 +776,13 @@ public class AutoF extends LinearOpMode {
 
     }
 
-    private TrajectorySequence getReturnTrajectorySequence() throws InterruptedException {
+    private TrajectorySequence getReturnTrajectorySequence(double targetY) throws InterruptedException {
 
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
-
-        // Get the appropriate left column.
-        int leftColumn = getLeftColumn(location);
-
-        // Get a target y coordinate.
-        double targetY = HeatSeekC.getTargetY(leftColumn, FIRST_ROW, redAlliance);
 
         // Return to backdrop.
         applyActions(returnToBackdrop(redAlliance, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);

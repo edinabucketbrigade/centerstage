@@ -39,8 +39,8 @@ import bucketbrigade.casperlibrary.TurnAction;
 
 public class MeepMeepTesting {
 
-    private static final boolean RED_ALLIANCE = true;
-    private static final boolean START_CLOSE = false;
+    private static final boolean RED_ALLIANCE = false;
+    private static final boolean START_CLOSE = true;
     private static final TeamPropLocation LOCATION = LEFT;
     private static final boolean PARK_LEFT = false;
 

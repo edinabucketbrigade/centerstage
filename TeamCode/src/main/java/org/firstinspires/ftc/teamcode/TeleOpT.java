@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.AutoF.FIRST_ROW;
 import static org.firstinspires.ftc.teamcode.AutoF.getLeftColumn;
 import static org.firstinspires.ftc.teamcode.AutoF.lastRanAutonomous;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.MAXIMUM_ROW;
@@ -68,6 +67,7 @@ public class TeleOpT extends LinearOpMode {
     public static double TRIGGER_THRESHOLD = 0.5;
     public static final String WHITE_CIRCLE = "⚪"; // See https://unicode-explorer.com/list/geometric-shapes
     public static int HANG_POSITION = 700;
+    public static final int FIRST_ROW = 1;
 
     private RobotHardwareC robotHardware;
     private Gamepad currentGamepad = new Gamepad();
