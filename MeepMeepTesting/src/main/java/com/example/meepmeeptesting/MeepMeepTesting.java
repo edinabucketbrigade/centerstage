@@ -5,6 +5,7 @@ import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
 import static bucketbrigade.casperlibrary.RobotRoutes.BACKDROP_TARGET_X;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToPlace;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToStack;
 import static bucketbrigade.casperlibrary.RobotRoutes.getStartPose;
@@ -44,11 +45,11 @@ import bucketbrigade.casperlibrary.TurnAction;
 
 public class MeepMeepTesting {
 
-    private static final boolean RED_ALLIANCE = false;
+    private static final boolean RED_ALLIANCE = true;
     private static final boolean START_CLOSE = true;
-    private static final TeamPropLocation LOCATION = LEFT;
-    private static final boolean PARK_LEFT = false;
-    private static final Objectives objectives = PURPLE_YELLOW_WHITE;
+    private static final TeamPropLocation LOCATION = RIGHT;
+    private static final boolean PARK_LEFT = true;
+    private static final Objectives objectives = PURPLE_YELLOW;
 
     public static final double MAXIMUM_VELOCITY = 60;
     public static final double MAXIMUM_ACCELERATION = 60;
@@ -99,11 +100,14 @@ public class MeepMeepTesting {
         // If we are placing the yellow pixel...
         if(objectives == PURPLE_YELLOW || objectives == PURPLE_YELLOW_WHITE) {
 
-            // Construct a target y coordinate.
-            double targetY = 36;
-
             // Drive to the backdrop.
-            applyActions(driveToBackdrop(RED_ALLIANCE, START_CLOSE, LOCATION, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);
+            applyActions(driveToBackdrop(RED_ALLIANCE, START_CLOSE, LOCATION), trajectorySequenceBuilder);
+
+            // Wait for a bit.
+            trajectorySequenceBuilder.waitSeconds(1);
+
+            // Drive to place.
+            applyActions(driveToPlace(RED_ALLIANCE, LOCATION, true), trajectorySequenceBuilder);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);
@@ -118,7 +122,13 @@ public class MeepMeepTesting {
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Return to the backdrop.
-                applyActions(returnToBackdrop(RED_ALLIANCE, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);
+                applyActions(returnToBackdrop(RED_ALLIANCE), trajectorySequenceBuilder);
+
+                // Wait for a bit.
+                trajectorySequenceBuilder.waitSeconds(1);
+
+                // Drive to place.
+                applyActions(driveToPlace(RED_ALLIANCE, LOCATION, false), trajectorySequenceBuilder);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
@@ -127,8 +137,13 @@ public class MeepMeepTesting {
 
         }
 
-        // Park.
-        applyActions(park(RED_ALLIANCE, PARK_LEFT), trajectorySequenceBuilder);
+        // If we should park...
+        if(START_CLOSE || objectives == PURPLE_YELLOW || objectives == PURPLE_YELLOW_WHITE) {
+
+            // Park.
+            applyActions(park(RED_ALLIANCE, PARK_LEFT), trajectorySequenceBuilder);
+
+        }
 
         // Build a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();

@@ -63,10 +63,6 @@ public class RobotHardwareC {
 
     public static final String RED_SQUARE = "\uD83D\uDFE5"; // See https://unicode-explorer.com/list/geometric-shapes
     public static final String GREEN_SQUARE = "\uD83D\uDFE9"; // See https://unicode-explorer.com/list/geometric-shapes
-    private static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
-    private static final int MAXIMUM_COLUMN_ODD_ROW = 6;
-    public static final int MINIMUM_COLUMN = 1;
-    public static final int MINIMUM_ROW = 1;
     public static double NORMAL_MULTIPLIER = 1;
     public static double TURTLE_MULTIPLIER = 0.5;
     public static double POWER_EPSILON = 0.001;
@@ -469,24 +465,6 @@ public class RobotHardwareC {
                 .addProcessor(aprilTagProcessor)
                 .build();
 
-    }
-
-    // Gets the column count for a specified row.
-    public static int getMaximumColumn(int row){
-        if (isEven(row)){
-            return MAXIMUM_COLUMN_EVEN_ROW;
-        } else {
-            return MAXIMUM_COLUMN_ODD_ROW;
-        }
-    }
-
-    // Determines whether a number is even.
-    public static boolean isEven(int value) {
-        if (value % 2 == 0) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     // Determines whether we are heat seeking.

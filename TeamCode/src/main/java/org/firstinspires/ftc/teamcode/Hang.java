@@ -7,8 +7,9 @@ import static org.firstinspires.ftc.teamcode.Hang.State.RAISE_ARM_AND_LIFT;
 import static org.firstinspires.ftc.teamcode.Hang.State.RAISE_ROBOT;
 import static org.firstinspires.ftc.teamcode.Hang.State.RAISE_WRIST;
 import static org.firstinspires.ftc.teamcode.Hang.State.WAIT_FOR_USER;
-import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.TeleOpT.HANG_POSITION;
+
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_POSITION;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;

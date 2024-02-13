@@ -1,20 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.AutoF.getLeftColumn;
 import static org.firstinspires.ftc.teamcode.AutoF.lastRanAutonomous;
-import static org.firstinspires.ftc.teamcode.HeatSeekC.MAXIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.Lift.DOWN_POSITION;
-import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.getMaximumColumn;
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.isEven;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.HANGING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.HEAT_SEEKING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.IDLE;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.PLACING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.RETRACTING;
 
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_POSITION;
+import static bucketbrigade.casperlibrary.RobotRoutes.getLeftColumn;
 import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
 import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
 import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
@@ -215,57 +210,6 @@ public class TeleOpT extends LinearOpMode {
             telemetry.update();
 
         }
-
-    }
-
-    // Gets a hex display.
-    private static String getHexDisplay(int leftColumn, int leftRow, int rightColumn, int rightRow) {
-
-        // Previous symbols: 〇 Ⓛ Ⓡ
-
-        // Initialize the output.
-        String output = "\n";
-
-        // For each row...
-        for (int row = MAXIMUM_ROW; row >= MINIMUM_ROW; row--) {
-
-            // If the row is odd...
-            if (!isEven(row)) {
-
-                // Append a space.
-                output += "  ";
-
-            }
-
-            // Get the row's column count.
-            int maximumColumn = getMaximumColumn(row);
-
-            // For each column...
-            for (int column = MINIMUM_COLUMN; column <= maximumColumn; column++) {
-
-                // Append the appropriate symbol.
-                if (column == leftColumn && leftRow == row) {
-                    output += ORANGE_CIRCLE;
-                } else if (column == rightColumn && rightRow == row) {
-                    output += ORANGE_CIRCLE;
-                } else {
-                    output += WHITE_CIRCLE;
-                }
-
-            }
-
-            // If this is not the bottom row...
-            if(row > MINIMUM_ROW) {
-
-                // Append a newline.
-                output += "\n";
-
-            }
-
-        }
-
-        // Return the output.
-        return output;
 
     }
 

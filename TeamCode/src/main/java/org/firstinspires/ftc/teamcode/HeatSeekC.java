@@ -7,13 +7,12 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.DRIVE_TO_PLACE_POSI
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.OPEN_CLAW;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.RELEASE_WRIST;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.WAIT_FOR_RELEASE;
-import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_COLUMN;
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.MINIMUM_ROW;
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.getMaximumColumn;
-import static org.firstinspires.ftc.teamcode.RobotHardwareC.isEven;
 
+import static bucketbrigade.casperlibrary.RobotRoutes.FIRST_ROW_LIFT_POSITION;
+import static bucketbrigade.casperlibrary.RobotRoutes.LIFT_INCREMENT;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.PLACE_TARGET_X;
+import static bucketbrigade.casperlibrary.RobotRoutes.getTargetY;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -34,14 +33,8 @@ public class HeatSeekC {
     enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW, RELEASE_WRIST, WAIT_FOR_RELEASE }
 
     public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
-    public static int FIRST_ROW_LIFT_POSITION = 0;
-    public static int LIFT_INCREMENT = 200;
-    public static double PIXEL_WIDTH = 3.2;
-    public static double TARGET_RED_Y = -28;
-    public static double TARGET_BLUE_Y = 43;
     public static double APPROACH_SPEED = 50;
     public static double PLACE_SPEED = 20;
-    public static int MAXIMUM_ROW = (int)Math.floor((MAXIMUM_POSITION - FIRST_ROW_LIFT_POSITION) / LIFT_INCREMENT);
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
@@ -225,50 +218,6 @@ public class HeatSeekC {
 
         // Reset the timer.
         timer.reset();
-
-    }
-
-    // Get a target y coordinate.
-    public static double getTargetY(int leftColumn, int row, boolean redAlliance) throws InterruptedException {
-
-        // If the row is invalid...
-        if(row < MINIMUM_ROW || row > MAXIMUM_ROW) {
-
-            // Complain.
-            throw new InterruptedException("The row is invalid.");
-
-        }
-
-        // Get the row's column count.
-        int maximumColumn = getMaximumColumn(row);
-
-        // If the left column is invalid...
-        if(leftColumn < MINIMUM_COLUMN || leftColumn > maximumColumn - 1) {
-
-            // Complain.
-            throw new InterruptedException("The left column is invalid.");
-
-        }
-
-        // Initialize a target y coordinate.
-        double targetY = redAlliance ? TARGET_RED_Y : TARGET_BLUE_Y;
-
-        // Determine whether this is an even row.
-        boolean isEvenRow = isEven(row);
-
-        // If this is an even row...
-        if(isEvenRow) {
-
-            // Shift the robot up by half a pixel width.
-            targetY += PIXEL_WIDTH / 2;
-
-        }
-
-        // Shift the robot down to the appropriate column.
-        targetY -= (leftColumn - 1) * PIXEL_WIDTH;
-
-        // Return the result.
-        return targetY;
 
     }
 

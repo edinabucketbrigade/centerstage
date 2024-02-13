@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.Lift.DOWN_POSITION;
-import static org.firstinspires.ftc.teamcode.Lift.MAXIMUM_POSITION;
 import static org.firstinspires.ftc.teamcode.Place.State.CLOSE_CLAW_AND_RAISE_WRIST;
 import static org.firstinspires.ftc.teamcode.Place.State.IDLE;
 import static org.firstinspires.ftc.teamcode.Place.State.LOWER_ARM;
@@ -10,6 +9,8 @@ import static org.firstinspires.ftc.teamcode.Place.State.LOWER_WRIST_AND_OPEN_CL
 import static org.firstinspires.ftc.teamcode.Place.State.RAISE_ARM_AND_LIFT;
 import static org.firstinspires.ftc.teamcode.Place.State.WAIT_FOR_DROP;
 import static org.firstinspires.ftc.teamcode.TeleOpT.TRIGGER_THRESHOLD;
+
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_POSITION;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;

@@ -14,13 +14,17 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PIXEL_ON_BACKDR
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETURN_TO_BACKDROP;
 import static org.firstinspires.ftc.teamcode.AutoF.State.WAIT_FOR_CLAW_TO_OPEN;
+import static org.firstinspires.ftc.teamcode.HeatSeekC.getTargetLiftPosition;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
 
 import static bucketbrigade.casperlibrary.RobotRoutes.BACKDROP_TARGET_X;
 import static bucketbrigade.casperlibrary.RobotRoutes.PLACE_TARGET_X;
+import static bucketbrigade.casperlibrary.RobotRoutes.WHITE_PIXEL_ROW;
+import static bucketbrigade.casperlibrary.RobotRoutes.YELLOW_PIXEL_ROW;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToPlace;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToStack;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
@@ -72,9 +76,6 @@ import bucketbrigade.casperlibrary.TurnAction;
 @Autonomous(preselectTeleOp = "TeleOpT")
 public class AutoF extends LinearOpMode {
 
-    public static final int YELLOW_PIXEL_ROW = 1;
-    public static final int WHITE_PIXEL_ROW = 3;
-    public static final int WHITE_PIXEL_LEFT_COLUMN = 4;
     public static final int MILLISECONDS_PER_SECOND = 1000;
 
     public static Boolean redAlliance;
@@ -194,33 +195,8 @@ public class AutoF extends LinearOpMode {
         // Update the robot's current pose.
         currentPose = robotHardware.getPose();
 
-        int liftPosition;
-        double targetY;
-
-        // If we are placing a yellow pixel...
-        if(placingYellowPixel) {
-
-            // Get a lift position.
-            liftPosition = HeatSeekC.getTargetLiftPosition(YELLOW_PIXEL_ROW);
-
-            // Get the appropriate yellow pixel left column.
-            int yellowPixelLeftColumn = getLeftColumn(location);
-
-            // Get a target y coordinate.
-            targetY = HeatSeekC.getTargetY(yellowPixelLeftColumn, YELLOW_PIXEL_ROW, redAlliance);
-
-        }
-
-        // Otherwise (if we are placing a white pixel)...
-        else {
-
-            // Get a lift position.
-            liftPosition = HeatSeekC.getTargetLiftPosition(WHITE_PIXEL_ROW);
-
-            // Get a target y coordinate.
-            targetY = HeatSeekC.getTargetY(WHITE_PIXEL_LEFT_COLUMN, WHITE_PIXEL_ROW, redAlliance);
-
-        }
+        // Get a backdrop lift position.
+        int backdropLiftPosition = placingYellowPixel ? getTargetLiftPosition(YELLOW_PIXEL_ROW) : getTargetLiftPosition(WHITE_PIXEL_ROW);
 
         // Update the state machine.
         switch (state) {
@@ -296,7 +272,7 @@ public class AutoF extends LinearOpMode {
                 }
 
                 // Construct an approach trajectory sequence.
-                TrajectorySequence approachTrajectorySequence = getBackdropTrajectorySequence(targetY);
+                TrajectorySequence approachTrajectorySequence = getBackdropTrajectorySequence();
                 lastEnd = approachTrajectorySequence.end();
 
                 // Start driving to the backdrop.
@@ -314,7 +290,7 @@ public class AutoF extends LinearOpMode {
                 }
 
                 // Raise the lift.
-                robotHardware.setLiftPosition(liftPosition);
+                robotHardware.setLiftPosition(backdropLiftPosition);
 
                 // Raise the arm.
                 robotHardware.raiseArm();
@@ -329,7 +305,7 @@ public class AutoF extends LinearOpMode {
             case DRIVE_TO_PLACE_POSITION:
 
                 // If we are waiting...
-                if (!robotHardware.isArmUp() || !robotHardware.isLiftInPosition(liftPosition)) {
+                if (!robotHardware.isArmUp() || !robotHardware.isLiftInPosition(backdropLiftPosition)) {
 
                     // Exit the method.
                     return;
@@ -337,7 +313,7 @@ public class AutoF extends LinearOpMode {
                 }
 
                 // Construct a trajectory sequence.
-                TrajectorySequence placeTrajectorySequence = getPlaceTrajectorySequence(targetY);
+                TrajectorySequence placeTrajectorySequence = getPlaceTrajectorySequence(placingYellowPixel);
                 lastEnd = placeTrajectorySequence.end();
 
                 // Execute the trajectory sequence.
@@ -416,7 +392,7 @@ public class AutoF extends LinearOpMode {
 
             case RETURN_TO_BACKDROP:
 
-                TrajectorySequence returnTrajectorySequence = getReturnTrajectorySequence(targetY);
+                TrajectorySequence returnTrajectorySequence = getReturnTrajectorySequence();
                 lastEnd = returnTrajectorySequence.end();
 
                 drive.followTrajectorySequenceAsync(returnTrajectorySequence);
@@ -760,8 +736,8 @@ public class AutoF extends LinearOpMode {
 
     }
 
-    // Gets a backdrop trajectory sequence.
-    private TrajectorySequence getPlaceTrajectorySequence(double targetY) throws InterruptedException {
+    // Gets a place trajectory sequence.
+    private TrajectorySequence getPlaceTrajectorySequence(boolean placingYellowPixel) throws InterruptedException {
 
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
@@ -772,17 +748,16 @@ public class AutoF extends LinearOpMode {
         // Construct an acceleration constraint.
         TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
 
-        // Construct a target position.
-        Vector2d targetPosition = new Vector2d(PLACE_TARGET_X, targetY);
+        // Construct a trajectory sequence builder.
+        TrajectorySequenceBuilder trajectorySequenceBuilder = drive
+                .trajectorySequenceBuilder(lastEnd)
+                .setConstraints(velocityConstraint, accelerationConstraint);
 
-        // Construct a target pose.
-        Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
+        // Drive to the place.
+        applyActions(driveToPlace(redAlliance, location, placingYellowPixel), trajectorySequenceBuilder);
 
-        // Construct a trajectory sequence.
-        TrajectorySequence trajectorySequence = drive.trajectorySequenceBuilder(lastEnd)
-                .setConstraints(velocityConstraint, accelerationConstraint)
-                .lineToLinearHeading(targetPose)
-                .build();
+        // Get a trajectory sequence.
+        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
 
         // Return the trajectory sequence.
         return trajectorySequence;
@@ -790,7 +765,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Gets a backdrop trajectory sequence.
-    private TrajectorySequence getBackdropTrajectorySequence(double targetY) throws InterruptedException {
+    private TrajectorySequence getBackdropTrajectorySequence() throws InterruptedException {
 
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
@@ -799,7 +774,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Drive to the baackdrop.
-        applyActions(driveToBackdrop(redAlliance, startClose, location, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);
+        applyActions(driveToBackdrop(redAlliance, startClose, location), trajectorySequenceBuilder);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -848,7 +823,7 @@ public class AutoF extends LinearOpMode {
 
     }
 
-    private TrajectorySequence getReturnTrajectorySequence(double targetY) throws InterruptedException {
+    private TrajectorySequence getReturnTrajectorySequence() throws InterruptedException {
 
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
@@ -857,7 +832,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Return to backdrop.
-        applyActions(returnToBackdrop(redAlliance, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);
+        applyActions(returnToBackdrop(redAlliance), trajectorySequenceBuilder);
 
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -865,18 +840,6 @@ public class AutoF extends LinearOpMode {
         // Return the result.
         return trajectorySequence;
 
-    }
-
-    public static int getLeftColumn(TeamPropLocation location) throws InterruptedException {
-        if (location == LEFT) {
-            return 1;
-        } else if (location == MIDDLE) {
-            return 3;
-        } else if (location == RIGHT) {
-            return 5;
-        } else {
-            throw new InterruptedException("The location is missing.");
-        }
     }
 
     public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder) throws InterruptedException {

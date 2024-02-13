@@ -15,7 +15,6 @@ public class Lift {
 
     public static int DOWN_POSITION = 0;
     public static double LOWER_POWER = 0.6;
-    public static int MAXIMUM_POSITION = 1700;
     public static double RAISE_POWER = 1;
     public static int THRESHOLD = 50;
 
