@@ -14,6 +14,9 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PIXEL_ON_BACKDR
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETURN_TO_BACKDROP;
 import static org.firstinspires.ftc.teamcode.AutoF.State.WAIT_FOR_CLAW_TO_OPEN;
+import static org.firstinspires.ftc.teamcode.Objectives.PURPLE;
+import static org.firstinspires.ftc.teamcode.Objectives.PURPLE_YELLOW;
+import static org.firstinspires.ftc.teamcode.Objectives.PURPLE_YELLOW_WHITE;
 
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
@@ -67,15 +70,18 @@ import bucketbrigade.casperlibrary.TurnAction;
 public class AutoF extends LinearOpMode {
 
     public static final int YELLOW_PIXEL_ROW = 1;
-    public static final int WHITE_PIXEL_ROW = 2;
+    public static final int WHITE_PIXEL_ROW = 3;
     public static final int WHITE_PIXEL_LEFT_COLUMN = 4;
     public static final double BACKDROP_TARGET_X = 40;
+    public static final int MILLISECONDS_PER_SECOND = 1000;
 
     public static Boolean redAlliance;
     public static Pose2d currentPose;
     public static boolean lastRanAutonomous;
     private Boolean startClose;
     private Boolean parkLeft;
+    private Integer delay;
+    private Objectives objectives;
     private OpenCvWebcam camera;
     private boolean startedStreaming;
     private Gamepad previousGamepad = new Gamepad();
@@ -154,6 +160,9 @@ public class AutoF extends LinearOpMode {
 
         // Initialize the drive interface.
         robotHardware.initializeDrive();
+
+        // Use the delay.
+        sleep(delay * MILLISECONDS_PER_SECOND);
 
         // Start the state machine.
         setState(DRIVE_TO_SPIKE_MARK);
@@ -273,6 +282,17 @@ public class AutoF extends LinearOpMode {
                     return;
                 }
 
+                if (objectives == PURPLE) {
+                    if (startClose) {
+                        setState(PARK);
+                    }
+                    else {
+                        setState(IDLE);
+                    }
+
+                    return;
+                }
+
                 // Construct an approach trajectory sequence.
                 TrajectorySequence approachTrajectorySequence = getBackdropTrajectorySequence(targetY);
                 lastEnd = approachTrajectorySequence.end();
@@ -367,7 +387,7 @@ public class AutoF extends LinearOpMode {
                 // Start retracting.
                 robotHardware.startRetracting();
 
-                if(placingYellowPixel) {
+                if(placingYellowPixel && objectives == PURPLE_YELLOW_WHITE) {
 
                     setState(DRIVE_TO_PIXEL_STACK);
 
@@ -382,6 +402,9 @@ public class AutoF extends LinearOpMode {
                 break;
 
             case DRIVE_TO_PIXEL_STACK:
+                //if (robotHardware.isRetracting()) {
+                //    return;
+                //}
 
                 TrajectorySequence stackTrajectorySequence = getStackTrajectorySequence();
                 lastEnd = stackTrajectorySequence.end();
@@ -518,6 +541,39 @@ public class AutoF extends LinearOpMode {
                 }
             }
 
+            // Otherwise, if the user has not selected a delay...
+            else if (delay == null) {
+                telemetry.addData("Delay", "A = 0, X = 5, Y = 10, B = 15");
+                telemetry.update();
+                if (currentGamepad.a && !previousGamepad.a) {
+                    delay = 0;
+                }
+                else if (currentGamepad.x && !previousGamepad.x) {
+                    delay = 5;
+                }
+                else if (currentGamepad.y && !previousGamepad.y) {
+                    delay = 10;
+                }
+                else if (currentGamepad.b && !previousGamepad.b) {
+                    delay = 15;
+                }
+            }
+
+            // Otherwise, if the user has not selected what to place...
+            else if (objectives == null) {
+                telemetry.addData("Place", "X = purple, A = purple and yellow, B = purple, yellow, and white");
+                telemetry.update();
+                if (currentGamepad.x && !previousGamepad.x) {
+                    objectives = PURPLE;
+                }
+                else if (currentGamepad.a && !previousGamepad.a) {
+                    objectives = PURPLE_YELLOW;
+                }
+                else if (currentGamepad.b && !previousGamepad.b) {
+                    objectives = PURPLE_YELLOW_WHITE;
+                }
+            }
+
             // Otherwise (if the user finished making menu selections)...
             else {
 
@@ -562,7 +618,7 @@ public class AutoF extends LinearOpMode {
         log("Initializing camera...");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startClose, telemetry, true);
+        teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startClose, telemetry, true, delay, objectives);
         camera.setPipeline(teamPropDetector);
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
 

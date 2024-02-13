@@ -89,7 +89,7 @@ public class RobotRoutes {
         List<Action> actions = new ArrayList<>();
         actions.add(new SetTangentAction(Math.toRadians(-90)));
         actions.add(new SplineToLinearHeadingAction(20, 8, Math.toRadians(180), Math.toRadians(180)));
-        actions.add(new LineToAction(-58, 8));
+        actions.add(new LineToAction(-59, 8));
         if(redAlliance) mirrorActions(actions);
         return actions;
 

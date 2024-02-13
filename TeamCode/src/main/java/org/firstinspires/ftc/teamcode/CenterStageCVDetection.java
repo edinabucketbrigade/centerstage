@@ -34,6 +34,8 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     boolean redAlliance;
     boolean startClose;
     boolean parkLeft;
+    int delay;
+    Objectives objectives;
     boolean isNew;
     Mat mat = new Mat();
 
@@ -43,10 +45,12 @@ public class CenterStageCVDetection extends OpenCvPipeline {
      *   This creates a rectangle of areas in the camera where a game element may be placed
      */
 
-    public CenterStageCVDetection(boolean parkLeft, boolean redAlliance, boolean startClose, Telemetry telemetry, boolean isNew) {
+    public CenterStageCVDetection(boolean parkLeft, boolean redAlliance, boolean startClose, Telemetry telemetry, boolean isNew, int delay, Objectives objectives) {
         this.parkLeft = parkLeft;
         this.redAlliance = redAlliance;
         this.startClose = startClose;
+        this.delay = delay;
+        this.objectives = objectives;
         this.telemetry = telemetry;
         this.isNew = isNew;
     }
@@ -68,6 +72,8 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         telemetry.addData("Alliance", redAlliance ? "Red" : "Blue");
         telemetry.addData("Start", startClose ? "Close" : "Far");
         telemetry.addData("Park", parkLeft ? "Left" : "Right");
+        telemetry.addData("Delay", delay);
+        telemetry.addData("Place", objectives);
 
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
