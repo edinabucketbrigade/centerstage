@@ -76,6 +76,7 @@ public class AutoF extends LinearOpMode {
     public static final int MILLISECONDS_PER_SECOND = 1000;
     public static final int MINIMUM_DELAY = 0;
     public static final int MAXIMUM_DELAY = 30;
+    public static int STACK_LIFT_POSITION = 200;
 
     public static Boolean redAlliance;
     public static Pose2d currentPose;
@@ -393,6 +394,9 @@ public class AutoF extends LinearOpMode {
 
                 }
 
+                // Raise the lift.
+                robotHardware.setLiftPosition(STACK_LIFT_POSITION);
+
                 // Get a stack grab trajectory sequence.
                 TrajectorySequence stackGrabTrajectorySequence = getStackGrabTrajectorySequence();
                 lastEnd = stackGrabTrajectorySequence.end();
@@ -407,8 +411,8 @@ public class AutoF extends LinearOpMode {
 
             case GRAB_OFF_STACK:
 
-                // If the robot is driving...
-                if (drive.isBusy()) {
+                // If the robot is driving or we are waiting for the lift...
+                if (drive.isBusy() || !robotHardware.isLiftInPosition(STACK_LIFT_POSITION)) {
 
                     // Exit the method.
                     return;
