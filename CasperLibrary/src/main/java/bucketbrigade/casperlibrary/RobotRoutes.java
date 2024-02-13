@@ -22,7 +22,7 @@ public class RobotRoutes {
     public static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     public static final int MAXIMUM_POSITION = 1700;
     public static final int MAXIMUM_ROW = (int)Math.floor((MAXIMUM_POSITION - FIRST_ROW_LIFT_POSITION) / LIFT_INCREMENT);
-    public static final double MAXIMUM_VELOCITY_FAST = 50;
+    public static final double MAXIMUM_VELOCITY_FAST = 55;
     public static final double MAXIMUM_VELOCITY_SLOW = 25;
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
@@ -126,7 +126,8 @@ public class RobotRoutes {
         actions.add(new TurnAction(Math.toRadians(90)));
         actions.add(new SetTangentAction(Math.toRadians(-90)));
         actions.add(new SplineToLinearHeadingAction(20, 6.5, Math.toRadians(180), Math.toRadians(180)));
-        actions.add(new LineToAction(-56, 6.5));
+        actions.add(new SetTangentAction(Math.toRadians(180)));
+        actions.add(new SplineToAction(-56, 6.5, Math.toRadians(180)));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
