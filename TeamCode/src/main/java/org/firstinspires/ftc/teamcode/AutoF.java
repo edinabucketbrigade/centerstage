@@ -77,7 +77,7 @@ public class AutoF extends LinearOpMode {
     public static final int MILLISECONDS_PER_SECOND = 1000;
     public static final int MINIMUM_DELAY = 0;
     public static final int MAXIMUM_DELAY = 30;
-    public static int STACK_LIFT_POSITION = 160;
+    public static int STACK_LIFT_POSITION = 145;
 
     public static Boolean redAlliance;
     public static Pose2d currentPose;
@@ -374,9 +374,8 @@ public class AutoF extends LinearOpMode {
 
             case DRIVE_TO_STACK_APPROACH:
 
-                //if (robotHardware.isRetracting()) {
-                //    return;
-                //}
+                // Close the claw to avoid capturing the team prop while driving to the white pixel stack.
+                robotHardware.closeClaw();
 
                 // Get a stack approach trajectory sequence.
                 TrajectorySequence stackApproachTrajectorySequence = getStackApproachTrajectorySequence();
@@ -399,6 +398,9 @@ public class AutoF extends LinearOpMode {
                     return;
 
                 }
+
+                // Open the claw fully to prepare to grab white pixels.
+                robotHardware.openClaw(true);
 
                 // Raise the lift.
                 robotHardware.setLiftPosition(STACK_LIFT_POSITION);

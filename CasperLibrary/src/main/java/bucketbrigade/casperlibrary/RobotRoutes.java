@@ -15,7 +15,7 @@ public class RobotRoutes {
     public static final double BACKDROP_TARGET_X = 40;
     public static final int FIRST_ROW_LIFT_POSITION = 0;
     public static final int LIFT_INCREMENT = 200;
-    public static final double MAXIMUM_ACCELERATION = 10;
+    public static final double MAXIMUM_ACCELERATION = 40;
     public static final double MAXIMUM_ANGULAR_ACCELERATION = Math.toRadians(100);
     public static final double MAXIMUM_ANGULAR_VELOCITY = Math.toRadians(100);
     public static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
@@ -123,9 +123,10 @@ public class RobotRoutes {
     public static List<Action> driveToStackApproach(boolean redAlliance) {
 
         List<Action> actions = new ArrayList<>();
+        actions.add(new TurnAction(Math.toRadians(90)));
         actions.add(new SetTangentAction(Math.toRadians(-90)));
-        actions.add(new SplineToLinearHeadingAction(20, 8.5, Math.toRadians(180), Math.toRadians(180)));
-        actions.add(new LineToAction(-55, 8.5));
+        actions.add(new SplineToLinearHeadingAction(20, 8, Math.toRadians(180), Math.toRadians(180)));
+        actions.add(new LineToAction(-56, 8));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
@@ -135,7 +136,7 @@ public class RobotRoutes {
     public static List<Action> driveToStackGrab(boolean redAlliance) {
 
         List<Action> actions = new ArrayList<>();
-        actions.add(new LineToAction(-60.5, 8.5));
+        actions.add(new LineToAction(-61, 8));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
