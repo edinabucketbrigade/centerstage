@@ -77,6 +77,8 @@ import bucketbrigade.casperlibrary.TurnAction;
 public class AutoF extends LinearOpMode {
 
     public static final int MILLISECONDS_PER_SECOND = 1000;
+    public static final int MINIMUM_DELAY = 0;
+    public static final int MAXIMUM_DELAY = 30;
 
     public static Boolean redAlliance;
     public static Pose2d currentPose;
@@ -84,6 +86,7 @@ public class AutoF extends LinearOpMode {
     private Boolean startClose;
     private Boolean parkLeft;
     private Integer delay;
+    private int temporaryDelay = MINIMUM_DELAY;
     private Objectives objectives;
     private OpenCvWebcam camera;
     private boolean startedStreaming;
@@ -506,19 +509,16 @@ public class AutoF extends LinearOpMode {
 
             // Otherwise, if the user has not selected a delay...
             else if (delay == null) {
-                telemetry.addData("Delay", "A = 0, X = 5, Y = 10, B = 15");
+                telemetry.addData("Delay: " + temporaryDelay, "Y = increase, A = decrease, B = done");
                 telemetry.update();
-                if (currentGamepad.a && !previousGamepad.a) {
-                    delay = 0;
+                if (currentGamepad.y && !previousGamepad.y) {
+                    temporaryDelay = Math.min(temporaryDelay + 1, MAXIMUM_DELAY);
                 }
-                else if (currentGamepad.x && !previousGamepad.x) {
-                    delay = 5;
-                }
-                else if (currentGamepad.y && !previousGamepad.y) {
-                    delay = 10;
+                else if (currentGamepad.a && !previousGamepad.a) {
+                    temporaryDelay = Math.max(temporaryDelay - 1, MINIMUM_DELAY);
                 }
                 else if (currentGamepad.b && !previousGamepad.b) {
-                    delay = 15;
+                    delay = temporaryDelay;
                 }
             }
 
