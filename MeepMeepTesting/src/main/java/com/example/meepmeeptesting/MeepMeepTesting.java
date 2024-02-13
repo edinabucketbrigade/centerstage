@@ -3,7 +3,11 @@ package com.example.meepmeeptesting;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
-import static bucketbrigade.casperlibrary.RobotRoutes.BACKDROP_TARGET_X;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_ACCELERATION;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_VELOCITY;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToPlace;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
@@ -45,17 +49,11 @@ import bucketbrigade.casperlibrary.TurnAction;
 
 public class MeepMeepTesting {
 
-    private static final boolean RED_ALLIANCE = true;
+    private static final boolean RED_ALLIANCE = false;
     private static final boolean START_CLOSE = true;
-    private static final TeamPropLocation LOCATION = RIGHT;
+    private static final TeamPropLocation LOCATION = LEFT;
     private static final boolean PARK_LEFT = true;
-    private static final Objectives objectives = PURPLE_YELLOW;
-
-    public static final double MAXIMUM_VELOCITY = 60;
-    public static final double MAXIMUM_ACCELERATION = 60;
-    public static final double MAXIMUM_ANGULAR_VELOCITY = Math.toRadians(180);
-    public static final double MAXIMUM_ANGULAR_ACCELERATION = Math.toRadians(180);
-    public static final double TRACK_WIDTH = 15;
+    private static final Objectives objectives = PURPLE_YELLOW_WHITE;
 
     // Runs the application.
     public static void main(String[] args) throws Exception {
@@ -83,7 +81,7 @@ public class MeepMeepTesting {
         Pose2d outputStartPose = new Pose2d(inputStartPose.x, inputStartPose.y, inputStartPose.heading);
 
         // Construct a velocity constraint.
-        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY, TRACK_WIDTH);
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_FAST, TRACK_WIDTH);
 
         // Construct an acceleration constraint.
         TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);

@@ -19,8 +19,9 @@ import static bucketbrigade.casperlibrary.Objectives.PURPLE;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
 
-import static bucketbrigade.casperlibrary.RobotRoutes.BACKDROP_TARGET_X;
-import static bucketbrigade.casperlibrary.RobotRoutes.PLACE_TARGET_X;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
+import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 import static bucketbrigade.casperlibrary.RobotRoutes.WHITE_PIXEL_ROW;
 import static bucketbrigade.casperlibrary.RobotRoutes.YELLOW_PIXEL_ROW;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
@@ -29,9 +30,6 @@ import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToStack;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
 import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
-import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
-import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
-import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -46,7 +44,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -743,10 +740,10 @@ public class AutoF extends LinearOpMode {
         SampleMecanumDrive drive = robotHardware.getDrive();
 
         // Construct a velocity constraint.
-        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(HeatSeekC.PLACE_SPEED, DriveConstants.TRACK_WIDTH);
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_SLOW, TRACK_WIDTH);
 
         // Construct an acceleration constraint.
-        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
+        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
 
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive

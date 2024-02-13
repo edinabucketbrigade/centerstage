@@ -21,6 +21,10 @@ import static org.firstinspires.ftc.teamcode.RobotHardwareB.MINIMUM_ROW;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.getMaximumColumn;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.isEven;
 
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -48,9 +52,6 @@ public class HeatSeekB {
     public static double PIXEL_WIDTH = 3;
     public static double TARGET_RED_Y = -TILE_SIZE - TARGET_Y_OFFSET;
     public static double TARGET_BLUE_Y = 2 * TILE_SIZE - TARGET_Y_OFFSET;
-    public static double VELOCITY_PERCENTAGE = 0.5;
-    public static double MAXIMUM_VELOCITY = DriveConstants.MAX_VEL * VELOCITY_PERCENTAGE;
-    public static double MAXIMUM_ACCELERATION = DriveConstants.MAX_ACCEL * VELOCITY_PERCENTAGE;
 
     private RobotHardwareB robotHardware;
     private State state = IDLE;
@@ -113,7 +114,7 @@ public class HeatSeekB {
                 Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
 
                 // Construct a velocity constraint.
-                TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY, DriveConstants.TRACK_WIDTH);
+                TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_FAST, TRACK_WIDTH);
 
                 // Construct an acceleration constraint.
                 TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);

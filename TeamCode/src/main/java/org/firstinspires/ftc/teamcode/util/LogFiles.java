@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_ACCELERATION;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_VELOCITY;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 
@@ -57,14 +63,14 @@ public final class LogFiles {
         public double motorF = DriveConstants.MOTOR_VELO_PID.f;
         public double wheelRadius = DriveConstants.WHEEL_RADIUS;
         public double gearRatio = DriveConstants.GEAR_RATIO;
-        public double trackWidth = DriveConstants.TRACK_WIDTH;
+        public double trackWidth = TRACK_WIDTH;
         public double kV = DriveConstants.kV;
         public double kA = DriveConstants.kA;
         public double kStatic = DriveConstants.kStatic;
-        public double maxVel = DriveConstants.MAX_VEL;
-        public double maxAccel = DriveConstants.MAX_ACCEL;
-        public double maxAngVel = DriveConstants.MAX_ANG_VEL;
-        public double maxAngAccel = DriveConstants.MAX_ANG_ACCEL;
+        public double maxVel = MAXIMUM_VELOCITY_FAST;
+        public double maxAccel = MAXIMUM_ACCELERATION;
+        public double maxAngVel = MAXIMUM_ANGULAR_VELOCITY;
+        public double maxAngAccel = MAXIMUM_ANGULAR_ACCELERATION;
 
         public double mecTransP = SampleMecanumDrive.TRANSLATIONAL_PID.kP;
         public double mecTransI = SampleMecanumDrive.TRANSLATIONAL_PID.kI;

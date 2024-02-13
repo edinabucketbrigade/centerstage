@@ -51,7 +51,6 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.8898; // RM: See https://www.gobilda.com/strafer-chassis-kit-v4/; wheels are 96 mm diameter, 48 mm radius, which is 1.8898 inches
     public static double GEAR_RATIO = 1; // RM: We have no gears or belts, so it is 1
-    public static double TRACK_WIDTH = 14; // RM: This is the distance from the center of one drive wheel to the center of its parallel wheel in inches
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -91,15 +90,6 @@ public class DriveConstants {
      * You are free to raise this on your own if you would like. It is best determined through experimentation.
      
      */
-    public static double MAX_VEL = 50;
-    public static double MAX_ACCEL = 50;
-    //public static double MAX_ANG_VEL = Math.toRadians(214.78926857142858 * 0.5); // V3 strafer chassis = 184.02607784577722, previous code = 214.78926857142858
-    public static double MAX_ANG_VEL = Math.toRadians(100); // V3 strafer chassis = 184.02607784577722, previous code = 214.78926857142858
-
-    //public static double MAX_ANG_ACCEL = Math.toRadians(214.78926857142858 * 0.5); // V3 strafer chassis = 184.02607784577722, previous code = 214.78926857142858
-
-    public static double MAX_ANG_ACCEL = Math.toRadians(100); // V3 strafer chassis = 184.02607784577722, previous code = 214.78926857142858
-
 
     public static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;

@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
+
 import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -52,12 +56,6 @@ public class AutoG extends LinearOpMode {
 
     // Y offset between the camera's front the the robot's center
     private static final double CAMERA_Y_OFFSET = 7;
-
-    // Maximum velocity
-    private static final double MAXIMUM_VELOCITY = DriveConstants.MAX_VEL;
-
-    // Maximum acceleration
-    private static final double MAXIMUM_ACCELERATION = DriveConstants.MAX_ACCEL;
 
     // Number of AprilTags to consider when looking for an accurate detection
     public static int TAG_WINDOW = 5;
@@ -118,7 +116,7 @@ public class AutoG extends LinearOpMode {
         //Pose2d targetPose = new Pose2d(50, -35, Math.toRadians(180)); // red backdrop middle
 
         // Construct a velocity constraint.
-        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY, DriveConstants.TRACK_WIDTH);
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_FAST, TRACK_WIDTH);
 
         // Construct an acceleration constraint.
         TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);

@@ -10,8 +10,12 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.WAIT_FOR_RELEASE;
 
 import static bucketbrigade.casperlibrary.RobotRoutes.FIRST_ROW_LIFT_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.LIFT_INCREMENT;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_POSITION;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
 import static bucketbrigade.casperlibrary.RobotRoutes.PLACE_TARGET_X;
+import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 import static bucketbrigade.casperlibrary.RobotRoutes.getTargetY;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -33,8 +37,6 @@ public class HeatSeekC {
     enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW, RELEASE_WRIST, WAIT_FOR_RELEASE }
 
     public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
-    public static double APPROACH_SPEED = 50;
-    public static double PLACE_SPEED = 20;
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
@@ -127,7 +129,7 @@ public class HeatSeekC {
                 robotHardware.raiseArm();
 
                 // Drive to the approach position.
-                startDrivingToBackdrop(APPROACH_SPEED, APPROACH_TARGET_X);
+                startDrivingToBackdrop(MAXIMUM_VELOCITY_FAST, APPROACH_TARGET_X);
 
                 // Advance to the next step.
                 setState(DRIVE_TO_PLACE_POSITION);
@@ -145,7 +147,7 @@ public class HeatSeekC {
                 }
 
                 // Drive to the place position.
-                startDrivingToBackdrop(PLACE_SPEED, PLACE_TARGET_X);
+                startDrivingToBackdrop(MAXIMUM_VELOCITY_SLOW, PLACE_TARGET_X);
 
                 // Advance to the next step.
                 setState(OPEN_CLAW);
@@ -244,10 +246,10 @@ public class HeatSeekC {
     public void startDrivingToBackdrop(double speed, double targetX) throws InterruptedException {
 
         // Construct a velocity constraint.
-        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(speed, DriveConstants.TRACK_WIDTH);
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(speed, TRACK_WIDTH);
 
         // Construct an acceleration constraint.
-        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(speed);
+        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
 
         // Get the drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
