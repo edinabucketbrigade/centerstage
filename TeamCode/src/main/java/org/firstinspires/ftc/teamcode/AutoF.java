@@ -180,6 +180,9 @@ public class AutoF extends LinearOpMode {
             // Update the robot hardware.
             robotHardware.update();
 
+            // Display the state.
+            telemetry.addData("State", state);
+
             // Update the telemetry.
             telemetry.update();
 
@@ -561,31 +564,31 @@ public class AutoF extends LinearOpMode {
 
             // Otherwise, if the user has not selected a delay...
             else if (delay == null) {
-                telemetry.addData("Delay: " + temporaryDelay, "Y = increase, A = decrease, B = done");
+                telemetry.addData("Delay = " + temporaryDelay, "X = ok, Y = increase, A = decrease");
                 telemetry.update();
-                if (currentGamepad.y && !previousGamepad.y) {
+                if (currentGamepad.x && !previousGamepad.x) {
+                    delay = temporaryDelay;
+                }
+                else if (currentGamepad.y && !previousGamepad.y) {
                     temporaryDelay = Math.min(temporaryDelay + 1, MAXIMUM_DELAY);
                 }
                 else if (currentGamepad.a && !previousGamepad.a) {
                     temporaryDelay = Math.max(temporaryDelay - 1, MINIMUM_DELAY);
                 }
-                else if (currentGamepad.b && !previousGamepad.b) {
-                    delay = temporaryDelay;
-                }
             }
 
             // Otherwise, if the user has not selected what to place...
             else if (objectives == null) {
-                telemetry.addData("Place", "X = purple, A = purple and yellow, B = purple, yellow, and white");
+                telemetry.addData("Place", "X = purple/yellow/white, A = purple/yellow, B = purple");
                 telemetry.update();
                 if (currentGamepad.x && !previousGamepad.x) {
-                    objectives = PURPLE;
+                    objectives = PURPLE_YELLOW_WHITE;
                 }
                 else if (currentGamepad.a && !previousGamepad.a) {
                     objectives = PURPLE_YELLOW;
                 }
                 else if (currentGamepad.b && !previousGamepad.b) {
-                    objectives = PURPLE_YELLOW_WHITE;
+                    objectives = PURPLE;
                 }
             }
 
