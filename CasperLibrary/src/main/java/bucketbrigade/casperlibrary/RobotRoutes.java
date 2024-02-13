@@ -125,8 +125,8 @@ public class RobotRoutes {
         List<Action> actions = new ArrayList<>();
         actions.add(new TurnAction(Math.toRadians(90)));
         actions.add(new SetTangentAction(Math.toRadians(-90)));
-        actions.add(new SplineToLinearHeadingAction(20, 8, Math.toRadians(180), Math.toRadians(180)));
-        actions.add(new LineToAction(-56, 8));
+        actions.add(new SplineToLinearHeadingAction(20, 6.5, Math.toRadians(180), Math.toRadians(180)));
+        actions.add(new LineToAction(-56, 6.5));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
@@ -136,7 +136,7 @@ public class RobotRoutes {
     public static List<Action> driveToStackGrab(boolean redAlliance) {
 
         List<Action> actions = new ArrayList<>();
-        actions.add(new LineToAction(-61, 8));
+        actions.add(new LineToAction(-60.5, 6.5));
         if(redAlliance) mirrorActions(actions);
         return actions;
 

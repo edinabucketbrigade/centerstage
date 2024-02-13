@@ -13,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PIXEL_ON_BACKDR
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETURN_TO_BACKDROP;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.getTargetLiftPosition;
+import static org.firstinspires.ftc.teamcode.Lift.DOWN_POSITION;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
@@ -235,7 +236,7 @@ public class AutoF extends LinearOpMode {
 
                 }
 
-                // Open the left claw.
+                // Open the left claw to release the purple pixel.
                 robotHardware.openLeftClaw(true);
 
                 // Raise the wrist so it does not bump the purple pixel when the robot starts moving.
@@ -333,7 +334,7 @@ public class AutoF extends LinearOpMode {
 
                 }
 
-                // Open the claw partially to release the pixel.
+                // Open the claw partially to release the pixel on the backdrop.
                 robotHardware.openClaw(false);
 
                 // Advance to the next step.
@@ -351,8 +352,11 @@ public class AutoF extends LinearOpMode {
 
                 }
 
-                // Start retracting.
-                robotHardware.startRetracting();
+                // Lower the lift.
+                robotHardware.setLiftPosition(DOWN_POSITION);
+
+                // Lower the arm.
+                robotHardware.lowerArm();
 
                 // If are placing white pixels...
                 if(placingYellowPixel && objectives == PURPLE_YELLOW_WHITE) {
@@ -374,8 +378,13 @@ public class AutoF extends LinearOpMode {
 
             case DRIVE_TO_STACK_APPROACH:
 
-                // Close the claw to avoid capturing the team prop while driving to the white pixel stack.
-                robotHardware.closeClaw();
+                // If we are waiting...
+                if (timer.milliseconds() < 500) {
+
+                    // Exit the method.
+                    return;
+
+                }
 
                 // Get a stack approach trajectory sequence.
                 TrajectorySequence stackApproachTrajectorySequence = getStackApproachTrajectorySequence();
@@ -398,9 +407,6 @@ public class AutoF extends LinearOpMode {
                     return;
 
                 }
-
-                // Open the claw fully to prepare to grab white pixels.
-                robotHardware.openClaw(true);
 
                 // Raise the lift.
                 robotHardware.setLiftPosition(STACK_LIFT_POSITION);
@@ -868,6 +874,17 @@ public class AutoF extends LinearOpMode {
         // Drive to the stack approach position.
         applyActions(driveToStackApproach(redAlliance), trajectorySequenceBuilder, true);
 
+        // During the sequence...
+        trajectorySequenceBuilder.addTemporalMarker(4, () -> {
+
+            // Lower the wrist.
+            robotHardware.setWristGround();
+
+            // Open the claw.
+            robotHardware.openClaw(true);
+
+        });
+
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
 
@@ -906,6 +923,17 @@ public class AutoF extends LinearOpMode {
 
         // Park.
         applyActions(park(redAlliance, parkLeft), trajectorySequenceBuilder, true);
+
+        // During the sequence...
+        trajectorySequenceBuilder.addTemporalMarker(2, () -> {
+
+            // Lower the wrist.
+            robotHardware.setWristGround();
+
+            // Open the claw.
+            robotHardware.openClaw(true);
+
+        });
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
