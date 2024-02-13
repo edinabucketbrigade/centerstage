@@ -1,5 +1,9 @@
 package com.example.meepmeeptesting;
 
+import static bucketbrigade.casperlibrary.Objectives.PURPLE;
+import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
+import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
+import static bucketbrigade.casperlibrary.RobotRoutes.BACKDROP_TARGET_X;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToStack;
@@ -28,6 +32,7 @@ import bucketbrigade.casperlibrary.Action;
 import bucketbrigade.casperlibrary.BackAction;
 import bucketbrigade.casperlibrary.LineToAction;
 import bucketbrigade.casperlibrary.LineToLinearHeadingAction;
+import bucketbrigade.casperlibrary.Objectives;
 import bucketbrigade.casperlibrary.RobotPose;
 import bucketbrigade.casperlibrary.SetReversedAction;
 import bucketbrigade.casperlibrary.SetTangentAction;
@@ -43,6 +48,7 @@ public class MeepMeepTesting {
     private static final boolean START_CLOSE = true;
     private static final TeamPropLocation LOCATION = LEFT;
     private static final boolean PARK_LEFT = false;
+    private static final Objectives objectives = PURPLE_YELLOW_WHITE;
 
     public static final double MAXIMUM_VELOCITY = 60;
     public static final double MAXIMUM_ACCELERATION = 60;
@@ -90,27 +96,36 @@ public class MeepMeepTesting {
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
 
-        // Construct a target position.
-        double targetX = 40;
-        double targetY = 36;
+        // If we are placing the yellow pixel...
+        if(objectives == PURPLE_YELLOW || objectives == PURPLE_YELLOW_WHITE) {
 
-        // Drive to the backdrop.
-        applyActions(driveToBackdrop(RED_ALLIANCE, START_CLOSE, LOCATION, targetX, targetY), trajectorySequenceBuilder);
+            // Construct a target y coordinate.
+            double targetY = 36;
 
-        // Wait for a bit.
-        trajectorySequenceBuilder.waitSeconds(1);
+            // Drive to the backdrop.
+            applyActions(driveToBackdrop(RED_ALLIANCE, START_CLOSE, LOCATION, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);
 
-        // Drive to the pixel stack.
-        applyActions(driveToStack(RED_ALLIANCE), trajectorySequenceBuilder);
+            // Wait for a bit.
+            trajectorySequenceBuilder.waitSeconds(1);
 
-        // Wait for a bit.
-        trajectorySequenceBuilder.waitSeconds(1);
+            // If we are placing white pixels...
+            if(objectives == PURPLE_YELLOW_WHITE) {
 
-        // Return to the backdrop.
-        applyActions(returnToBackdrop(RED_ALLIANCE, targetX, targetY), trajectorySequenceBuilder);
+                // Drive to the pixel stack.
+                applyActions(driveToStack(RED_ALLIANCE), trajectorySequenceBuilder);
 
-        // Wait for a bit.
-        trajectorySequenceBuilder.waitSeconds(1);
+                // Wait for a bit.
+                trajectorySequenceBuilder.waitSeconds(1);
+
+                // Return to the backdrop.
+                applyActions(returnToBackdrop(RED_ALLIANCE, BACKDROP_TARGET_X, targetY), trajectorySequenceBuilder);
+
+                // Wait for a bit.
+                trajectorySequenceBuilder.waitSeconds(1);
+
+            }
+
+        }
 
         // Park.
         applyActions(park(RED_ALLIANCE, PARK_LEFT), trajectorySequenceBuilder);

@@ -14,10 +14,12 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PIXEL_ON_BACKDR
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETURN_TO_BACKDROP;
 import static org.firstinspires.ftc.teamcode.AutoF.State.WAIT_FOR_CLAW_TO_OPEN;
-import static org.firstinspires.ftc.teamcode.Objectives.PURPLE;
-import static org.firstinspires.ftc.teamcode.Objectives.PURPLE_YELLOW;
-import static org.firstinspires.ftc.teamcode.Objectives.PURPLE_YELLOW_WHITE;
+import static bucketbrigade.casperlibrary.Objectives.PURPLE;
+import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
+import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
 
+import static bucketbrigade.casperlibrary.RobotRoutes.BACKDROP_TARGET_X;
+import static bucketbrigade.casperlibrary.RobotRoutes.PLACE_TARGET_X;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToStack;
@@ -55,6 +57,7 @@ import bucketbrigade.casperlibrary.Action;
 import bucketbrigade.casperlibrary.BackAction;
 import bucketbrigade.casperlibrary.LineToAction;
 import bucketbrigade.casperlibrary.LineToLinearHeadingAction;
+import bucketbrigade.casperlibrary.Objectives;
 import bucketbrigade.casperlibrary.RobotPose;
 import bucketbrigade.casperlibrary.RobotRoutes;
 import bucketbrigade.casperlibrary.SetReversedAction;
@@ -72,7 +75,6 @@ public class AutoF extends LinearOpMode {
     public static final int YELLOW_PIXEL_ROW = 1;
     public static final int WHITE_PIXEL_ROW = 3;
     public static final int WHITE_PIXEL_LEFT_COLUMN = 4;
-    public static final double BACKDROP_TARGET_X = 40;
     public static final int MILLISECONDS_PER_SECOND = 1000;
 
     public static Boolean redAlliance;
@@ -334,23 +336,8 @@ public class AutoF extends LinearOpMode {
 
                 }
 
-                // Construct a velocity constraint.
-                TrajectoryVelocityConstraint placeVelocityConstraint = new MecanumVelocityConstraint(HeatSeekC.PLACE_SPEED, DriveConstants.TRACK_WIDTH);
-
-                // Construct an acceleration constraint.
-                TrajectoryAccelerationConstraint placeAccelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
-
-                // Construct a target position.
-                Vector2d targetPosition = new Vector2d(HeatSeekC.PLACE_TARGET_X, targetY);
-
-                // Construct a target pose.
-                Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
-
                 // Construct a trajectory sequence.
-                TrajectorySequence placeTrajectorySequence = drive.trajectorySequenceBuilder(lastEnd)
-                        .setConstraints(placeVelocityConstraint, placeAccelerationConstraint)
-                        .lineToLinearHeading(targetPose)
-                        .build();
+                TrajectorySequence placeTrajectorySequence = getPlaceTrajectorySequence(targetY);
                 lastEnd = placeTrajectorySequence.end();
 
                 // Execute the trajectory sequence.
@@ -769,6 +756,35 @@ public class AutoF extends LinearOpMode {
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
 
         // Return the result.
+        return trajectorySequence;
+
+    }
+
+    // Gets a backdrop trajectory sequence.
+    private TrajectorySequence getPlaceTrajectorySequence(double targetY) throws InterruptedException {
+
+        // Get a drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Construct a velocity constraint.
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(HeatSeekC.PLACE_SPEED, DriveConstants.TRACK_WIDTH);
+
+        // Construct an acceleration constraint.
+        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(HeatSeekC.PLACE_SPEED);
+
+        // Construct a target position.
+        Vector2d targetPosition = new Vector2d(PLACE_TARGET_X, targetY);
+
+        // Construct a target pose.
+        Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
+
+        // Construct a trajectory sequence.
+        TrajectorySequence trajectorySequence = drive.trajectorySequenceBuilder(lastEnd)
+                .setConstraints(velocityConstraint, accelerationConstraint)
+                .lineToLinearHeading(targetPose)
+                .build();
+
+        // Return the trajectory sequence.
         return trajectorySequence;
 
     }

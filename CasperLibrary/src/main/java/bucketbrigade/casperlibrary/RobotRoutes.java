@@ -12,6 +12,9 @@ import java.util.List;
 
 public class RobotRoutes {
 
+    public static final double BACKDROP_TARGET_X = 40;
+    public static final double PLACE_TARGET_X = 43.5;
+
     // Gets a start pose.
     public static RobotPose getStartPose(boolean redAlliance, boolean startClose) {
 

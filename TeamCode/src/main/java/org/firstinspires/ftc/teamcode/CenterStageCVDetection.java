@@ -14,6 +14,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import bucketbrigade.casperlibrary.Objectives;
 import bucketbrigade.casperlibrary.TeamPropLocation;
 
 @Config

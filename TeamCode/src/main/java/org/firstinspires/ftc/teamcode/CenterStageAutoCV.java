@@ -17,6 +17,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import bucketbrigade.casperlibrary.Objectives;
 import bucketbrigade.casperlibrary.TeamPropLocation;
 
 @Config
