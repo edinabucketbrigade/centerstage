@@ -79,8 +79,8 @@ public class RobotRoutes {
 
     }
 
-    // Drives to the backdrop.
-    public static List<Action> driveToBackdrop(boolean redAlliance, boolean startClose, TeamPropLocation inputLocation) throws InterruptedException {
+    // Drives to the backdrop approach position.
+    public static List<Action> driveToBackdropApproach(boolean redAlliance, boolean startClose, TeamPropLocation inputLocation) throws InterruptedException {
 
         double targetY = getWhitePixelTargetY();
         TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
@@ -107,8 +107,8 @@ public class RobotRoutes {
 
     }
 
-    // Drives to the placement position.
-    public static List<Action> driveToPlace(boolean redAlliance, TeamPropLocation inputLocation, boolean isYellowPixel) throws InterruptedException {
+    // Drives to the backdrop place position.
+    public static List<Action> driveToBackdropPlace(boolean redAlliance, TeamPropLocation inputLocation, boolean isYellowPixel) throws InterruptedException {
 
         TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
         double targetY = isYellowPixel ? getYellowPixelTargetY(outputLocation) : getWhitePixelTargetY();

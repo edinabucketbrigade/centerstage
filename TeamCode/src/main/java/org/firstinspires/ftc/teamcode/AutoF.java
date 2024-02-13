@@ -24,8 +24,8 @@ import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 import static bucketbrigade.casperlibrary.RobotRoutes.WHITE_PIXEL_ROW;
 import static bucketbrigade.casperlibrary.RobotRoutes.YELLOW_PIXEL_ROW;
-import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdrop;
-import static bucketbrigade.casperlibrary.RobotRoutes.driveToPlace;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdropApproach;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdropPlace;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToStack;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
@@ -751,7 +751,7 @@ public class AutoF extends LinearOpMode {
                 .setConstraints(velocityConstraint, accelerationConstraint);
 
         // Drive to the place.
-        applyActions(driveToPlace(redAlliance, location, placingYellowPixel), trajectorySequenceBuilder);
+        applyActions(driveToBackdropPlace(redAlliance, location, placingYellowPixel), trajectorySequenceBuilder);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -771,7 +771,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Drive to the baackdrop.
-        applyActions(driveToBackdrop(redAlliance, startClose, location), trajectorySequenceBuilder);
+        applyActions(driveToBackdropApproach(redAlliance, startClose, location), trajectorySequenceBuilder);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
