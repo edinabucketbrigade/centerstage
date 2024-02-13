@@ -9,8 +9,6 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.IDLE;
 import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_SPIKE_MARK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.PARK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_ARM_AND_LIFT;
-import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_WRIST;
-import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PURPLE_PIXEL;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PIXEL_ON_BACKDROP;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETURN_TO_BACKDROP;
@@ -95,7 +93,7 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
 
-    enum State {IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, RAISE_WRIST, DRIVE_TO_BACKDROP_APPROACH, RAISE_ARM_AND_LIFT, DRIVE_TO_BACKDROP_PLACE, RELEASE_PIXEL_ON_BACKDROP, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_STACK_APPROACH, DRIVE_TO_STACK_GRAB, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK}
+    enum State {IDLE, DRIVE_TO_SPIKE_MARK, DRIVE_TO_BACKDROP_APPROACH, RAISE_ARM_AND_LIFT, DRIVE_TO_BACKDROP_PLACE, RELEASE_PIXEL_ON_BACKDROP, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_STACK_APPROACH, DRIVE_TO_STACK_GRAB, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK}
 
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
@@ -216,11 +214,11 @@ public class AutoF extends LinearOpMode {
                 robotHardware.setWristGround();
 
                 // Advance to the next step.
-                setState(RELEASE_PURPLE_PIXEL);
+                setState(DRIVE_TO_BACKDROP_APPROACH);
 
                 break;
 
-            case RELEASE_PURPLE_PIXEL:
+            case DRIVE_TO_BACKDROP_APPROACH:
 
                 // If the robot is driving...
                 if (drive.isBusy()) {
@@ -233,51 +231,38 @@ public class AutoF extends LinearOpMode {
                 // Open the left claw.
                 robotHardware.openLeftClaw(true);
 
-                // Advance to the next step.
-                setState(RAISE_WRIST);
+                // Raise the wrist so it does not bump the purple pixel when the robot starts moving.
+                robotHardware.setWristBackdrop();
 
-                break;
+                // If we are only placing the purple pixel...
+                if (objectives == PURPLE) {
 
-            case RAISE_WRIST:
+                    // If we started close to the backdrop...
+                    if (startClose) {
 
-                // If we are waiting...
-                if (timer.milliseconds() > 500) {
+                        // Park.
+                        setState(PARK);
+
+                    }
+
+                    // Otherwise, if we started far from the backdrop...
+                    else {
+
+                        // We are done.
+                        setState(IDLE);
+
+                    }
 
                     // Exit the method.
                     return;
 
                 }
 
-                // Raise the wrist so it does not bump the purple pixel when the robot starts moving.
-                robotHardware.setWristBackdrop();
-
-                // Advance to the next step.
-                setState(DRIVE_TO_BACKDROP_APPROACH);
-
-                break;
-
-            case DRIVE_TO_BACKDROP_APPROACH:
-
-                if (timer.milliseconds() > 500) {
-                    return;
-                }
-
-                if (objectives == PURPLE) {
-                    if (startClose) {
-                        setState(PARK);
-                    }
-                    else {
-                        setState(IDLE);
-                    }
-
-                    return;
-                }
-
-                // Construct an approach trajectory sequence.
+                // Get a backdrop approach trajectory sequence.
                 TrajectorySequence backdropApproachTrajectorySequence = getBackdropApproachTrajectorySequence();
                 lastEnd = backdropApproachTrajectorySequence.end();
 
-                // Start driving to the backdrop.
+                // Start driving to the backdrop approach position.
                 drive.followTrajectorySequenceAsync(backdropApproachTrajectorySequence);
 
                 // Advance to the next step.
@@ -287,8 +272,12 @@ public class AutoF extends LinearOpMode {
 
             case RAISE_ARM_AND_LIFT:
 
+                // If the robot is driving...
                 if (drive.isBusy()) {
+
+                    // Exit the method.
                     return;
+
                 }
 
                 // Raise the lift.
@@ -300,13 +289,14 @@ public class AutoF extends LinearOpMode {
                 // Move the wrist to the backdrop position.
                 robotHardware.setWristBackdrop();
 
+                // Advance to the next step.
                 setState(DRIVE_TO_BACKDROP_PLACE);
 
                 break;
 
             case DRIVE_TO_BACKDROP_PLACE:
 
-                // If we are waiting...
+                // If we are waiting for the arm or lift...
                 if (!robotHardware.isArmUp() || !robotHardware.isLiftInPosition(backdropLiftPosition)) {
 
                     // Exit the method.
@@ -314,46 +304,61 @@ public class AutoF extends LinearOpMode {
 
                 }
 
-                // Construct a trajectory sequence.
+                // Get a backdrop place trajectory sequence.
                 TrajectorySequence backdropPlaceTrajectorySequence = getBackdropPlaceTrajectorySequence(placingYellowPixel);
                 lastEnd = backdropPlaceTrajectorySequence.end();
 
-                // Execute the trajectory sequence.
+                // Start driving to the backdrop place position.
                 drive.followTrajectorySequenceAsync(backdropPlaceTrajectorySequence);
 
+                // Advance to the next step.
                 setState(RELEASE_PIXEL_ON_BACKDROP);
 
                 break;
 
             case RELEASE_PIXEL_ON_BACKDROP:
 
+                // If the robot is driving...
                 if (drive.isBusy()) {
+
+                    // Exit the method.
                     return;
+
                 }
 
+                // Open the claw partially to release the pixel.
                 robotHardware.openClaw(false);
 
+                // Advance to the next step.
                 setState(RETRACT);
 
                 break;
 
             case RETRACT:
 
+                // If we are waiting...
                 if (timer.milliseconds() < 500) {
+
+                    // Exit the method.
                     return;
+
                 }
 
                 // Start retracting.
                 robotHardware.startRetracting();
 
+                // If are placing white pixels...
                 if(placingYellowPixel && objectives == PURPLE_YELLOW_WHITE) {
 
+                    // Drive to the white pixel stack.
                     setState(DRIVE_TO_STACK_APPROACH);
 
                 }
 
+                // Otherwise (if we are not placing white pixels)...
                 else {
 
+                    // Park.
                     setState(PARK);
 
                 }
@@ -366,51 +371,76 @@ public class AutoF extends LinearOpMode {
                 //    return;
                 //}
 
+                // Get a stack approach trajectory sequence.
                 TrajectorySequence stackApproachTrajectorySequence = getStackApproachTrajectorySequence();
                 lastEnd = stackApproachTrajectorySequence.end();
 
+                // Start driving to the stack approach position.
                 drive.followTrajectorySequenceAsync(stackApproachTrajectorySequence);
 
+                // Advance to the next step.
                 setState(DRIVE_TO_STACK_GRAB);
 
                 break;
 
             case DRIVE_TO_STACK_GRAB:
 
+                // If the robot is driving...
                 if (drive.isBusy()) {
+
+                    // Exit the method.
                     return;
+
                 }
 
-                // Construct a trajectory sequence.
+                // Get a stack grab trajectory sequence.
                 TrajectorySequence stackGrabTrajectorySequence = getStackGrabTrajectorySequence();
                 lastEnd = stackGrabTrajectorySequence.end();
 
-                // Execute the trajectory sequence.
+                // Start driving to the stack grab position.
                 drive.followTrajectorySequenceAsync(stackGrabTrajectorySequence);
 
+                // Advance to the next step.
                 setState(GRAB_OFF_STACK);
 
                 break;
 
             case GRAB_OFF_STACK:
 
+                // If the robot is driving...
                 if (drive.isBusy()) {
+
+                    // Exit the method.
                     return;
+
                 }
 
+                // Close the left claw to grab white pixels.
                 robotHardware.closeLeftClaw();
 
+                // Advance to the next step.
                 setState(RETURN_TO_BACKDROP);
 
                 break;
 
             case RETURN_TO_BACKDROP:
 
+                // If we are waiting...
+                if (timer.milliseconds() < 500) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Get a return trajectory sequence.
                 TrajectorySequence returnTrajectorySequence = getReturnTrajectorySequence();
                 lastEnd = returnTrajectorySequence.end();
 
+                // Start driving to the backdrop.
                 drive.followTrajectorySequenceAsync(returnTrajectorySequence);
 
+                // Remember that we are placing white pixels.
                 placingYellowPixel = false;
 
                 // Advance to the next step.
@@ -420,15 +450,22 @@ public class AutoF extends LinearOpMode {
 
             case PARK:
 
+                // If the robot is driving...
                 if (drive.isBusy()) {
+
+                    // Exit the method.
                     return;
+
                 }
 
+                // Get a park trajectory sequence.
                 TrajectorySequence parkTrajectorySequence = getParkTrajectorySequence();
                 lastEnd = parkTrajectorySequence.end();
 
+                // Start parking.
                 drive.followTrajectorySequenceAsync(parkTrajectorySequence);
 
+                // Advance to the next step.
                 setState(IDLE);
 
                 break;
