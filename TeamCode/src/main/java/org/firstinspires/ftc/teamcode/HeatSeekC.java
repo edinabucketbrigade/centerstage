@@ -8,13 +8,13 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.OPEN_CLAW;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.RELEASE_WRIST;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.WAIT_FOR_RELEASE;
 
+import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_TARGET_X;
 import static bucketbrigade.casperlibrary.RobotRoutes.FIRST_ROW_LIFT_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.LIFT_INCREMENT;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
-import static bucketbrigade.casperlibrary.RobotRoutes.PLACE_TARGET_X;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 import static bucketbrigade.casperlibrary.RobotRoutes.getTargetY;
 
@@ -36,7 +36,7 @@ public class HeatSeekC {
 
     enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW, RELEASE_WRIST, WAIT_FOR_RELEASE }
 
-    public static double APPROACH_TARGET_X = PLACE_TARGET_X - 10;
+    public static double APPROACH_TARGET_X = DEFAULT_PLACE_TARGET_X - 10;
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
@@ -147,7 +147,7 @@ public class HeatSeekC {
                 }
 
                 // Drive to the place position.
-                startDrivingToBackdrop(MAXIMUM_VELOCITY_SLOW, PLACE_TARGET_X);
+                startDrivingToBackdrop(MAXIMUM_VELOCITY_SLOW, DEFAULT_PLACE_TARGET_X);
 
                 // Advance to the next step.
                 setState(OPEN_CLAW);

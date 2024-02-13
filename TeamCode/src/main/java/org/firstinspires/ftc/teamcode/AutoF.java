@@ -17,6 +17,7 @@ import static bucketbrigade.casperlibrary.Objectives.PURPLE;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
 
+import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_TARGET_X;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
@@ -76,7 +77,7 @@ public class AutoF extends LinearOpMode {
     public static final int MILLISECONDS_PER_SECOND = 1000;
     public static final int MINIMUM_DELAY = 0;
     public static final int MAXIMUM_DELAY = 30;
-    public static int STACK_LIFT_POSITION = 200;
+    public static int STACK_LIFT_POSITION = 160;
 
     public static Boolean redAlliance;
     public static Pose2d currentPose;
@@ -93,6 +94,8 @@ public class AutoF extends LinearOpMode {
     private TeamPropLocation location;
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
+    private Double placeTargetX;
+    private double temporaryPlaceTargetX = DEFAULT_PLACE_TARGET_X;
 
     enum State {IDLE, DRIVE_TO_SPIKE_MARK, DRIVE_TO_BACKDROP_APPROACH, RAISE_ARM_AND_LIFT, DRIVE_TO_BACKDROP_PLACE, RELEASE_PIXEL_ON_BACKDROP, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_STACK_APPROACH, DRIVE_TO_STACK_GRAB, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK}
 
@@ -160,7 +163,7 @@ public class AutoF extends LinearOpMode {
         }
 
         // Start looking for AprilTags.
-        robotHardware.startLookingForAprilTags();
+        //robotHardware.startLookingForAprilTags();
 
         // Initialize the drive interface.
         robotHardware.initializeDrive();
@@ -422,8 +425,13 @@ public class AutoF extends LinearOpMode {
 
                 }
 
-                // Close the left claw to grab white pixels.
-                robotHardware.closeLeftClaw();
+                // Close the appropriate claw to grab white pixels.
+                if(redAlliance) {
+                    robotHardware.closeLeftClaw();
+                }
+                else {
+                    robotHardware.closeRightClaw();
+                }
 
                 // Advance to the next step.
                 setState(RETURN_TO_BACKDROP);
@@ -592,6 +600,21 @@ public class AutoF extends LinearOpMode {
                 }
             }
 
+            // Otherwise, if the user has not selected a place target x...
+            else if (placeTargetX == null) {
+                telemetry.addData("Place Target X = " + temporaryPlaceTargetX, "X = ok, Y = increase, A = decrease");
+                telemetry.update();
+                if (currentGamepad.x && !previousGamepad.x) {
+                    placeTargetX = temporaryPlaceTargetX;
+                }
+                else if (currentGamepad.y && !previousGamepad.y) {
+                    temporaryPlaceTargetX += 0.5;
+                }
+                else if (currentGamepad.a && !previousGamepad.a) {
+                    temporaryPlaceTargetX -= 0.5;
+                }
+            }
+
             // Otherwise (if the user finished making menu selections)...
             else {
 
@@ -636,7 +659,7 @@ public class AutoF extends LinearOpMode {
         log("Initializing camera...");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startClose, telemetry, true, delay, objectives);
+        teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startClose, telemetry, true, delay, objectives, placeTargetX);
         camera.setPipeline(teamPropDetector);
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
 
@@ -801,7 +824,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Drive to the place.
-        applyActions(driveToBackdropPlace(redAlliance, location, placingYellowPixel), trajectorySequenceBuilder, false);
+        applyActions(driveToBackdropPlace(redAlliance, location, placingYellowPixel, placeTargetX), trajectorySequenceBuilder, false);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();

@@ -15,7 +15,7 @@ public class RobotRoutes {
     public static final double BACKDROP_TARGET_X = 40;
     public static final int FIRST_ROW_LIFT_POSITION = 0;
     public static final int LIFT_INCREMENT = 200;
-    public static final double MAXIMUM_ACCELERATION = 50;
+    public static final double MAXIMUM_ACCELERATION = 10;
     public static final double MAXIMUM_ANGULAR_ACCELERATION = Math.toRadians(100);
     public static final double MAXIMUM_ANGULAR_VELOCITY = Math.toRadians(100);
     public static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
@@ -27,7 +27,7 @@ public class RobotRoutes {
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
     public static double PIXEL_WIDTH = 3.2;
-    public static final double PLACE_TARGET_X = 43.5;
+    public static final double DEFAULT_PLACE_TARGET_X = 45;
     public static final double TARGET_BLUE_Y = 43;
     public static final double TARGET_RED_Y = -28;
     public static final double TRACK_WIDTH = 14;
@@ -82,8 +82,8 @@ public class RobotRoutes {
     // Drives to the backdrop approach position.
     public static List<Action> driveToBackdropApproach(boolean redAlliance, boolean startClose, TeamPropLocation inputLocation) throws InterruptedException {
 
-        double targetY = getWhitePixelTargetY();
         TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
+        double targetY = getYellowPixelTargetY(outputLocation);
         double targetHeading = Math.toRadians(180);
         List<Action> actions = new ArrayList<>();
         if (startClose) {
@@ -108,12 +108,12 @@ public class RobotRoutes {
     }
 
     // Drives to the backdrop place position.
-    public static List<Action> driveToBackdropPlace(boolean redAlliance, TeamPropLocation inputLocation, boolean isYellowPixel) throws InterruptedException {
+    public static List<Action> driveToBackdropPlace(boolean redAlliance, TeamPropLocation inputLocation, boolean isYellowPixel, double placeTargetX) throws InterruptedException {
 
         TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
         double targetY = isYellowPixel ? getYellowPixelTargetY(outputLocation) : getWhitePixelTargetY();
         List<Action> actions = new ArrayList<>();
-        actions.add(new LineToLinearHeadingAction(PLACE_TARGET_X, targetY, Math.toRadians(180)));
+        actions.add(new LineToLinearHeadingAction(placeTargetX, targetY, Math.toRadians(180)));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
@@ -124,8 +124,8 @@ public class RobotRoutes {
 
         List<Action> actions = new ArrayList<>();
         actions.add(new SetTangentAction(Math.toRadians(-90)));
-        actions.add(new SplineToLinearHeadingAction(20, 8, Math.toRadians(180), Math.toRadians(180)));
-        actions.add(new LineToAction(-53, 8));
+        actions.add(new SplineToLinearHeadingAction(20, 8.5, Math.toRadians(180), Math.toRadians(180)));
+        actions.add(new LineToAction(-55, 8.5));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
@@ -135,7 +135,7 @@ public class RobotRoutes {
     public static List<Action> driveToStackGrab(boolean redAlliance) {
 
         List<Action> actions = new ArrayList<>();
-        actions.add(new LineToAction(-58, 8));
+        actions.add(new LineToAction(-60.5, 8.5));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
@@ -146,7 +146,7 @@ public class RobotRoutes {
 
         double targetY = getWhitePixelTargetY();
         List<Action> actions = new ArrayList<>();
-        actions.add(new LineToAction(20, 8));
+        actions.add(new LineToAction(20, 9));
         actions.add(new SplineToLinearHeadingAction(BACKDROP_TARGET_X, targetY, Math.toRadians(180), Math.toRadians(90)));
         if(redAlliance) mirrorActions(actions);
         return actions;

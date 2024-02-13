@@ -2,6 +2,7 @@ package com.example.meepmeeptesting;
 
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
+import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_TARGET_X;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_VELOCITY;
@@ -17,6 +18,7 @@ import static bucketbrigade.casperlibrary.RobotRoutes.getStartPose;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
 import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
 import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
+import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -104,7 +106,7 @@ public class MeepMeepTesting {
             trajectorySequenceBuilder.waitSeconds(1);
 
             // Drive to the backdrop place position.
-            applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, true), trajectorySequenceBuilder, false);
+            applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, true, DEFAULT_PLACE_TARGET_X), trajectorySequenceBuilder, false);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);
@@ -131,7 +133,7 @@ public class MeepMeepTesting {
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Drive to the backdrop place position.
-                applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, false), trajectorySequenceBuilder, false);
+                applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, false, DEFAULT_PLACE_TARGET_X), trajectorySequenceBuilder, false);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);

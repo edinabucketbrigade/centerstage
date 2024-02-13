@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_TARGET_X;
 import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
 import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
 import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
@@ -100,7 +101,7 @@ public class CenterStageAutoCV extends LinearOpMode {
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        CenterStageCVDetection detector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry, false, 0, Objectives.PURPLE);
+        CenterStageCVDetection detector = new CenterStageCVDetection(parkLeft, redAlliance, startLeft, telemetry, false, 0, Objectives.PURPLE, DEFAULT_PLACE_TARGET_X);
         camera.setPipeline(detector);
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
         log("opening camera");
