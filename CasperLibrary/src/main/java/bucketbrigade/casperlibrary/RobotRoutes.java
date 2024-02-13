@@ -119,12 +119,22 @@ public class RobotRoutes {
 
     }
 
-    // Drives to a white pixel stack.
-    public static List<Action> driveToStack(boolean redAlliance) {
+    // Drives to the stack approach position.
+    public static List<Action> driveToStackApproach(boolean redAlliance) {
 
         List<Action> actions = new ArrayList<>();
         actions.add(new SetTangentAction(Math.toRadians(-90)));
         actions.add(new SplineToLinearHeadingAction(20, 8, Math.toRadians(180), Math.toRadians(180)));
+        actions.add(new LineToAction(-54, 8));
+        if(redAlliance) mirrorActions(actions);
+        return actions;
+
+    }
+
+    // Drives to the stack grab position.
+    public static List<Action> driveToStackGrab(boolean redAlliance) {
+
+        List<Action> actions = new ArrayList<>();
         actions.add(new LineToAction(-59, 8));
         if(redAlliance) mirrorActions(actions);
         return actions;

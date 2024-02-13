@@ -6,11 +6,13 @@ import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_VELOCITY;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdropApproach;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdropPlace;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
-import static bucketbrigade.casperlibrary.RobotRoutes.driveToStack;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToStackApproach;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToStackGrab;
 import static bucketbrigade.casperlibrary.RobotRoutes.getStartPose;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
 import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
@@ -87,7 +89,7 @@ public class MeepMeepTesting {
         TrajectorySequenceBuilder trajectorySequenceBuilder = new TrajectorySequenceBuilder(outputStartPose, null, velocityConstraint, accelerationConstraint, MAXIMUM_ANGULAR_VELOCITY, MAXIMUM_ANGULAR_ACCELERATION);
 
         // Drive to the spike mark.
-        applyActions(driveToSpikeMark(RED_ALLIANCE, START_CLOSE, LOCATION), trajectorySequenceBuilder);
+        applyActions(driveToSpikeMark(RED_ALLIANCE, START_CLOSE, LOCATION), trajectorySequenceBuilder, true);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
@@ -95,14 +97,14 @@ public class MeepMeepTesting {
         // If we are placing the yellow pixel...
         if(objectives == PURPLE_YELLOW || objectives == PURPLE_YELLOW_WHITE) {
 
-            // Drive to the backdrop.
-            applyActions(driveToBackdropApproach(RED_ALLIANCE, START_CLOSE, LOCATION), trajectorySequenceBuilder);
+            // Drive to the backdrop approach position.
+            applyActions(driveToBackdropApproach(RED_ALLIANCE, START_CLOSE, LOCATION), trajectorySequenceBuilder, true);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);
 
-            // Drive to place.
-            applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, true), trajectorySequenceBuilder);
+            // Drive to the backdrop place position.
+            applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, true), trajectorySequenceBuilder, false);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);
@@ -110,20 +112,26 @@ public class MeepMeepTesting {
             // If we are placing white pixels...
             if(objectives == PURPLE_YELLOW_WHITE) {
 
-                // Drive to the pixel stack.
-                applyActions(driveToStack(RED_ALLIANCE), trajectorySequenceBuilder);
+                // Drive to the stack approach position.
+                applyActions(driveToStackApproach(RED_ALLIANCE), trajectorySequenceBuilder, true);
+
+                // Wait for a bit.
+                trajectorySequenceBuilder.waitSeconds(1);
+
+                // Drive to the stack grab position.
+                applyActions(driveToStackGrab(RED_ALLIANCE), trajectorySequenceBuilder, false);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Return to the backdrop.
-                applyActions(returnToBackdrop(RED_ALLIANCE), trajectorySequenceBuilder);
+                applyActions(returnToBackdrop(RED_ALLIANCE), trajectorySequenceBuilder, true);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
 
-                // Drive to place.
-                applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, false), trajectorySequenceBuilder);
+                // Drive to the backdrop place position.
+                applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, false), trajectorySequenceBuilder, false);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
@@ -136,7 +144,7 @@ public class MeepMeepTesting {
         if(START_CLOSE || objectives == PURPLE_YELLOW || objectives == PURPLE_YELLOW_WHITE) {
 
             // Park.
-            applyActions(park(RED_ALLIANCE, PARK_LEFT), trajectorySequenceBuilder);
+            applyActions(park(RED_ALLIANCE, PARK_LEFT), trajectorySequenceBuilder, true);
 
         }
 
@@ -151,7 +159,21 @@ public class MeepMeepTesting {
 
     }
 
-    public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder) throws Exception {
+    public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder, boolean fast) throws Exception {
+
+        // Get a maximum velocity.
+        double maximumVelocity = fast ? MAXIMUM_VELOCITY_FAST : MAXIMUM_VELOCITY_SLOW;
+
+        // Construct a velocity constraint.
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(maximumVelocity, TRACK_WIDTH);
+
+        // Construct an acceleration constraint.
+        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
+
+        // Apply the constraints.
+        trajectorySequenceBuilder.setConstraints(velocityConstraint, accelerationConstraint);
+
+        // Apply the actions.
         for(Action inputAction : actions) {
             if(inputAction instanceof BackAction) {
                 BackAction outputAction = (BackAction)inputAction;
@@ -192,8 +214,8 @@ public class MeepMeepTesting {
             else {
                 throw new Exception("The action type is unrecognized.");
             }
-
         }
+
     }
 
 }

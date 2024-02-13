@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.AutoF.State.APPROACH_BACKDROP;
-import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_PIXEL_STACK;
-import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_PLACE_POSITION;
+import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_BACKDROP_APPROACH;
+import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_STACK_APPROACH;
+import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_BACKDROP_PLACE;
+import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_STACK_GRAB;
 import static org.firstinspires.ftc.teamcode.AutoF.State.GRAB_OFF_STACK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.IDLE;
 import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_SPIKE_MARK;
@@ -13,13 +14,13 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PURPLE_PIXEL;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PIXEL_ON_BACKDROP;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETRACT;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RETURN_TO_BACKDROP;
-import static org.firstinspires.ftc.teamcode.AutoF.State.WAIT_FOR_CLAW_TO_OPEN;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.getTargetLiftPosition;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
 
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 import static bucketbrigade.casperlibrary.RobotRoutes.WHITE_PIXEL_ROW;
@@ -27,7 +28,8 @@ import static bucketbrigade.casperlibrary.RobotRoutes.YELLOW_PIXEL_ROW;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdropApproach;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdropPlace;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
-import static bucketbrigade.casperlibrary.RobotRoutes.driveToStack;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToStackApproach;
+import static bucketbrigade.casperlibrary.RobotRoutes.driveToStackGrab;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
 import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
 
@@ -93,7 +95,7 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
 
-    enum State {IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, RAISE_WRIST, APPROACH_BACKDROP, RAISE_ARM_AND_LIFT, DRIVE_TO_PLACE_POSITION, RELEASE_PIXEL_ON_BACKDROP, WAIT_FOR_CLAW_TO_OPEN, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_PIXEL_STACK, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK}
+    enum State {IDLE, DRIVE_TO_SPIKE_MARK, RELEASE_PURPLE_PIXEL, RAISE_WRIST, DRIVE_TO_BACKDROP_APPROACH, RAISE_ARM_AND_LIFT, DRIVE_TO_BACKDROP_PLACE, RELEASE_PIXEL_ON_BACKDROP, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_STACK_APPROACH, DRIVE_TO_STACK_GRAB, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK}
 
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
@@ -250,11 +252,11 @@ public class AutoF extends LinearOpMode {
                 robotHardware.setWristBackdrop();
 
                 // Advance to the next step.
-                setState(APPROACH_BACKDROP);
+                setState(DRIVE_TO_BACKDROP_APPROACH);
 
                 break;
 
-            case APPROACH_BACKDROP:
+            case DRIVE_TO_BACKDROP_APPROACH:
 
                 if (timer.milliseconds() > 500) {
                     return;
@@ -272,11 +274,11 @@ public class AutoF extends LinearOpMode {
                 }
 
                 // Construct an approach trajectory sequence.
-                TrajectorySequence approachTrajectorySequence = getBackdropTrajectorySequence();
-                lastEnd = approachTrajectorySequence.end();
+                TrajectorySequence backdropApproachTrajectorySequence = getBackdropApproachTrajectorySequence();
+                lastEnd = backdropApproachTrajectorySequence.end();
 
                 // Start driving to the backdrop.
-                drive.followTrajectorySequenceAsync(approachTrajectorySequence);
+                drive.followTrajectorySequenceAsync(backdropApproachTrajectorySequence);
 
                 // Advance to the next step.
                 setState(RAISE_ARM_AND_LIFT);
@@ -298,11 +300,11 @@ public class AutoF extends LinearOpMode {
                 // Move the wrist to the backdrop position.
                 robotHardware.setWristBackdrop();
 
-                setState(DRIVE_TO_PLACE_POSITION);
+                setState(DRIVE_TO_BACKDROP_PLACE);
 
                 break;
 
-            case DRIVE_TO_PLACE_POSITION:
+            case DRIVE_TO_BACKDROP_PLACE:
 
                 // If we are waiting...
                 if (!robotHardware.isArmUp() || !robotHardware.isLiftInPosition(backdropLiftPosition)) {
@@ -313,11 +315,11 @@ public class AutoF extends LinearOpMode {
                 }
 
                 // Construct a trajectory sequence.
-                TrajectorySequence placeTrajectorySequence = getPlaceTrajectorySequence(placingYellowPixel);
-                lastEnd = placeTrajectorySequence.end();
+                TrajectorySequence backdropPlaceTrajectorySequence = getBackdropPlaceTrajectorySequence(placingYellowPixel);
+                lastEnd = backdropPlaceTrajectorySequence.end();
 
                 // Execute the trajectory sequence.
-                drive.followTrajectorySequenceAsync(placeTrajectorySequence);
+                drive.followTrajectorySequenceAsync(backdropPlaceTrajectorySequence);
 
                 setState(RELEASE_PIXEL_ON_BACKDROP);
 
@@ -331,28 +333,22 @@ public class AutoF extends LinearOpMode {
 
                 robotHardware.openClaw(false);
 
-                setState(WAIT_FOR_CLAW_TO_OPEN);
-
-                break;
-
-            case WAIT_FOR_CLAW_TO_OPEN:
-
-                if (timer.milliseconds() < 500) {
-                    return;
-                }
-
                 setState(RETRACT);
 
                 break;
 
             case RETRACT:
 
+                if (timer.milliseconds() < 500) {
+                    return;
+                }
+
                 // Start retracting.
                 robotHardware.startRetracting();
 
                 if(placingYellowPixel && objectives == PURPLE_YELLOW_WHITE) {
 
-                    setState(DRIVE_TO_PIXEL_STACK);
+                    setState(DRIVE_TO_STACK_APPROACH);
 
                 }
 
@@ -364,15 +360,33 @@ public class AutoF extends LinearOpMode {
 
                 break;
 
-            case DRIVE_TO_PIXEL_STACK:
+            case DRIVE_TO_STACK_APPROACH:
+
                 //if (robotHardware.isRetracting()) {
                 //    return;
                 //}
 
-                TrajectorySequence stackTrajectorySequence = getStackTrajectorySequence();
-                lastEnd = stackTrajectorySequence.end();
+                TrajectorySequence stackApproachTrajectorySequence = getStackApproachTrajectorySequence();
+                lastEnd = stackApproachTrajectorySequence.end();
 
-                drive.followTrajectorySequenceAsync(stackTrajectorySequence);
+                drive.followTrajectorySequenceAsync(stackApproachTrajectorySequence);
+
+                setState(DRIVE_TO_STACK_GRAB);
+
+                break;
+
+            case DRIVE_TO_STACK_GRAB:
+
+                if (drive.isBusy()) {
+                    return;
+                }
+
+                // Construct a trajectory sequence.
+                TrajectorySequence stackGrabTrajectorySequence = getStackGrabTrajectorySequence();
+                lastEnd = stackGrabTrajectorySequence.end();
+
+                // Execute the trajectory sequence.
+                drive.followTrajectorySequenceAsync(stackGrabTrajectorySequence);
 
                 setState(GRAB_OFF_STACK);
 
@@ -723,7 +737,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(startPose);
 
         // Drive to the spike mark.
-        applyActions(driveToSpikeMark(redAlliance, startClose, location), trajectorySequenceBuilder);
+        applyActions(driveToSpikeMark(redAlliance, startClose, location), trajectorySequenceBuilder, true);
 
         // Build the trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -733,25 +747,17 @@ public class AutoF extends LinearOpMode {
 
     }
 
-    // Gets a place trajectory sequence.
-    private TrajectorySequence getPlaceTrajectorySequence(boolean placingYellowPixel) throws InterruptedException {
+    // Gets a backdrop place trajectory sequence.
+    private TrajectorySequence getBackdropPlaceTrajectorySequence(boolean placingYellowPixel) throws InterruptedException {
 
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
-        // Construct a velocity constraint.
-        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_SLOW, TRACK_WIDTH);
-
-        // Construct an acceleration constraint.
-        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
-
         // Construct a trajectory sequence builder.
-        TrajectorySequenceBuilder trajectorySequenceBuilder = drive
-                .trajectorySequenceBuilder(lastEnd)
-                .setConstraints(velocityConstraint, accelerationConstraint);
+        TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Drive to the place.
-        applyActions(driveToBackdropPlace(redAlliance, location, placingYellowPixel), trajectorySequenceBuilder);
+        applyActions(driveToBackdropPlace(redAlliance, location, placingYellowPixel), trajectorySequenceBuilder, false);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -762,7 +768,7 @@ public class AutoF extends LinearOpMode {
     }
 
     // Gets a backdrop trajectory sequence.
-    private TrajectorySequence getBackdropTrajectorySequence() throws InterruptedException {
+    private TrajectorySequence getBackdropApproachTrajectorySequence() throws InterruptedException {
 
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
@@ -771,7 +777,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Drive to the baackdrop.
-        applyActions(driveToBackdropApproach(redAlliance, startClose, location), trajectorySequenceBuilder);
+        applyActions(driveToBackdropApproach(redAlliance, startClose, location), trajectorySequenceBuilder, true);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -781,8 +787,8 @@ public class AutoF extends LinearOpMode {
 
     }
 
-    // Gets a stack trajectory sequence.
-    private TrajectorySequence getStackTrajectorySequence() throws InterruptedException {
+    // Gets a stack approach trajectory sequence.
+    private TrajectorySequence getStackApproachTrajectorySequence() throws InterruptedException {
 
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
@@ -790,8 +796,28 @@ public class AutoF extends LinearOpMode {
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
-        // Drive to the stack.
-        applyActions(driveToStack(redAlliance), trajectorySequenceBuilder);
+        // Drive to the stack approach position.
+        applyActions(driveToStackApproach(redAlliance), trajectorySequenceBuilder, true);
+
+        // Construct a trajectory sequence.
+        TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
+
+        // Return the result.
+        return trajectorySequence;
+
+    }
+
+    // Gets a stack grab trajectory sequence.
+    private TrajectorySequence getStackGrabTrajectorySequence() throws InterruptedException {
+
+        // Get a drive interface.
+        SampleMecanumDrive drive = robotHardware.getDrive();
+
+        // Construct a trajectory sequence builder.
+        TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
+
+        // Drive to the stack grab position.
+        applyActions(driveToStackGrab(redAlliance), trajectorySequenceBuilder, false);
 
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -810,7 +836,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Park.
-        applyActions(park(redAlliance, parkLeft), trajectorySequenceBuilder);
+        applyActions(park(redAlliance, parkLeft), trajectorySequenceBuilder, true);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -829,7 +855,7 @@ public class AutoF extends LinearOpMode {
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
         // Return to backdrop.
-        applyActions(returnToBackdrop(redAlliance), trajectorySequenceBuilder);
+        applyActions(returnToBackdrop(redAlliance), trajectorySequenceBuilder, true);
 
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -839,7 +865,21 @@ public class AutoF extends LinearOpMode {
 
     }
 
-    public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder) throws InterruptedException {
+    public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder, boolean fast) throws InterruptedException {
+
+        // Get a maximum velocity.
+        double maximumVelocity = fast ? MAXIMUM_VELOCITY_FAST : MAXIMUM_VELOCITY_SLOW;
+
+        // Construct a velocity constraint.
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(maximumVelocity, TRACK_WIDTH);
+
+        // Construct an acceleration constraint.
+        TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
+
+        // Apply the constraints.
+        trajectorySequenceBuilder.setConstraints(velocityConstraint, accelerationConstraint);
+
+        // Apply the actions.
         for(Action inputAction : actions) {
             if(inputAction instanceof BackAction) {
                 BackAction outputAction = (BackAction)inputAction;
@@ -880,8 +920,8 @@ public class AutoF extends LinearOpMode {
             else {
                 throw new InterruptedException("The action type is unrecognized.");
             }
-
         }
+
     }
 
 }
