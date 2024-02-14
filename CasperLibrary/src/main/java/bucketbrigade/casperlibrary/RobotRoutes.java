@@ -125,8 +125,14 @@ public class RobotRoutes {
         List<Action> actions = new ArrayList<>();
         actions.add(new TurnAction(Math.toRadians(90)));
         actions.add(new SetTangentAction(Math.toRadians(-90)));
+
+        // Method A
         actions.add(new SplineToLinearHeadingAction(20, 6.5, Math.toRadians(180), Math.toRadians(180)));
         actions.add(new SetTangentAction(Math.toRadians(180)));
+
+        // Method B
+        //actions.add(new SplineToAction(20, 6.5, Math.toRadians(180)));
+
         actions.add(new SplineToAction(-56, 6.5, Math.toRadians(180)));
         if(redAlliance) mirrorActions(actions);
         return actions;
