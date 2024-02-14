@@ -2,7 +2,10 @@ package com.example.meepmeeptesting;
 
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_TARGET_X;
+import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_GRAB_STACK_X;
+import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_GRAB_STACK_Y;
+import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_BACKDROP_X;
+import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_BACKDROP_Y;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_VELOCITY;
@@ -18,6 +21,7 @@ import static bucketbrigade.casperlibrary.RobotRoutes.getStartPose;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
 import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
 import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
+import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
 import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -100,13 +104,13 @@ public class MeepMeepTesting {
         if(objectives == PURPLE_YELLOW || objectives == PURPLE_YELLOW_WHITE) {
 
             // Drive to the backdrop approach position.
-            applyActions(driveToBackdropApproach(RED_ALLIANCE, START_CLOSE, LOCATION), trajectorySequenceBuilder, true);
+            applyActions(driveToBackdropApproach(RED_ALLIANCE, START_CLOSE, LOCATION, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y), trajectorySequenceBuilder, true);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);
 
             // Drive to the backdrop place position.
-            applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, true, DEFAULT_PLACE_TARGET_X), trajectorySequenceBuilder, false);
+            applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, true, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y), trajectorySequenceBuilder, false);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);
@@ -115,25 +119,25 @@ public class MeepMeepTesting {
             if(objectives == PURPLE_YELLOW_WHITE) {
 
                 // Drive to the stack approach position.
-                applyActions(driveToStackApproach(RED_ALLIANCE), trajectorySequenceBuilder, true);
+                applyActions(driveToStackApproach(RED_ALLIANCE, DEFAULT_GRAB_STACK_X, DEFAULT_GRAB_STACK_Y), trajectorySequenceBuilder, true);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Drive to the stack grab position.
-                applyActions(driveToStackGrab(RED_ALLIANCE), trajectorySequenceBuilder, false);
+                applyActions(driveToStackGrab(RED_ALLIANCE, DEFAULT_GRAB_STACK_X, DEFAULT_GRAB_STACK_Y), trajectorySequenceBuilder, false);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Return to the backdrop.
-                applyActions(returnToBackdrop(RED_ALLIANCE), trajectorySequenceBuilder, true);
+                applyActions(returnToBackdrop(RED_ALLIANCE, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y), trajectorySequenceBuilder, true);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Drive to the backdrop place position.
-                applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, false, DEFAULT_PLACE_TARGET_X), trajectorySequenceBuilder, false);
+                applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, false, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y), trajectorySequenceBuilder, false);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);

@@ -12,7 +12,8 @@ import java.util.List;
 
 public class RobotRoutes {
 
-    public static final double BACKDROP_TARGET_X = 40;
+    public static final double APPROACH_DISTANCE = 5;
+    public static final double BACKDROP_SEPARATION = 36;
     public static final int FIRST_ROW_LIFT_POSITION = 0;
     public static final int LIFT_INCREMENT = 200;
     public static final double MAXIMUM_ACCELERATION = 50;
@@ -26,14 +27,15 @@ public class RobotRoutes {
     public static final double MAXIMUM_VELOCITY_SLOW = 25;
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
-    public static double PIXEL_WIDTH = 3.2;
-    public static final double DEFAULT_PLACE_TARGET_X = 45;
-    public static final double TARGET_BLUE_Y = 43;
-    public static final double TARGET_RED_Y = -28;
+    public static double PIXEL_WIDTH = 3;
+    public static final double DEFAULT_PLACE_BACKDROP_X = 45;
+    public static final double DEFAULT_PLACE_BACKDROP_Y = 41;
     public static final double TRACK_WIDTH = 14;
-    public static final int WHITE_PIXEL_LEFT_COLUMN = 4;
+    public static final int WHITE_PIXEL_LEFT_COLUMN = 3;
     public static final int WHITE_PIXEL_ROW = 3;
     public static final int YELLOW_PIXEL_ROW = 1;
+    public static final double DEFAULT_GRAB_STACK_X = -60.5;
+    public static final double DEFAULT_GRAB_STACK_Y = 6.5;
 
     // Gets a start pose.
     public static RobotPose getStartPose(boolean redAlliance, boolean startClose) {
@@ -80,14 +82,15 @@ public class RobotRoutes {
     }
 
     // Drives to the backdrop approach position.
-    public static List<Action> driveToBackdropApproach(boolean redAlliance, boolean startClose, TeamPropLocation inputLocation) throws InterruptedException {
+    public static List<Action> driveToBackdropApproach(boolean redAlliance, boolean startClose, TeamPropLocation inputLocation, double placeBackdropX, double placeBackdropY) throws InterruptedException {
 
         TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
-        double targetY = getYellowPixelTargetY(outputLocation);
+        double targetY = getYellowPixelTargetY(outputLocation, placeBackdropY);
         double targetHeading = Math.toRadians(180);
         List<Action> actions = new ArrayList<>();
+        double approachBackdropX = getApproachBackdropX(placeBackdropX);
         if (startClose) {
-            actions.add(new LineToLinearHeadingAction(BACKDROP_TARGET_X, targetY, targetHeading));
+            actions.add(new LineToLinearHeadingAction(approachBackdropX, targetY, targetHeading));
         } else {
             actions.add(new SetReversedAction(true));
             if(outputLocation == LEFT) {
@@ -100,7 +103,7 @@ public class RobotRoutes {
                 actions.add(new SplineToAction(-36, 9, Math.toRadians(0)));
             }
             actions.add(new LineToAction(30, 9));
-            actions.add(new SplineToAction(BACKDROP_TARGET_X, targetY, Math.toRadians(0)));
+            actions.add(new SplineToAction(approachBackdropX, targetY, Math.toRadians(0)));
         }
         if(redAlliance) mirrorActions(actions);
         return actions;
@@ -108,54 +111,60 @@ public class RobotRoutes {
     }
 
     // Drives to the backdrop place position.
-    public static List<Action> driveToBackdropPlace(boolean redAlliance, TeamPropLocation inputLocation, boolean isYellowPixel, double placeTargetX) throws InterruptedException {
+    public static List<Action> driveToBackdropPlace(boolean redAlliance, TeamPropLocation inputLocation, boolean isYellowPixel, double placeBackdropX, double placeBackdropY) throws InterruptedException {
 
         TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
-        double targetY = isYellowPixel ? getYellowPixelTargetY(outputLocation) : getWhitePixelTargetY();
+        double targetY = isYellowPixel ? getYellowPixelTargetY(outputLocation, placeBackdropY) : getWhitePixelTargetY(placeBackdropY);
         List<Action> actions = new ArrayList<>();
-        actions.add(new LineToLinearHeadingAction(placeTargetX, targetY, Math.toRadians(180)));
+        actions.add(new LineToLinearHeadingAction(placeBackdropX, targetY, Math.toRadians(180)));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
     }
 
     // Drives to the stack approach position.
-    public static List<Action> driveToStackApproach(boolean redAlliance) {
+    public static List<Action> driveToStackApproach(boolean redAlliance, double grabStackX, double grabStackY) {
 
         List<Action> actions = new ArrayList<>();
+
+        double approachStackX = getApproachStackX(grabStackX);
+
         actions.add(new TurnAction(Math.toRadians(90)));
         actions.add(new SetTangentAction(Math.toRadians(-90)));
 
         // Method A
-        actions.add(new SplineToLinearHeadingAction(20, 6.5, Math.toRadians(180), Math.toRadians(180)));
+        actions.add(new SplineToLinearHeadingAction(20, grabStackY, Math.toRadians(180), Math.toRadians(180)));
         actions.add(new SetTangentAction(Math.toRadians(180)));
 
         // Method B
-        //actions.add(new SplineToAction(20, 6.5, Math.toRadians(180)));
+        //actions.add(new SplineToAction(20, grabStackY, Math.toRadians(180)));
 
-        actions.add(new SplineToAction(-56, 6.5, Math.toRadians(180)));
+
+
+        actions.add(new SplineToAction(approachStackX, grabStackY, Math.toRadians(180)));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
     }
 
     // Drives to the stack grab position.
-    public static List<Action> driveToStackGrab(boolean redAlliance) {
+    public static List<Action> driveToStackGrab(boolean redAlliance, double grabStackX, double grabStackY) {
 
         List<Action> actions = new ArrayList<>();
-        actions.add(new LineToAction(-60.5, 6.5));
+        actions.add(new LineToAction(grabStackX, grabStackY));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
     }
 
     // Returns to the backdrop.
-    public static List<Action> returnToBackdrop(boolean redAlliance) throws InterruptedException {
+    public static List<Action> returnToBackdrop(boolean redAlliance, double placeBackdropX, double placeBackdropY) throws InterruptedException {
 
-        double targetY = getWhitePixelTargetY();
+        double targetY = getWhitePixelTargetY(placeBackdropY);
+        double approachBackdropX = getApproachBackdropX(placeBackdropX);
         List<Action> actions = new ArrayList<>();
         actions.add(new LineToAction(20, 9));
-        actions.add(new SplineToLinearHeadingAction(BACKDROP_TARGET_X, targetY, Math.toRadians(180), Math.toRadians(90)));
+        actions.add(new SplineToLinearHeadingAction(approachBackdropX, targetY, Math.toRadians(180), Math.toRadians(90)));
         if(redAlliance) mirrorActions(actions);
         return actions;
 
@@ -180,23 +189,23 @@ public class RobotRoutes {
 
     }
 
-    private static double getYellowPixelTargetY(TeamPropLocation location) throws InterruptedException {
+    private static double getYellowPixelTargetY(TeamPropLocation location, double placeBackdropY) throws InterruptedException {
 
         // Get the appropriate yellow pixel left column.
         int yellowPixelLeftColumn = getLeftColumn(location);
 
         // Get a target y coordinate.
-        double targetY = getTargetY(yellowPixelLeftColumn, YELLOW_PIXEL_ROW, false);
+        double targetY = getTargetY(yellowPixelLeftColumn, YELLOW_PIXEL_ROW, false, placeBackdropY);
 
         // Return the result.
         return targetY;
 
     }
 
-    private static double getWhitePixelTargetY() throws InterruptedException {
+    private static double getWhitePixelTargetY(double placeBackdropY) throws InterruptedException {
 
         // Get a target y coordinate.
-        double targetY = getTargetY(WHITE_PIXEL_LEFT_COLUMN, WHITE_PIXEL_ROW, false);
+        double targetY = getTargetY(WHITE_PIXEL_LEFT_COLUMN, WHITE_PIXEL_ROW, false, placeBackdropY);
 
         // Return the result.
         return targetY;
@@ -216,7 +225,7 @@ public class RobotRoutes {
     }
 
     // Get a target y coordinate.
-    public static double getTargetY(int leftColumn, int row, boolean redAlliance) throws InterruptedException {
+    public static double getTargetY(int leftColumn, int row, boolean redAlliance, double placeBackdropY) throws InterruptedException {
 
         // If the row is invalid...
         if(row < MINIMUM_ROW || row > MAXIMUM_ROW) {
@@ -237,8 +246,16 @@ public class RobotRoutes {
 
         }
 
-        // Initialize a target y coordinate.
-        double targetY = redAlliance ? TARGET_RED_Y : TARGET_BLUE_Y;
+        // Initialize the target y value to the place backdrop y value.
+        double targetY = placeBackdropY;
+
+        // If we are on the red alliance.
+        if(redAlliance) {
+
+            // Update the target y value.
+            targetY -= BACKDROP_SEPARATION;
+
+        }
 
         // Determine whether this is an even row.
         boolean isEvenRow = isEven(row);
@@ -275,6 +292,14 @@ public class RobotRoutes {
         } else {
             return false;
         }
+    }
+
+    private static double getApproachBackdropX(double placeBackdropX) {
+        return placeBackdropX - APPROACH_DISTANCE;
+    }
+
+    private static double getApproachStackX(double grabStackX) {
+        return grabStackX + APPROACH_DISTANCE;
     }
 
 }

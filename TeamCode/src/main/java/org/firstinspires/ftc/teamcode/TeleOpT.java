@@ -1,21 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.AutoF.lastRanAutonomous;
 import static org.firstinspires.ftc.teamcode.Lift.DOWN_POSITION;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.HANGING;
-import static org.firstinspires.ftc.teamcode.TeleOpT.State.HEAT_SEEKING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.IDLE;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.PLACING;
 import static org.firstinspires.ftc.teamcode.TeleOpT.State.RETRACTING;
 
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_POSITION;
-import static bucketbrigade.casperlibrary.RobotRoutes.getLeftColumn;
-import static bucketbrigade.casperlibrary.TeamPropLocation.LEFT;
-import static bucketbrigade.casperlibrary.TeamPropLocation.MIDDLE;
-import static bucketbrigade.casperlibrary.TeamPropLocation.RIGHT;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -44,10 +37,6 @@ public class TeleOpT extends LinearOpMode {
 
     Debug Mode (hold right trigger)
 
-    - dpad left = start heat seeking left
-    - dpad down = start heat seeking middle
-    - dpad right = start heat seeking right
-    - dpad up = cancel heat seeking
     - x = lower wrist
     - b = raise wrist
     - a = lower arm
@@ -56,7 +45,7 @@ public class TeleOpT extends LinearOpMode {
     - right bumper = raise lift
     */
 
-    enum State { IDLE, HEAT_SEEKING, RETRACTING, HANGING, PLACING }
+    enum State { IDLE, RETRACTING, HANGING, PLACING }
 
     public static final String ORANGE_CIRCLE = "\uD83D\uDFE0"; // See https://unicode-explorer.com/list/geometric-shapes
     public static double TRIGGER_THRESHOLD = 0.5;
@@ -80,35 +69,10 @@ public class TeleOpT extends LinearOpMode {
         robotHardware.initializeDrive();
 
         // Start looking for AprilTags.
-        robotHardware.startLookingForAprilTags();
-
-        // If we last ran an autonomous op mode...
-        if(lastRanAutonomous) {
-
-            // Get the robot's pose at the end of the autonomous op mode.
-            Pose2d currentPose = AutoF.currentPose;
-
-            // Set the robot's pose.
-            robotHardware.setPose(currentPose);
-
-        }
-
-        // Otherwise (if we last ran a tele op mode)...
-        else {
-
-            // Clear the red alliance value.
-            AutoF.redAlliance = null;
-
-        }
-
-        // Remember that we last ran a tele op mode.
-        lastRanAutonomous = false;
-
-        // Wait for menu selection.
-        waitForMenuSelection();
+        //robotHardware.startLookingForAprilTags();
 
         // Wait for the user to lower the lift.
-        robotHardware.waitForLiftDown();
+        //robotHardware.waitForLiftDown();
 
         // Wait for the user to lower the arm.
         //robotHardware.waitForArmDown();
@@ -143,12 +107,6 @@ public class TeleOpT extends LinearOpMode {
             // Switch based on the state.
             switch (state) {
 
-                case HEAT_SEEKING:
-
-                    handleHeatSeeking(debugging);
-
-                    break;
-
                 case RETRACTING:
 
                     handleRetracting();
@@ -179,36 +137,13 @@ public class TeleOpT extends LinearOpMode {
 
             }
 
-            // Determine whether we are heat seeking.
-            boolean isHeatSeeking = robotHardware.isHeatSeeking();
+            // Move the robot.
+            robotHardware.moveRobot();
 
-            // If we are not heat seeking...
-            if(!isHeatSeeking) {
-
-                // Move the robot.
-                robotHardware.moveRobot();
-
-            }
-
-            // If the driver pressed right bumper...
-//            if(currentGamepad.right_bumper && !previousGamepad.right_bumper && !debugging) {
-//
-//                // Toggle turtle mode.
-//                robotHardware.toggleTurtleMode();
-//
-//            }
-            if(currentGamepad.right_bumper && !debugging) {
-
-                // Toggle turtle mode.
-                robotHardware.setTurtleMode(true);
-
-            }
-            else {
-                robotHardware.setTurtleMode(false);
-            }
+            // Set turtle mode if appropriate.
+            robotHardware.setTurtleMode(currentGamepad.right_bumper && !debugging);
 
             // Add telemetry.
-            telemetry.addData("Alliance", AutoF.redAlliance ? "Red" : "Blue");
             telemetry.addData("State", state);
             telemetry.addData("Debugging", debugging);
 
@@ -222,84 +157,11 @@ public class TeleOpT extends LinearOpMode {
 
     }
 
-    // Waits for menu selection.
-    private void waitForMenuSelection() throws InterruptedException {
-
-        // While the op mode is active...
-        while (!isStopRequested()) {
-
-            // Update the gamepads.
-            previousGamepad.copy(currentGamepad);
-            currentGamepad.copy(gamepad1);
-
-            // If the user has not selected an alliance...
-            if (AutoF.redAlliance == null) {
-                telemetry.addData("Alliance", "X = blue, B = red");
-                telemetry.update();
-                if (currentGamepad.x && !previousGamepad.x) {
-                    AutoF.redAlliance = false;
-                }
-                if (currentGamepad.b && !previousGamepad.b) {
-                    AutoF.redAlliance = true;
-                }
-            }
-
-            // Otherwise (if the user finished making menu selections)...
-            else {
-
-                // Stop prompting the user for inputs.
-                break;
-
-            }
-
-        }
-
-    }
-
     // Logs a message.
     private void log(String message) {
 
         // Show the message.
         Utilities.log(message, telemetry);
-
-    }
-
-    // Handles the heat seeking state.
-    private void handleHeatSeeking(boolean debugging) {
-
-        // If the driver pressed dpad up...
-        if(currentGamepad.dpad_up && !previousGamepad.dpad_up && debugging) {
-
-            // Stop heat seeking.
-            robotHardware.stopHeatSeeking();
-
-            // Start retracting.
-            robotHardware.startRetracting();
-
-            // Advance to the retracting state.
-            state = RETRACTING;
-
-            // Exit the method.
-            return;
-
-        }
-
-        // Determine whether we are actively heat seeking.
-        boolean isHeatSeeking = robotHardware.isHeatSeeking();
-
-        // If we are actively heat seeking...
-        if (isHeatSeeking) {
-
-            // Exit the method.
-            return;
-
-        }
-
-        // Start retracting.
-        robotHardware.startRetracting();
-
-        // Advance to the retracting state.
-        state = RETRACTING;
 
     }
 
@@ -385,56 +247,6 @@ public class TeleOpT extends LinearOpMode {
 
                 // Raise the arm.
                 robotHardware.raiseArm();
-
-            }
-
-            // Determine whether the robot is localized.
-            boolean localized = robotHardware.isLocalized();
-
-            // If the robot is localized...
-            if(localized) {
-
-                // If the driver pressed dpad left...
-                if(currentGamepad.dpad_left && !previousGamepad.dpad_left) {
-
-                    // Get the left pixel location.
-                    int leftColumn = getLeftColumn(LEFT);
-
-                    // Start heat seeking.
-                    robotHardware.startHeatSeeking(leftColumn, FIRST_ROW, AutoF.redAlliance);
-
-                    // Advance to the heat seeking state.
-                    state = HEAT_SEEKING;
-
-                }
-
-                // If the driver pressed dpad down...
-                if(currentGamepad.dpad_down && !previousGamepad.dpad_down) {
-
-                    // Get the middle pixel location.
-                    int leftColumn = getLeftColumn(MIDDLE);
-
-                    // Start heat seeking.
-                    robotHardware.startHeatSeeking(leftColumn, FIRST_ROW, AutoF.redAlliance);
-
-                    // Advance to the heat seeking state.
-                    state = HEAT_SEEKING;
-
-                }
-
-                // If the driver pressed dpad right...
-                if(currentGamepad.dpad_right && !previousGamepad.dpad_right) {
-
-                    // Get the right pixel location.
-                    int leftColumn = getLeftColumn(RIGHT);
-
-                    // Start heat seeking.
-                    robotHardware.startHeatSeeking(leftColumn, FIRST_ROW, AutoF.redAlliance);
-
-                    // Advance to the heat seeking state.
-                    state = HEAT_SEEKING;
-
-                }
 
             }
 

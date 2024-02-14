@@ -15,10 +15,8 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.RETURN_TO_BACKDROP;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.getTargetLiftPosition;
 import static org.firstinspires.ftc.teamcode.Lift.DOWN_POSITION;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE;
-import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
 
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_TARGET_X;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
@@ -42,7 +40,6 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -76,27 +73,13 @@ import bucketbrigade.casperlibrary.TurnAction;
 public class AutoF extends LinearOpMode {
 
     public static final int MILLISECONDS_PER_SECOND = 1000;
-    public static final int MINIMUM_DELAY = 0;
-    public static final int MAXIMUM_DELAY = 30;
     public static int STACK_LIFT_POSITION = 145;
 
-    public static Boolean redAlliance;
-    public static Pose2d currentPose;
-    public static boolean lastRanAutonomous;
-    private Boolean startClose;
-    private Boolean parkLeft;
-    private Integer delay;
-    private int temporaryDelay = MINIMUM_DELAY;
-    private Objectives objectives;
     private OpenCvWebcam camera;
     private boolean startedStreaming;
-    private Gamepad previousGamepad = new Gamepad();
-    private Gamepad currentGamepad = new Gamepad();
     private TeamPropLocation location;
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
-    private Double placeTargetX;
-    private double temporaryPlaceTargetX = DEFAULT_PLACE_TARGET_X;
 
     enum State {IDLE, DRIVE_TO_SPIKE_MARK, DRIVE_TO_BACKDROP_APPROACH, RAISE_ARM_AND_LIFT, DRIVE_TO_BACKDROP_PLACE, RELEASE_PIXEL_ON_BACKDROP, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_STACK_APPROACH, DRIVE_TO_STACK_GRAB, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK}
 
@@ -104,27 +87,25 @@ public class AutoF extends LinearOpMode {
     private ElapsedTime timer = new ElapsedTime();
     private Pose2d lastEnd;
     private boolean placingYellowPixel = true;
+    private LaunchMenu launchMenu;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        // Clear the red alliance value.
-        redAlliance = null;
-
-        // Remember that we last ran autonomous.
-        lastRanAutonomous = true;
-
         // Get the robot hardware.
         robotHardware = new RobotHardwareC(this);
 
+        // Construct a launch menu.
+        launchMenu = new LaunchMenu(this);
+
         // Wait for menu selection.
-        waitForMenuSelection();
+        while (!isStopRequested() && launchMenu.isActive()) {}
 
         // Wait for the user to lower the lift.
         robotHardware.waitForLiftDown();
 
         // Wait for the user to lower the arm.
-        //robotHardware.waitForArmDown();
+        robotHardware.waitForArmDown();
 
         // Wait for the camera to open.
         waitForCameraOpen();
@@ -169,6 +150,9 @@ public class AutoF extends LinearOpMode {
         // Initialize the drive interface.
         robotHardware.initializeDrive();
 
+        // Get the delay.
+        int delay = launchMenu.delay;
+
         // Use the delay.
         sleep(delay * MILLISECONDS_PER_SECOND);
 
@@ -200,11 +184,14 @@ public class AutoF extends LinearOpMode {
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
-        // Update the robot's current pose.
-        currentPose = robotHardware.getPose();
-
         // Get a backdrop lift position.
         int backdropLiftPosition = placingYellowPixel ? getTargetLiftPosition(YELLOW_PIXEL_ROW) : getTargetLiftPosition(WHITE_PIXEL_ROW);
+
+        // Get the objectives.
+        Objectives objectives = launchMenu.objectives;
+
+        // Get the red alliance value.
+        boolean redAlliance = launchMenu.redAlliance;
 
         // Update the state machine.
         switch (state) {
@@ -244,6 +231,9 @@ public class AutoF extends LinearOpMode {
 
                 // If we are only placing the purple pixel...
                 if (objectives == PURPLE) {
+
+                    // Get the start close button.
+                    boolean startClose = launchMenu.startClose;
 
                     // If we started close to the backdrop...
                     if (startClose) {
@@ -515,7 +505,6 @@ public class AutoF extends LinearOpMode {
         return output;
     }
 
-
     private void log(String message) {
 
         // If the telemetry is missing...
@@ -532,124 +521,12 @@ public class AutoF extends LinearOpMode {
 
     }
 
-    // Waits for menu selection.
-    private void waitForMenuSelection() {
-
-        // While the op mode is active...
-        while (!isStopRequested()) {
-
-            // Update the gamepads.
-            previousGamepad.copy(currentGamepad);
-            currentGamepad.copy(gamepad1);
-
-            // If the user has not selected an alliance...
-            if (redAlliance == null) {
-                telemetry.addData("Alliance", "X = blue, B = red");
-                telemetry.update();
-                if (currentGamepad.x && !previousGamepad.x) {
-                    redAlliance = false;
-                }
-                if (currentGamepad.b && !previousGamepad.b) {
-                    redAlliance = true;
-                }
-            }
-
-            // Otherwise, if the user has not selected a starting location...
-            else if (startClose == null) {
-                telemetry.addData("Start", "X = close, B = far");
-                telemetry.update();
-                if (currentGamepad.x && !previousGamepad.x) {
-                    startClose = true;
-                }
-                if (currentGamepad.b && !previousGamepad.b) {
-                    startClose = false;
-                }
-            }
-
-            // Otherwise, if the user has not selected a parking location...
-            else if (parkLeft == null) {
-                telemetry.addData("Park", "X = left, B = right");
-                telemetry.update();
-                if (currentGamepad.x && !previousGamepad.x) {
-                    parkLeft = true;
-                }
-                if (currentGamepad.b && !previousGamepad.b) {
-                    parkLeft = false;
-                }
-            }
-
-            // Otherwise, if the user has not selected a delay...
-            else if (delay == null) {
-                telemetry.addData("Delay = " + temporaryDelay, "X = ok, Y = increase, A = decrease");
-                telemetry.update();
-                if (currentGamepad.x && !previousGamepad.x) {
-                    delay = temporaryDelay;
-                }
-                else if (currentGamepad.y && !previousGamepad.y) {
-                    temporaryDelay = Math.min(temporaryDelay + 1, MAXIMUM_DELAY);
-                }
-                else if (currentGamepad.a && !previousGamepad.a) {
-                    temporaryDelay = Math.max(temporaryDelay - 1, MINIMUM_DELAY);
-                }
-            }
-
-            // Otherwise, if the user has not selected what to place...
-            else if (objectives == null) {
-                telemetry.addData("Place", "X = purple/yellow/white, A = purple/yellow, B = purple");
-                telemetry.update();
-                if (currentGamepad.x && !previousGamepad.x) {
-                    objectives = PURPLE_YELLOW_WHITE;
-                }
-                else if (currentGamepad.a && !previousGamepad.a) {
-                    objectives = PURPLE_YELLOW;
-                }
-                else if (currentGamepad.b && !previousGamepad.b) {
-                    objectives = PURPLE;
-                }
-            }
-
-            // Otherwise, if the user has not selected a place target x...
-            else if (placeTargetX == null) {
-                telemetry.addData("Place Target X = " + temporaryPlaceTargetX, "X = ok, Y = increase, A = decrease");
-                telemetry.update();
-                if (currentGamepad.x && !previousGamepad.x) {
-                    placeTargetX = temporaryPlaceTargetX;
-                }
-                else if (currentGamepad.y && !previousGamepad.y) {
-                    temporaryPlaceTargetX += 0.5;
-                }
-                else if (currentGamepad.a && !previousGamepad.a) {
-                    temporaryPlaceTargetX -= 0.5;
-                }
-            }
-
-            // Otherwise (if the user finished making menu selections)...
-            else {
-
-                // Stop prompting the user for inputs.
-                break;
-
-            }
-
-        }
-
-    }
-
     // Waits for the camera to open.
     private void waitForCameraOpen() throws InterruptedException {
 
         // Verify inputs exist.
         if (hardwareMap == null) {
             throw new InterruptedException("The hardware map is missing.");
-        }
-        if (parkLeft == null) {
-            throw new InterruptedException("The park left value is missing.");
-        }
-        if (redAlliance == null) {
-            throw new InterruptedException("The red alliance value is missing.");
-        }
-        if (startClose == null) {
-            throw new InterruptedException("The start close value is missing.");
         }
         if (telemetry == null) {
             throw new InterruptedException("The telemetry is missing.");
@@ -667,7 +544,7 @@ public class AutoF extends LinearOpMode {
         log("Initializing camera...");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        teamPropDetector = new CenterStageCVDetection(parkLeft, redAlliance, startClose, telemetry, true, delay, objectives, placeTargetX);
+        teamPropDetector = new CenterStageCVDetection(telemetry, true, launchMenu);
         camera.setPipeline(teamPropDetector);
         camera.setMillisecondsPermissionTimeout(5000); // Timeout for obtaining permission is configurable. Set before opening.
 
@@ -765,13 +642,8 @@ public class AutoF extends LinearOpMode {
     // Gets a start pose.
     private Pose2d getStartPose() throws InterruptedException {
 
-        // Verify the inputs exist.
-        if (redAlliance == null) {
-            throw new InterruptedException("The red alliance value is missing.");
-        }
-        if (startClose == null) {
-            throw new InterruptedException("The start close value is missing.");
-        }
+        boolean redAlliance = launchMenu.redAlliance;
+        boolean startClose = launchMenu.startClose;
 
         // Get a start pose.
         RobotPose inputStartPose = RobotRoutes.getStartPose(redAlliance, startClose);
@@ -795,12 +667,6 @@ public class AutoF extends LinearOpMode {
         if (location == null) {
             throw new InterruptedException("The location is missing.");
         }
-        if (redAlliance == null) {
-            throw new InterruptedException("The red alliance value is missing.");
-        }
-        if (startClose == null) {
-            throw new InterruptedException("The start close value is missing.");
-        }
 
         // Get a start pose.
         Pose2d startPose = getStartPose();
@@ -810,6 +676,9 @@ public class AutoF extends LinearOpMode {
 
         // Set the trajectory sequence's start pose.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(startPose);
+
+        boolean redAlliance = launchMenu.redAlliance;
+        boolean startClose = launchMenu.startClose;
 
         // Drive to the spike mark.
         applyActions(driveToSpikeMark(redAlliance, startClose, location), trajectorySequenceBuilder, true);
@@ -831,8 +700,12 @@ public class AutoF extends LinearOpMode {
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
+        boolean redAlliance = launchMenu.redAlliance;
+        double placeBackdropX = launchMenu.placeBackdropX;
+        double placeBackdropY = launchMenu.placeBackdropY;
+
         // Drive to the place.
-        applyActions(driveToBackdropPlace(redAlliance, location, placingYellowPixel, placeTargetX), trajectorySequenceBuilder, false);
+        applyActions(driveToBackdropPlace(redAlliance, location, placingYellowPixel, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, false);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -851,8 +724,13 @@ public class AutoF extends LinearOpMode {
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
-        // Drive to the baackdrop.
-        applyActions(driveToBackdropApproach(redAlliance, startClose, location), trajectorySequenceBuilder, true);
+        double placeBackdropX = launchMenu.placeBackdropX;
+        double placeBackdropY = launchMenu.placeBackdropY;
+        boolean redAlliance = launchMenu.redAlliance;
+        boolean startClose = launchMenu.startClose;
+
+        // Drive to the backdrop.
+        applyActions(driveToBackdropApproach(redAlliance, startClose, location, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, true);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -871,8 +749,12 @@ public class AutoF extends LinearOpMode {
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
+        double grabStackX = launchMenu.grabStackX;
+        double grabStackY = launchMenu.grabStackY;
+        boolean redAlliance = launchMenu.redAlliance;
+
         // Drive to the stack approach position.
-        applyActions(driveToStackApproach(redAlliance), trajectorySequenceBuilder, true);
+        applyActions(driveToStackApproach(redAlliance, grabStackX, grabStackY), trajectorySequenceBuilder, true);
 
         // During the sequence...
         trajectorySequenceBuilder.addTemporalMarker(4, () -> {
@@ -902,8 +784,12 @@ public class AutoF extends LinearOpMode {
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
+        double grabStackX = launchMenu.grabStackX;
+        double grabStackY = launchMenu.grabStackY;
+        boolean redAlliance = launchMenu.redAlliance;
+
         // Drive to the stack grab position.
-        applyActions(driveToStackGrab(redAlliance), trajectorySequenceBuilder, false);
+        applyActions(driveToStackGrab(redAlliance, grabStackX, grabStackY), trajectorySequenceBuilder, false);
 
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -920,6 +806,9 @@ public class AutoF extends LinearOpMode {
 
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
+
+        boolean redAlliance = launchMenu.redAlliance;
+        boolean parkLeft = launchMenu.parkLeft;
 
         // Park.
         applyActions(park(redAlliance, parkLeft), trajectorySequenceBuilder, true);
@@ -951,8 +840,12 @@ public class AutoF extends LinearOpMode {
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
+        double placeBackdropX = launchMenu.placeBackdropX;
+        double placeBackdropY = launchMenu.placeBackdropY;
+        boolean redAlliance = launchMenu.redAlliance;
+
         // Return to backdrop.
-        applyActions(returnToBackdrop(redAlliance), trajectorySequenceBuilder, true);
+        applyActions(returnToBackdrop(redAlliance, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, true);
 
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();

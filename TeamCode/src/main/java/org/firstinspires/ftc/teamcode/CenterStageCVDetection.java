@@ -32,13 +32,8 @@ public class CenterStageCVDetection extends OpenCvPipeline {
     public static Rect MIDDLE_ROI = new Rect();
     public static Rect RIGHT_ROI = new Rect();
     Telemetry telemetry;
-    boolean redAlliance;
-    boolean startClose;
-    boolean parkLeft;
-    int delay;
-    Objectives objectives;
-    double placeTargetX;
     boolean isNew;
+    LaunchMenu launchMenu;
     Mat mat = new Mat();
 
     private TeamPropLocation location;
@@ -47,15 +42,10 @@ public class CenterStageCVDetection extends OpenCvPipeline {
      *   This creates a rectangle of areas in the camera where a game element may be placed
      */
 
-    public CenterStageCVDetection(boolean parkLeft, boolean redAlliance, boolean startClose, Telemetry telemetry, boolean isNew, int delay, Objectives objectives, double placeTargetX) {
-        this.parkLeft = parkLeft;
-        this.redAlliance = redAlliance;
-        this.startClose = startClose;
-        this.delay = delay;
-        this.objectives = objectives;
-        this.placeTargetX = placeTargetX;
+    public CenterStageCVDetection(Telemetry telemetry, boolean isNew, LaunchMenu launchMenu) {
         this.telemetry = telemetry;
         this.isNew = isNew;
+        this.launchMenu = launchMenu;
     }
     @Override
     public Mat processFrame(Mat input) {
@@ -72,12 +62,7 @@ public class CenterStageCVDetection extends OpenCvPipeline {
             RIGHT_ROI = new Rect(475,135,150,120);
         }
 
-        telemetry.addData("Alliance", redAlliance ? "Red" : "Blue");
-        telemetry.addData("Start", startClose ? "Close" : "Far");
-        telemetry.addData("Park", parkLeft ? "Left" : "Right");
-        telemetry.addData("Delay", delay);
-        telemetry.addData("Place", objectives);
-        telemetry.addData("Place Target X", placeTargetX);
+        launchMenu.addTelemetry();
 
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
@@ -87,6 +72,8 @@ public class CenterStageCVDetection extends OpenCvPipeline {
         Scalar MAXIMUM_RED_LOW = new Scalar(MAXIMUM_RED_LOW_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
         Scalar MINIMUM_RED_HIGH = new Scalar(MINIMUM_RED_HIGH_HUE, MINIMUM_RED_VALUES, MINIMUM_RED_VALUES);
         Scalar MAXIMUM_RED_HIGH = new Scalar(MAXIMUM_RED_HIGH_HUE,MAXIMUM_VALUES,MAXIMUM_VALUES);
+
+        boolean redAlliance = launchMenu.redAlliance;
 
         if (redAlliance){
             Mat mat1 = mat.clone();

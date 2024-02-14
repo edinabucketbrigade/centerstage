@@ -61,6 +61,7 @@ public class TeleOpR extends LinearOpMode {
     private Gamepad previousGamepad1 = new Gamepad();
     private Gamepad currentGamepad2 = new Gamepad();
     private Gamepad previousGamepad2 = new Gamepad();
+    private Boolean redAlliance;
 
     // Runs the op mode.
     @Override
@@ -127,7 +128,7 @@ public class TeleOpR extends LinearOpMode {
                 if(localized && currentGamepad2.a && !previousGamepad2.a && !debugging) {
 
                     // Start heat seeking.
-                    robotHardware.startHeatSeeking(leftColumn, leftRow, AutoF.redAlliance);
+                    robotHardware.startHeatSeeking(leftColumn, leftRow, redAlliance);
 
                 }
 
@@ -377,14 +378,14 @@ public class TeleOpR extends LinearOpMode {
             currentGamepad1.copy(gamepad1);
 
             // If the user has not selected an alliance...
-            if (AutoF.redAlliance == null) {
+            if (redAlliance == null) {
                 telemetry.addData("Alliance", "X = blue, B = red");
                 telemetry.update();
                 if (currentGamepad1.x && !previousGamepad1.x) {
-                    AutoF.redAlliance = false;
+                    redAlliance = false;
                 }
                 if (currentGamepad1.b && !previousGamepad1.b) {
-                    AutoF.redAlliance = true;
+                    redAlliance = true;
                 }
             }
 
