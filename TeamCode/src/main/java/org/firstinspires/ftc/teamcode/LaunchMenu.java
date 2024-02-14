@@ -111,15 +111,15 @@ public class LaunchMenu {
                 }
                 break;
             case DELAY:
-                prompt("Delay = " + delay, "X = ok, Y = increase, A = decrease");
-                if (currentGamepad.x && !previousGamepad.x) {
-                    state = BACKDROP;
-                }
-                else if (currentGamepad.y && !previousGamepad.y) {
+                prompt("Delay = " + delay, "Y = increase, A = decrease, right bumper = ok");
+                if (currentGamepad.y && !previousGamepad.y) {
                     delay = Math.min(delay + 1, MAXIMUM_DELAY);
                 }
                 else if (currentGamepad.a && !previousGamepad.a) {
                     delay = Math.max(delay - 1, MINIMUM_DELAY);
+                }
+                else if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                    state = BACKDROP;
                 }
                 break;
             case BACKDROP:
