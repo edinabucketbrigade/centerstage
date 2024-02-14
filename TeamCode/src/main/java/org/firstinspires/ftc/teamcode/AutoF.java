@@ -99,7 +99,9 @@ public class AutoF extends LinearOpMode {
         launchMenu = new LaunchMenu(this);
 
         // Wait for menu selection.
-        while (!isStopRequested() && launchMenu.isActive()) {}
+        while (!isStopRequested() && launchMenu.isActive()) {
+            launchMenu.update();
+        }
 
         // Wait for the user to lower the lift.
         robotHardware.waitForLiftDown();
