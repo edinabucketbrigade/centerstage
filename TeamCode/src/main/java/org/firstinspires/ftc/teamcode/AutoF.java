@@ -223,8 +223,13 @@ public class AutoF extends LinearOpMode {
 
                 }
 
-                // Open the left claw to release the purple pixel.
-                robotHardware.openLeftClaw(true);
+                // Open the claw to release the purple pixel.
+                if(redAlliance) {
+                    robotHardware.openRightClaw(true);
+                }
+                else {
+                    robotHardware.openLeftClaw(true);
+                }
 
                 // Raise the wrist so it does not bump the purple pixel when the robot starts moving.
                 robotHardware.setWristBackdrop();
@@ -324,7 +329,7 @@ public class AutoF extends LinearOpMode {
 
                 }
 
-                // Open the claw partially to release the pixel on the backdrop.
+                // Open the claw to release the yellow or white pixel.
                 robotHardware.openClaw(false);
 
                 // Advance to the next step.
