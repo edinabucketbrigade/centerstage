@@ -191,11 +191,20 @@ public class TeleOpT extends LinearOpMode {
             }
 
             // If the driver pressed right bumper...
-            if(currentGamepad.right_bumper && !previousGamepad.right_bumper && !debugging) {
+//            if(currentGamepad.right_bumper && !previousGamepad.right_bumper && !debugging) {
+//
+//                // Toggle turtle mode.
+//                robotHardware.toggleTurtleMode();
+//
+//            }
+            if(currentGamepad.right_bumper && !debugging) {
 
                 // Toggle turtle mode.
-                robotHardware.toggleTurtleMode();
+                robotHardware.setTurtleMode(true);
 
+            }
+            else {
+                robotHardware.setTurtleMode(false);
             }
 
             // Add telemetry.
