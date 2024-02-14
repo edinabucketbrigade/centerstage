@@ -35,7 +35,7 @@ public class RobotRoutes {
     public static final int WHITE_PIXEL_ROW = 3;
     public static final int YELLOW_PIXEL_ROW = 1;
     public static final double DEFAULT_GRAB_STACK_X = -60.5;
-    public static final double DEFAULT_GRAB_STACK_Y = 6.5;
+    public static final double DEFAULT_GRAB_STACK_Y = 7.5;
 
     // Gets a start pose.
     public static RobotPose getStartPose(boolean redAlliance, boolean startClose) {
