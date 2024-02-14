@@ -29,7 +29,7 @@ public class RobotRoutes {
     public static final int MINIMUM_ROW = 1;
     public static double PIXEL_WIDTH = 3;
     public static final double DEFAULT_PLACE_BACKDROP_X = 45;
-    public static final double DEFAULT_PLACE_BACKDROP_Y = 41;
+    public static final double DEFAULT_PLACE_BACKDROP_Y = 41.5;
     public static final double TRACK_WIDTH = 14;
     public static final int WHITE_PIXEL_LEFT_COLUMN = 3;
     public static final int WHITE_PIXEL_ROW = 3;
@@ -42,10 +42,10 @@ public class RobotRoutes {
 
         RobotPose startPose;
         if(startClose) {
-            startPose = new RobotPose(12, 61, Math.toRadians(90));
+            startPose = new RobotPose(12, 62, Math.toRadians(90));
         }
         else {
-            startPose = new RobotPose(-36, 61, Math.toRadians(90));
+            startPose = new RobotPose(-36, 62, Math.toRadians(90));
         }
         if(redAlliance) mirrorPose(startPose);
         return startPose;
