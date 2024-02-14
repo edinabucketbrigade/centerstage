@@ -66,7 +66,7 @@ public class RobotHardwareC {
     public static double NORMAL_MULTIPLIER = 1;
     public static double TURTLE_MULTIPLIER = 0.5;
     public static double POWER_EPSILON = 0.001;
-    public static double DRIVE_POWER_RAMP_MILLISECONDS = 800;
+    public static double DRIVE_POWER_RAMP_MILLISECONDS = 100;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -238,11 +238,11 @@ public class RobotHardwareC {
         double lateral = gamepad1.left_stick_x;
         double yaw = gamepad1.right_stick_x;
 
-        boolean reverse = claw.isClosed() || (place.isActive() && (claw.isLeftClosed() || claw.isRightClosed()));
-
-        if(reverse) {
-            yaw = -yaw;
-        }
+//        boolean reverse = claw.isClosed() || (place.isActive() && (claw.isLeftClosed() || claw.isRightClosed()));
+//
+//        if(reverse) {
+//            yaw = -yaw;
+//        }
 
         double max;
 
@@ -309,12 +309,13 @@ public class RobotHardwareC {
         //rightFrontPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
 
         // Send calculated power to wheels
-        if (reverse) {
-            moveRobot(-leftFrontPower, -rightFrontPower, -leftBackPower, -rightBackPower);
-        }
-        else {
-            moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
-        }
+//        if (reverse) {
+//            moveRobot(-leftFrontPower, -rightFrontPower, -leftBackPower, -rightBackPower);
+//        }
+//        else {
+//            moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
+//        }
+        moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
 
     }
 
