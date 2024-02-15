@@ -12,7 +12,8 @@ import java.util.List;
 
 public class RobotRoutes {
 
-    public static final double APPROACH_DISTANCE = 5;
+    public static final double BACKDROP_APPROACH_DISTANCE = 5;
+    public static final double STACK_APPROACH_DISTANCE = 8;
     public static final double BACKDROP_SEPARATION = 36;
     public static final int FIRST_ROW_LIFT_POSITION = 0;
     public static final int LIFT_INCREMENT = 200;
@@ -295,11 +296,11 @@ public class RobotRoutes {
     }
 
     private static double getApproachBackdropX(double placeBackdropX) {
-        return placeBackdropX - APPROACH_DISTANCE;
+        return placeBackdropX - BACKDROP_APPROACH_DISTANCE;
     }
 
     private static double getApproachStackX(double grabStackX) {
-        return grabStackX + APPROACH_DISTANCE;
+        return grabStackX + STACK_APPROACH_DISTANCE;
     }
 
 }
