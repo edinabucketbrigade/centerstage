@@ -43,6 +43,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -131,6 +132,9 @@ public class AutoF extends LinearOpMode {
 
         // Move the wrist to the backdrop position.
         robotHardware.setWristBackdrop();
+
+        // Secure the drone.
+        robotHardware.secureDrone();
 
         // Notify the user that we are waiting for start.
         log("Waiting for start...");

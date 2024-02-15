@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -48,6 +49,7 @@ public class RobotHardwareC {
                 1 - Servo - wrist_servo
                 2 - Servo - right_claw_servo
                 3 - Servo - left_claw_servo
+                4 - Servo - drone_servo
             Digital Devices
                 0 - Digital Device - green_right_led
                 1 - Digital Device - red_right_led
@@ -63,9 +65,11 @@ public class RobotHardwareC {
     public static final String RED_SQUARE = "\uD83D\uDFE5"; // See https://unicode-explorer.com/list/geometric-shapes
     public static final String GREEN_SQUARE = "\uD83D\uDFE9"; // See https://unicode-explorer.com/list/geometric-shapes
     public static final String BLUE_SQUARE = "\uD83D\uDFE6"; // See https://unicode-explorer.com/list/geometric-shapes
+
+    public static double LAUNCH_DRONE_POSITION = 0;
     public static double NORMAL_MULTIPLIER = 1;
+    public static double SECURE_DRONE_POSITION = 1;
     public static double TURTLE_MULTIPLIER = 0.5;
-    public static double POWER_EPSILON = 0.001;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -87,6 +91,7 @@ public class RobotHardwareC {
     private Arm arm;
     private Claw claw;
     private ElapsedTime localizationTimer;
+    private Servo droneServo;
 
     // Initializes this.
     public RobotHardwareC(LinearOpMode opMode) throws InterruptedException {
@@ -107,6 +112,7 @@ public class RobotHardwareC {
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         leftBackDistance = hardwareMap.get(Rev2mDistanceSensor.class, "left_back_distance");
         rightBackDistance = hardwareMap.get(Rev2mDistanceSensor.class, "right_back_distance");
+        droneServo = hardwareMap.get(Servo.class, "drone_servo");
         arm = new Arm(this);
         claw = new Claw(this);
         lift = new Lift(this);
@@ -379,6 +385,9 @@ public class RobotHardwareC {
 
         // Move the wrist to the ground position.
         setWristGround();
+
+        // Secure the drone.
+        secureDrone();
 
         // Notify the user that the robot is initialized.
         log("Initialized robot");
@@ -723,6 +732,14 @@ public class RobotHardwareC {
 
     private static boolean areEqual(double a, double b, double epsilon) {
         return Math.abs(a - b) <= epsilon;
+    }
+
+    public void launchDrone() {
+        droneServo.setPosition(LAUNCH_DRONE_POSITION);
+    }
+
+    public void secureDrone() {
+        droneServo.setPosition(SECURE_DRONE_POSITION);
     }
 
 }

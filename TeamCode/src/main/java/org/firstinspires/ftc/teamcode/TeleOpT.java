@@ -23,12 +23,13 @@ public class TeleOpT extends LinearOpMode {
     - left stick = move robot
     - right stick = rotate robot
     - left bumper = start/stop placing
-    - right bumper = toggle turtle mode
+    - right bumper = hold for turtle mode
     - left trigger = raise lift (when arm is up)
     - right trigger = lower lift (when arm is up)
     - a = toggle both claws
     - x = toggle left claw
     - b = toggle right claw
+    - y = launch drone
     - dpad up = hang mode
       1) raise arm and lift for hanging
       2) raise robot onto rigging
@@ -43,6 +44,7 @@ public class TeleOpT extends LinearOpMode {
     - y = raise arm
     - left bumper = lower lift
     - right bumper = raise lift
+    - dpad down = secure drone
     */
 
     enum State { IDLE, RETRACTING, HANGING, PLACING }
@@ -254,6 +256,14 @@ public class TeleOpT extends LinearOpMode {
 
             }
 
+            // If the driver pressed dpad down...
+            if(currentGamepad.dpad_down && !previousGamepad.dpad_down) {
+
+                // Secure the drone.
+                robotHardware.secureDrone();
+
+            }
+
         }
 
         // Otherwise (if the user is not debugging)...
@@ -302,6 +312,14 @@ public class TeleOpT extends LinearOpMode {
 
                 // Advance to the placing state.
                 state = PLACING;
+
+            }
+
+            // If the driver pressed y...
+            if(currentGamepad.y && !previousGamepad.y) {
+
+                // Launch the drone.
+                robotHardware.launchDrone();
 
             }
 
