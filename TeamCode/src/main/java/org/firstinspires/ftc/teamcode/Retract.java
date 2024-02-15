@@ -3,7 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.Lift.DOWN_POSITION;
 import static org.firstinspires.ftc.teamcode.Retract.State.IDLE;
 import static org.firstinspires.ftc.teamcode.Retract.State.LOWER_LIFT_AND_ARM;
-import static org.firstinspires.ftc.teamcode.Retract.State.LOWER_WRIST_AND_OPEN_CLAW;
+import static org.firstinspires.ftc.teamcode.Retract.State.LOWER_WRIST;
+import static org.firstinspires.ftc.teamcode.Retract.State.OPEN_CLAW;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
 public class Retract {
-    enum State {IDLE, LOWER_LIFT_AND_ARM, LOWER_WRIST_AND_OPEN_CLAW}
+    enum State {IDLE, LOWER_LIFT_AND_ARM, LOWER_WRIST, OPEN_CLAW}
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
@@ -53,11 +54,11 @@ public class Retract {
                 robotHardware.lowerArm();
 
                 // Advance to the next step.
-                setState(LOWER_WRIST_AND_OPEN_CLAW);
+                setState(LOWER_WRIST);
 
                 break;
 
-            case LOWER_WRIST_AND_OPEN_CLAW:
+            case LOWER_WRIST:
 
                 // If we are waiting...
                 if (!robotHardware.isArmDown() || !robotHardware.isLiftInPosition(DOWN_POSITION)) {
@@ -67,14 +68,31 @@ public class Retract {
 
                 }
 
-                // Move the wrist to the ground position.
+                // Lower the wrist.
                 robotHardware.setWristGround();
+
+                // Advance to the next step.
+                setState(OPEN_CLAW);
+
+                break;
+
+            case OPEN_CLAW:
+
+                // If we are waiting...
+                if(timer.milliseconds() < 800) {
+
+                    // Exit the method.
+                    return;
+
+                }
 
                 // Open the claw.
                 robotHardware.openClaw(true);
 
                 // Advance to the next step.
                 setState(IDLE);
+
+                break;
 
             case IDLE:
 
