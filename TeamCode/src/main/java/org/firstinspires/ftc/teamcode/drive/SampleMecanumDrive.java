@@ -70,7 +70,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAXIMUM_ACCELERATION);
 
     private static final Pose2d ADMISSIBLE_ERROR_POSE = new Pose2d(0.5, 0.5, Math.toRadians(2));
-    private static final double ADMISSIBLE_ERROR_TIMEOUT_IN_SECONDS = 1;
+    private static final double ADMISSIBLE_ERROR_TIMEOUT_IN_SECONDS = 0.5;
 
     private TrajectoryFollower follower;
 
