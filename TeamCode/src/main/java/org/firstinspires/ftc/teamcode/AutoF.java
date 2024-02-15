@@ -18,6 +18,8 @@ import static org.firstinspires.ftc.teamcode.Lift.DOWN_POSITION;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
 
+import static bucketbrigade.casperlibrary.RobotRoutes.HIGH_FIRST_ROW_LIFT_POSITION;
+import static bucketbrigade.casperlibrary.RobotRoutes.LOW_FIRST_ROW_LIFT_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
@@ -187,8 +189,11 @@ public class AutoF extends LinearOpMode {
         // Get a drive interface.
         SampleMecanumDrive drive = robotHardware.getDrive();
 
+        // Get a first row lift position.
+        int firstRowLiftPosition = launchMenu.dropLow ? LOW_FIRST_ROW_LIFT_POSITION : HIGH_FIRST_ROW_LIFT_POSITION;
+
         // Get a backdrop lift position.
-        int backdropLiftPosition = placingYellowPixel ? getTargetLiftPosition(YELLOW_PIXEL_ROW) : getTargetLiftPosition(WHITE_PIXEL_ROW);
+        int backdropLiftPosition = placingYellowPixel ? getTargetLiftPosition(YELLOW_PIXEL_ROW, firstRowLiftPosition) : getTargetLiftPosition(WHITE_PIXEL_ROW, firstRowLiftPosition);
 
         // Get the objectives.
         Objectives objectives = launchMenu.objectives;

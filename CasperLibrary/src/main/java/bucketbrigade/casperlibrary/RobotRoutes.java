@@ -15,7 +15,8 @@ public class RobotRoutes {
     public static final double BACKDROP_APPROACH_DISTANCE = 5;
     public static final double STACK_APPROACH_DISTANCE = 8;
     public static final double BACKDROP_SEPARATION = 36;
-    public static final int FIRST_ROW_LIFT_POSITION = 200;
+    public static final int LOW_FIRST_ROW_LIFT_POSITION = 0;
+    public static final int HIGH_FIRST_ROW_LIFT_POSITION = 200;
     public static final int LIFT_INCREMENT = 200;
     public static final double MAXIMUM_ACCELERATION = 50;
     public static final double MAXIMUM_ANGULAR_ACCELERATION = Math.toRadians(100);
@@ -23,7 +24,7 @@ public class RobotRoutes {
     public static final int MAXIMUM_COLUMN_EVEN_ROW = 7;
     public static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     public static final int MAXIMUM_POSITION = 1700;
-    public static final int MAXIMUM_ROW = (int)Math.floor((MAXIMUM_POSITION - FIRST_ROW_LIFT_POSITION) / LIFT_INCREMENT);
+    public static final int MAXIMUM_ROW = 8;
     public static final double MAXIMUM_VELOCITY_FAST = 55;
     public static final double MAXIMUM_VELOCITY_SLOW = 25;
     public static final int MINIMUM_COLUMN = 1;
@@ -38,7 +39,7 @@ public class RobotRoutes {
     public static final int WHITE_PIXEL_ROW = 3;
     public static final int YELLOW_PIXEL_ROW = 1;
     public static final double DEFAULT_BLUE_GRAB_STACK_X = -60;
-    public static final double DEFAULT_RED_GRAB_STACK_X = DEFAULT_BLUE_GRAB_STACK_X;
+    public static final double DEFAULT_RED_GRAB_STACK_X = -55.5;
     public static final double DEFAULT_BLUE_GRAB_STACK_Y = 7.5;
     public static final double DEFAULT_RED_GRAB_STACK_Y = 9;
 

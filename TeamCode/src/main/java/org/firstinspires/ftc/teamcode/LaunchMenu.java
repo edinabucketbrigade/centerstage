@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.LaunchMenu.State.BACKDROP;
 import static org.firstinspires.ftc.teamcode.LaunchMenu.State.DELAY;
+import static org.firstinspires.ftc.teamcode.LaunchMenu.State.DROP_LOW;
 import static org.firstinspires.ftc.teamcode.LaunchMenu.State.IDLE;
 import static org.firstinspires.ftc.teamcode.LaunchMenu.State.OBJECTIVES;
 import static org.firstinspires.ftc.teamcode.LaunchMenu.State.PARK;
@@ -28,7 +29,7 @@ import bucketbrigade.casperlibrary.Objectives;
 
 public class LaunchMenu {
 
-    enum State {ALLIANCE, CLOSE, PARK, DELAY, OBJECTIVES, BACKDROP, STACK, IDLE}
+    enum State {ALLIANCE, CLOSE, PARK, DELAY, OBJECTIVES, BACKDROP, STACK, IDLE, DROP_LOW}
 
     private static final int MINIMUM_DELAY = 0;
     private static final int MAXIMUM_DELAY = 30;
@@ -37,6 +38,7 @@ public class LaunchMenu {
     public static final String PURPLE_CIRCLE = "\uD83D\uDFE3"; // See https://unicode-explorer.com/list/geometric-shapes
 
     public int delay;
+    public boolean dropLow;
     public double grabStackX;
     public double grabStackY;
     public Objectives objectives;
@@ -78,6 +80,10 @@ public class LaunchMenu {
                 }
                 break;
             case CLOSE:
+                placeBackdropX = getDefaultPlaceBackdropX(redAlliance);
+                placeBackdropY = getDefaultPlaceBackdropY(redAlliance);
+                grabStackX = getDefaultGrabStackX(redAlliance);
+                grabStackY = getDefaultGrabStackY(redAlliance);
                 prompt("Start", "X = close, B = far");
                 if (currentGamepad.x && !previousGamepad.x) {
                     startClose = true;
@@ -92,10 +98,21 @@ public class LaunchMenu {
                 prompt("Park", "X = left, B = right");
                 if (currentGamepad.x && !previousGamepad.x) {
                     parkLeft = true;
-                    state = OBJECTIVES;
+                    state = DROP_LOW;
                 }
                 else if (currentGamepad.b && !previousGamepad.b) {
                     parkLeft = false;
+                    state = DROP_LOW;
+                }
+                break;
+            case DROP_LOW:
+                prompt("Drop", "X = low, B = high");
+                if (currentGamepad.x && !previousGamepad.x) {
+                    dropLow = true;
+                    state = OBJECTIVES;
+                }
+                else if (currentGamepad.b && !previousGamepad.b) {
+                    dropLow = false;
                     state = OBJECTIVES;
                 }
                 break;
@@ -127,8 +144,6 @@ public class LaunchMenu {
                 }
                 break;
             case BACKDROP:
-                placeBackdropX = getDefaultPlaceBackdropX(redAlliance);
-                placeBackdropY = getDefaultPlaceBackdropY(redAlliance);
                 String backdropCaption = "Backdrop = " + placeBackdropX + ", " + placeBackdropY;
                 prompt(backdropCaption, "X = ok, dpad = adjust");
                 if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
@@ -148,8 +163,6 @@ public class LaunchMenu {
                 }
                 break;
             case STACK:
-                grabStackX = getDefaultGrabStackX(redAlliance);
-                grabStackY = getDefaultGrabStackY(redAlliance);
                 String stackCaption = "Stack = " + grabStackX + ", " + grabStackY;
                 prompt(stackCaption, "X = ok, dpad = adjust");
                 if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
@@ -193,6 +206,7 @@ public class LaunchMenu {
         }
         telemetry.addData("Start", startClose ? "Close" : "Far");
         telemetry.addData("Park", parkLeft ? "Left" : "Right");
+        telemetry.addData("Drop", dropLow ? "Low" : "High");
         telemetry.addData("Objectives", objectives);
         telemetry.addData("Delay", delay);
         telemetry.addData("Backdrop", placeBackdropX + ", " + placeBackdropY);

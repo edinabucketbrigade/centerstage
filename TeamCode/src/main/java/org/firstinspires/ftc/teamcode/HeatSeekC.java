@@ -8,8 +8,8 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.OPEN_CLAW;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.RELEASE_WRIST;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.WAIT_FOR_RELEASE;
 
-import static bucketbrigade.casperlibrary.RobotRoutes.FIRST_ROW_LIFT_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.LIFT_INCREMENT;
+import static bucketbrigade.casperlibrary.RobotRoutes.LOW_FIRST_ROW_LIFT_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
@@ -93,7 +93,7 @@ public class HeatSeekC {
         SampleMecanumDrive drive = robotHardware.getDrive();
 
         // Get a lift position.
-        int liftPosition = getTargetLiftPosition(row);
+        int liftPosition = getTargetLiftPosition(row, LOW_FIRST_ROW_LIFT_POSITION);
 
         // Switch based on the state.
         switch (state) {
@@ -227,10 +227,10 @@ public class HeatSeekC {
     }
 
     // Gets a target lift position.
-    public static int getTargetLiftPosition(int row) {
+    public static int getTargetLiftPosition(int row, int firstRowLiftPosition) {
 
         // Get a heat seek lift position.
-        int position =  Math.min(FIRST_ROW_LIFT_POSITION + (row - 1) * LIFT_INCREMENT, MAXIMUM_POSITION);
+        int position =  Math.min(firstRowLiftPosition + (row - 1) * LIFT_INCREMENT, MAXIMUM_POSITION);
 
         // Return the result.
         return position;
