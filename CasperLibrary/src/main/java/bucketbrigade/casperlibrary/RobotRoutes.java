@@ -83,7 +83,7 @@ public class RobotRoutes {
     }
 
     // Drives to the backdrop approach position.
-    public static List<Action> driveToBackdropApproach(boolean redAlliance, boolean startClose, TeamPropLocation inputLocation, double placeBackdropX, double placeBackdropY) throws InterruptedException {
+    public static List<Action> driveToBackdropApproach(boolean redAlliance, boolean startClose, TeamPropLocation inputLocation, double placeBackdropX, double placeBackdropY, double grabStackY) throws InterruptedException {
 
         TeamPropLocation outputLocation = redAlliance ? mirrorLocation(inputLocation) : inputLocation;
         double targetY = getYellowPixelTargetY(outputLocation, placeBackdropY);
@@ -95,15 +95,15 @@ public class RobotRoutes {
         } else {
             actions.add(new SetReversedAction(true));
             if(outputLocation == LEFT) {
-                actions.add(new SplineToAction(-46, 9, Math.toRadians(0)));
+                actions.add(new SplineToAction(-46, grabStackY, Math.toRadians(0)));
             }
             else if(outputLocation == MIDDLE) {
-                actions.add(new SplineToAction(-33, 9, Math.toRadians(0)));
+                actions.add(new SplineToAction(-33, grabStackY, Math.toRadians(0)));
             }
             else {
-                actions.add(new SplineToAction(-36, 9, Math.toRadians(0)));
+                actions.add(new SplineToAction(-36, grabStackY, Math.toRadians(0)));
             }
-            actions.add(new LineToAction(30, 9));
+            actions.add(new LineToAction(30, grabStackY));
             actions.add(new SplineToAction(approachBackdropX, targetY, Math.toRadians(0)));
         }
         if(redAlliance) mirrorActions(actions);

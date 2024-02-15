@@ -54,10 +54,10 @@ import bucketbrigade.casperlibrary.TurnAction;
 
 public class MeepMeepTesting {
 
-    private static final boolean RED_ALLIANCE = false;
-    private static final boolean START_CLOSE = true;
-    private static final TeamPropLocation LOCATION = LEFT;
-    private static final boolean PARK_LEFT = true;
+    private static final boolean RED_ALLIANCE = true;
+    private static final boolean START_CLOSE = false;
+    private static final TeamPropLocation LOCATION = MIDDLE;
+    private static final boolean PARK_LEFT = false;
     private static final Objectives objectives = PURPLE_YELLOW_WHITE;
 
     // Runs the application.
@@ -104,7 +104,7 @@ public class MeepMeepTesting {
         if(objectives == PURPLE_YELLOW || objectives == PURPLE_YELLOW_WHITE) {
 
             // Drive to the backdrop approach position.
-            applyActions(driveToBackdropApproach(RED_ALLIANCE, START_CLOSE, LOCATION, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y), trajectorySequenceBuilder, true);
+            applyActions(driveToBackdropApproach(RED_ALLIANCE, START_CLOSE, LOCATION, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y, DEFAULT_GRAB_STACK_Y), trajectorySequenceBuilder, true);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);

@@ -769,13 +769,14 @@ public class AutoF extends LinearOpMode {
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = drive.trajectorySequenceBuilder(lastEnd);
 
+        double grabStackY = launchMenu.grabStackY;
         double placeBackdropX = launchMenu.placeBackdropX;
         double placeBackdropY = launchMenu.placeBackdropY;
         boolean redAlliance = launchMenu.redAlliance;
         boolean startClose = launchMenu.startClose;
 
         // Drive to the backdrop.
-        applyActions(driveToBackdropApproach(redAlliance, startClose, location, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, true);
+        applyActions(driveToBackdropApproach(redAlliance, startClose, location, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, true);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();

@@ -127,7 +127,7 @@ public class LaunchMenu {
                 }
                 break;
             case BACKDROP:
-                String backdropCaption = "Backdrop = (" + placeBackdropX + ", " + placeBackdropY + ")";
+                String backdropCaption = "Backdrop = " + placeBackdropX + ", " + placeBackdropY;
                 prompt(backdropCaption, "X = ok, dpad = adjust");
                 if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
                     placeBackdropX -= POSITION_INCREMENT;
@@ -146,7 +146,7 @@ public class LaunchMenu {
                 }
                 break;
             case STACK:
-                String stackCaption = "Stack = (" + grabStackX + ", " + grabStackY + ")";
+                String stackCaption = "Stack = " + grabStackX + ", " + grabStackY;
                 prompt(stackCaption, "X = ok, dpad = adjust");
                 if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
                     grabStackX -= POSITION_INCREMENT;
