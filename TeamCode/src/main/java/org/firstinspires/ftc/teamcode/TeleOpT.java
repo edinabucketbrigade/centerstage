@@ -193,7 +193,8 @@ public class TeleOpT extends LinearOpMode {
             // If the driver pressed left bumper...
             if(currentGamepad.left_bumper && !previousGamepad.left_bumper) {
 
-                // Close the claw so it does not catch when lowering the lift.
+                // Raise the wrist and close the claw so they do not catch.
+                robotHardware.setWristBackdrop();
                 robotHardware.closeClaw();
 
                 // Lower the lift.
@@ -204,7 +205,8 @@ public class TeleOpT extends LinearOpMode {
             // If the driver pressed right bumper...
             if(currentGamepad.right_bumper && !previousGamepad.right_bumper) {
 
-                // Close the claw so it does not catch when raising the lift.
+                // Raise the wrist and close the claw so they do not catch.
+                robotHardware.setWristBackdrop();
                 robotHardware.closeClaw();
 
                 // Raise the lift.
@@ -231,7 +233,8 @@ public class TeleOpT extends LinearOpMode {
             // If the driver pressed a...
             if(currentGamepad.a && !previousGamepad.a) {
 
-                // Close the claw so it does not catch when lowering the arm.
+                // Raise the wrist and close the claw so they do not catch.
+                robotHardware.setWristBackdrop();
                 robotHardware.closeClaw();
 
                 // Lower the arm.
@@ -242,7 +245,8 @@ public class TeleOpT extends LinearOpMode {
             // If the driver pressed y...
             if(currentGamepad.y && !previousGamepad.y) {
 
-                // Close the claw so it does not catch when raising the arm.
+                // Raise the wrist and close the claw so they do not catch.
+                robotHardware.setWristBackdrop();
                 robotHardware.closeClaw();
 
                 // Raise the arm.
