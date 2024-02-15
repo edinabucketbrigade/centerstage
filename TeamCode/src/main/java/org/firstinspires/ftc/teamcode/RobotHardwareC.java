@@ -62,6 +62,7 @@ public class RobotHardwareC {
 
     public static final String RED_SQUARE = "\uD83D\uDFE5"; // See https://unicode-explorer.com/list/geometric-shapes
     public static final String GREEN_SQUARE = "\uD83D\uDFE9"; // See https://unicode-explorer.com/list/geometric-shapes
+    public static final String BLUE_SQUARE = "\uD83D\uDFE6"; // See https://unicode-explorer.com/list/geometric-shapes
     public static double NORMAL_MULTIPLIER = 1;
     public static double TURTLE_MULTIPLIER = 0.5;
     public static double POWER_EPSILON = 0.001;

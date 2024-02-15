@@ -8,6 +8,8 @@ import static org.firstinspires.ftc.teamcode.LaunchMenu.State.PARK;
 import static org.firstinspires.ftc.teamcode.LaunchMenu.State.ALLIANCE;
 import static org.firstinspires.ftc.teamcode.LaunchMenu.State.CLOSE;
 import static org.firstinspires.ftc.teamcode.LaunchMenu.State.STACK;
+import static org.firstinspires.ftc.teamcode.RobotHardwareC.BLUE_SQUARE;
+import static org.firstinspires.ftc.teamcode.RobotHardwareC.RED_SQUARE;
 
 import static bucketbrigade.casperlibrary.Objectives.PURPLE;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
@@ -31,6 +33,8 @@ public class LaunchMenu {
     private static final int MINIMUM_DELAY = 0;
     private static final int MAXIMUM_DELAY = 30;
     private static final double POSITION_INCREMENT = 0.5;
+    public static final String YELLOW_CIRCLE = "\uD83D\uDFE1"; // See https://unicode-explorer.com/list/geometric-shapes
+    public static final String PURPLE_CIRCLE = "\uD83D\uDFE3"; // See https://unicode-explorer.com/list/geometric-shapes
 
     public int delay;
     public double grabStackX = DEFAULT_GRAB_STACK_X;
@@ -179,7 +183,10 @@ public class LaunchMenu {
 
     public void addTelemetry() {
         Telemetry telemetry = opMode.telemetry;
-        telemetry.addData("Alliance", redAlliance ? "Red" : "Blue");
+        telemetry.addData("Alliance", redAlliance ? RED_SQUARE : BLUE_SQUARE);
+        if(redAlliance) {
+            telemetry.addData("REMINDER", "SWAP " + PURPLE_CIRCLE + " AND " + YELLOW_CIRCLE + " PIXELS");
+        }
         telemetry.addData("Start", startClose ? "Close" : "Far");
         telemetry.addData("Park", parkLeft ? "Left" : "Right");
         telemetry.addData("Objectives", objectives);
