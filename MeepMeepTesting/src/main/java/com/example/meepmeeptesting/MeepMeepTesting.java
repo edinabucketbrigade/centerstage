@@ -131,7 +131,7 @@ public class MeepMeepTesting {
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Return to the backdrop.
-                applyActions(returnToBackdrop(RED_ALLIANCE, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y), trajectorySequenceBuilder, true);
+                applyActions(returnToBackdrop(RED_ALLIANCE, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y, DEFAULT_GRAB_STACK_Y), trajectorySequenceBuilder, true);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);

@@ -158,12 +158,12 @@ public class RobotRoutes {
     }
 
     // Returns to the backdrop.
-    public static List<Action> returnToBackdrop(boolean redAlliance, double placeBackdropX, double placeBackdropY) throws InterruptedException {
+    public static List<Action> returnToBackdrop(boolean redAlliance, double placeBackdropX, double placeBackdropY, double grabStackY) throws InterruptedException {
 
         double targetY = getWhitePixelTargetY(placeBackdropY);
         double approachBackdropX = getApproachBackdropX(placeBackdropX);
         List<Action> actions = new ArrayList<>();
-        actions.add(new LineToAction(20, 9));
+        actions.add(new LineToAction(20, grabStackY));
         actions.add(new SplineToLinearHeadingAction(approachBackdropX, targetY, Math.toRadians(180), Math.toRadians(90)));
         if(redAlliance) mirrorActions(actions);
         return actions;
