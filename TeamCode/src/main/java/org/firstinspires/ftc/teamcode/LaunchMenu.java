@@ -14,10 +14,10 @@ import static org.firstinspires.ftc.teamcode.RobotHardwareC.RED_SQUARE;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_GRAB_STACK_X;
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_GRAB_STACK_Y;
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_BACKDROP_X;
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_BACKDROP_Y;
+import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultGrabStackX;
+import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultGrabStackY;
+import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultPlaceBackdropX;
+import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultPlaceBackdropY;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -37,12 +37,12 @@ public class LaunchMenu {
     public static final String PURPLE_CIRCLE = "\uD83D\uDFE3"; // See https://unicode-explorer.com/list/geometric-shapes
 
     public int delay;
-    public double grabStackX = DEFAULT_GRAB_STACK_X;
-    public double grabStackY = DEFAULT_GRAB_STACK_Y;
+    public double grabStackX;
+    public double grabStackY;
     public Objectives objectives;
     public boolean parkLeft;
-    public double placeBackdropX = DEFAULT_PLACE_BACKDROP_X;
-    public double placeBackdropY = DEFAULT_PLACE_BACKDROP_Y;
+    public double placeBackdropX;
+    public double placeBackdropY;
     public boolean redAlliance;
     public boolean startClose;
 
@@ -127,6 +127,8 @@ public class LaunchMenu {
                 }
                 break;
             case BACKDROP:
+                placeBackdropX = getDefaultPlaceBackdropX(redAlliance);
+                placeBackdropY = getDefaultPlaceBackdropY(redAlliance);
                 String backdropCaption = "Backdrop = " + placeBackdropX + ", " + placeBackdropY;
                 prompt(backdropCaption, "X = ok, dpad = adjust");
                 if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
@@ -146,6 +148,8 @@ public class LaunchMenu {
                 }
                 break;
             case STACK:
+                grabStackX = getDefaultGrabStackX(redAlliance);
+                grabStackY = getDefaultGrabStackY(redAlliance);
                 String stackCaption = "Stack = " + grabStackX + ", " + grabStackY;
                 prompt(stackCaption, "X = ok, dpad = adjust");
                 if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {

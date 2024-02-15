@@ -8,8 +8,6 @@ import static org.firstinspires.ftc.teamcode.HeatSeekC.State.OPEN_CLAW;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.RELEASE_WRIST;
 import static org.firstinspires.ftc.teamcode.HeatSeekC.State.WAIT_FOR_RELEASE;
 
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_BACKDROP_X;
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_BACKDROP_Y;
 import static bucketbrigade.casperlibrary.RobotRoutes.FIRST_ROW_LIFT_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.LIFT_INCREMENT;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
@@ -17,6 +15,8 @@ import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
+import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultPlaceBackdropX;
+import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultPlaceBackdropY;
 import static bucketbrigade.casperlibrary.RobotRoutes.getTargetY;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -36,8 +36,6 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 public class HeatSeekC {
 
     enum State { IDLE, CLOSE_CLAW, RAISE_ARM_LIFT_AND_WRIST, DRIVE_TO_APPROACH_POSITION, DRIVE_TO_PLACE_POSITION, OPEN_CLAW, RELEASE_WRIST, WAIT_FOR_RELEASE }
-
-    public static double APPROACH_TARGET_X = DEFAULT_PLACE_BACKDROP_X - 10;
 
     private RobotHardwareC robotHardware;
     private State state = IDLE;
@@ -129,8 +127,10 @@ public class HeatSeekC {
                 // Raise the arm.
                 robotHardware.raiseArm();
 
+                double approachTargetX = getDefaultPlaceBackdropX(redAlliance) - 10;
+
                 // Drive to the approach position.
-                startDrivingToBackdrop(MAXIMUM_VELOCITY_FAST, APPROACH_TARGET_X);
+                startDrivingToBackdrop(MAXIMUM_VELOCITY_FAST, approachTargetX);
 
                 // Advance to the next step.
                 setState(DRIVE_TO_PLACE_POSITION);
@@ -147,8 +147,10 @@ public class HeatSeekC {
 
                 }
 
+                double placeBackdropX = getDefaultPlaceBackdropX(redAlliance);
+
                 // Drive to the place position.
-                startDrivingToBackdrop(MAXIMUM_VELOCITY_SLOW, DEFAULT_PLACE_BACKDROP_X);
+                startDrivingToBackdrop(MAXIMUM_VELOCITY_SLOW, placeBackdropX);
 
                 // Advance to the next step.
                 setState(OPEN_CLAW);
@@ -258,8 +260,10 @@ public class HeatSeekC {
         // Get the robot's current pose.
         Pose2d currentPose = drive.getPoseEstimate();
 
+        double placeBackdropY = getDefaultPlaceBackdropY(redAlliance);
+
         // Get a target y coordinate.
-        double targetY = getTargetY(leftColumn, row, redAlliance, DEFAULT_PLACE_BACKDROP_Y);
+        double targetY = getTargetY(leftColumn, row, redAlliance, placeBackdropY);
 
         // Construct a target position.
         Vector2d targetPosition = new Vector2d(targetX, targetY);

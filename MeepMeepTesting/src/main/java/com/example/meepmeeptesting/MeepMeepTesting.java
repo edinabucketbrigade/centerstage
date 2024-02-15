@@ -2,10 +2,6 @@ package com.example.meepmeeptesting;
 
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW;
 import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_GRAB_STACK_X;
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_GRAB_STACK_Y;
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_BACKDROP_X;
-import static bucketbrigade.casperlibrary.RobotRoutes.DEFAULT_PLACE_BACKDROP_Y;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_VELOCITY;
@@ -17,6 +13,10 @@ import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdropPlace;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToStackApproach;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToStackGrab;
+import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultGrabStackX;
+import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultGrabStackY;
+import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultPlaceBackdropX;
+import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultPlaceBackdropY;
 import static bucketbrigade.casperlibrary.RobotRoutes.getStartPose;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
 import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
@@ -103,14 +103,19 @@ public class MeepMeepTesting {
         // If we are placing the yellow pixel...
         if(objectives == PURPLE_YELLOW || objectives == PURPLE_YELLOW_WHITE) {
 
+            double grabStackX = getDefaultGrabStackX(RED_ALLIANCE);
+            double grabStackY = getDefaultGrabStackY(RED_ALLIANCE);
+            double placeBackdropX = getDefaultPlaceBackdropX(RED_ALLIANCE);
+            double placeBackdropY = getDefaultPlaceBackdropY(RED_ALLIANCE);
+
             // Drive to the backdrop approach position.
-            applyActions(driveToBackdropApproach(RED_ALLIANCE, START_CLOSE, LOCATION, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y, DEFAULT_GRAB_STACK_Y), trajectorySequenceBuilder, true);
+            applyActions(driveToBackdropApproach(RED_ALLIANCE, START_CLOSE, LOCATION, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, true);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);
 
             // Drive to the backdrop place position.
-            applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, true, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y), trajectorySequenceBuilder, false);
+            applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, true, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, false);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);
@@ -119,25 +124,25 @@ public class MeepMeepTesting {
             if(objectives == PURPLE_YELLOW_WHITE) {
 
                 // Drive to the stack approach position.
-                applyActions(driveToStackApproach(RED_ALLIANCE, DEFAULT_GRAB_STACK_X, DEFAULT_GRAB_STACK_Y), trajectorySequenceBuilder, true);
+                applyActions(driveToStackApproach(RED_ALLIANCE, grabStackX, grabStackY), trajectorySequenceBuilder, true);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Drive to the stack grab position.
-                applyActions(driveToStackGrab(RED_ALLIANCE, DEFAULT_GRAB_STACK_X, DEFAULT_GRAB_STACK_Y), trajectorySequenceBuilder, false);
+                applyActions(driveToStackGrab(RED_ALLIANCE, grabStackX, grabStackY), trajectorySequenceBuilder, false);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(2);
 
                 // Return to the backdrop.
-                applyActions(returnToBackdrop(RED_ALLIANCE, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y, DEFAULT_GRAB_STACK_Y), trajectorySequenceBuilder, true);
+                applyActions(returnToBackdrop(RED_ALLIANCE, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, true);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Drive to the backdrop place position.
-                applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, false, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y), trajectorySequenceBuilder, false);
+                applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, false, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, false);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);

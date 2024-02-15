@@ -29,14 +29,18 @@ public class RobotRoutes {
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
     public static double PIXEL_WIDTH = 3;
-    public static final double DEFAULT_PLACE_BACKDROP_X = 44.5;
-    public static final double DEFAULT_PLACE_BACKDROP_Y = 41.5;
+    public static final double DEFAULT_BLUE_PLACE_BACKDROP_X = 44.5;
+    public static final double DEFAULT_RED_PLACE_BACKDROP_X = DEFAULT_BLUE_PLACE_BACKDROP_X;
+    public static final double DEFAULT_BLUE_PLACE_BACKDROP_Y = 41.5;
+    public static final double DEFAULT_RED_PLACE_BACKDROP_Y = 40.5;
     public static final double TRACK_WIDTH = 14;
     public static final int WHITE_PIXEL_LEFT_COLUMN = 3;
     public static final int WHITE_PIXEL_ROW = 3;
     public static final int YELLOW_PIXEL_ROW = 1;
-    public static final double DEFAULT_GRAB_STACK_X = -60;
-    public static final double DEFAULT_GRAB_STACK_Y = 7.5;
+    public static final double DEFAULT_BLUE_GRAB_STACK_X = -60;
+    public static final double DEFAULT_RED_GRAB_STACK_X = DEFAULT_BLUE_GRAB_STACK_X;
+    public static final double DEFAULT_BLUE_GRAB_STACK_Y = 7.5;
+    public static final double DEFAULT_RED_GRAB_STACK_Y = 9;
 
     // Gets a start pose.
     public static RobotPose getStartPose(boolean redAlliance, boolean startClose) {
@@ -299,6 +303,22 @@ public class RobotRoutes {
 
     private static double getApproachStackX(double grabStackX) {
         return grabStackX + STACK_APPROACH_DISTANCE;
+    }
+
+    public static double getDefaultPlaceBackdropX(boolean redAlliance) {
+        return redAlliance ? DEFAULT_RED_PLACE_BACKDROP_X : DEFAULT_BLUE_PLACE_BACKDROP_X;
+    }
+
+    public static double getDefaultPlaceBackdropY(boolean redAlliance) {
+        return redAlliance ? DEFAULT_RED_PLACE_BACKDROP_Y : DEFAULT_BLUE_PLACE_BACKDROP_Y;
+    }
+
+    public static double getDefaultGrabStackX(boolean redAlliance) {
+        return redAlliance ? DEFAULT_RED_GRAB_STACK_X : DEFAULT_BLUE_GRAB_STACK_X;
+    }
+
+    public static double getDefaultGrabStackY(boolean redAlliance) {
+        return redAlliance ? DEFAULT_RED_GRAB_STACK_Y : DEFAULT_BLUE_GRAB_STACK_Y;
     }
 
 }
