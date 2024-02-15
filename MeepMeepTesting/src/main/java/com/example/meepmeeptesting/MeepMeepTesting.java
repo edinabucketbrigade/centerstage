@@ -128,7 +128,7 @@ public class MeepMeepTesting {
                 applyActions(driveToStackGrab(RED_ALLIANCE, DEFAULT_GRAB_STACK_X, DEFAULT_GRAB_STACK_Y), trajectorySequenceBuilder, false);
 
                 // Wait for a bit.
-                trajectorySequenceBuilder.waitSeconds(1);
+                trajectorySequenceBuilder.waitSeconds(2);
 
                 // Return to the backdrop.
                 applyActions(returnToBackdrop(RED_ALLIANCE, DEFAULT_PLACE_BACKDROP_X, DEFAULT_PLACE_BACKDROP_Y, DEFAULT_GRAB_STACK_Y), trajectorySequenceBuilder, true);
