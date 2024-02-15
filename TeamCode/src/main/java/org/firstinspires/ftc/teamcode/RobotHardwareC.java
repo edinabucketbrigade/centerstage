@@ -5,7 +5,6 @@ import android.util.Size;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -66,7 +65,6 @@ public class RobotHardwareC {
     public static double NORMAL_MULTIPLIER = 1;
     public static double TURTLE_MULTIPLIER = 0.5;
     public static double POWER_EPSILON = 0.001;
-    public static double DRIVE_POWER_RAMP_MILLISECONDS = 100;
 
     private LinearOpMode opMode;
     private DcMotor leftFrontDrive;
@@ -88,7 +86,6 @@ public class RobotHardwareC {
     private Arm arm;
     private Claw claw;
     private ElapsedTime localizationTimer;
-    private Ramp drivePowerRamp = new Ramp(DRIVE_POWER_RAMP_MILLISECONDS);
 
     // Initializes this.
     public RobotHardwareC(LinearOpMode opMode) throws InterruptedException {
@@ -238,12 +235,6 @@ public class RobotHardwareC {
         double lateral = gamepad1.left_stick_x;
         double yaw = gamepad1.right_stick_x;
 
-//        boolean reverse = claw.isClosed() || (place.isActive() && (claw.isLeftClosed() || claw.isRightClosed()));
-//
-//        if(reverse) {
-//            yaw = -yaw;
-//        }
-
         double max;
 
         // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -275,20 +266,6 @@ public class RobotHardwareC {
             multiplier = NORMAL_MULTIPLIER;
         }
 
-        // Determine whether the robot is stopped.
-        boolean isRobotStopped = isRobotStopped(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
-
-        // If the robot is stopped...
-        if(isRobotStopped) {
-
-            // Reset the drive power ramp.
-            drivePowerRamp.reset();
-
-        }
-
-        // Apply the drive power ramp to the multiplier.
-        multiplier = drivePowerRamp.apply(multiplier);
-
         leftFrontPower *= multiplier;
         leftBackPower *= multiplier;
         rightBackPower *= multiplier;
@@ -309,12 +286,6 @@ public class RobotHardwareC {
         //rightFrontPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
 
         // Send calculated power to wheels
-//        if (reverse) {
-//            moveRobot(-leftFrontPower, -rightFrontPower, -leftBackPower, -rightBackPower);
-//        }
-//        else {
-//            moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
-//        }
         moveRobot(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower);
 
     }
@@ -747,15 +718,6 @@ public class RobotHardwareC {
 
     public boolean isClawOpen() {
         return claw.isOpen();
-    }
-
-    private boolean isRobotStopped(double leftFrontPower, double leftBackPower, double rightFrontPower, double rightBackPower) {
-        boolean isLeftFrontStopped = areEqual(leftFrontPower, 0, POWER_EPSILON);
-        boolean isLeftBackStopped = areEqual(leftBackPower, 0, POWER_EPSILON);
-        boolean isRightFrontStopped = areEqual(rightFrontPower, 0, POWER_EPSILON);
-        boolean isRightBackStopped = areEqual(rightBackPower, 0, POWER_EPSILON);
-        boolean isRobotStopped = isLeftFrontStopped && isLeftBackStopped && isRightFrontStopped && isRightBackStopped;
-        return isRobotStopped;
     }
 
     private static boolean areEqual(double a, double b, double epsilon) {
