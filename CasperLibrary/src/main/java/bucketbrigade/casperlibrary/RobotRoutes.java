@@ -139,9 +139,7 @@ public class RobotRoutes {
 
         // Method B
         //actions.add(new SplineToAction(20, grabStackY, Math.toRadians(180)));
-
-
-
+        
         actions.add(new SplineToAction(approachStackX, grabStackY, Math.toRadians(180)));
         if(redAlliance) mirrorActions(actions);
         return actions;

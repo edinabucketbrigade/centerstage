@@ -68,10 +68,13 @@ public class Place {
 
             case CLOSE_CLAW_AND_RAISE_WRIST:
 
+                // Close the claw.
                 robotHardware.closeClaw();
 
+                // Raise the wrist.
                 robotHardware.setWristBackdrop();
 
+                // Advance to the next step.
                 setState(RAISE_ARM_AND_LIFT);
 
                 break;
@@ -153,8 +156,12 @@ public class Place {
 
             case LOWER_ARM:
 
+                // If we are waiting...
                 if (timer.milliseconds() < 500) {
+
+                    // Exit the method.
                     return;
+
                 }
 
                 // Lower the arm.
@@ -167,8 +174,12 @@ public class Place {
 
             case LOWER_LIFT:
 
+                // If we are waiting...
                 if (timer.milliseconds() < 500) {
+
+                    // Exit the method.
                     return;
+
                 }
 
                 // Lower the lift.
@@ -188,7 +199,7 @@ public class Place {
 
                 }
 
-                // Move the wrist to the ground position.
+                // Lower the wrist.
                 robotHardware.setWristGround();
 
                 // Open the claw.
@@ -196,6 +207,8 @@ public class Place {
 
                 // Advance to the next step.
                 setState(IDLE);
+
+                break;
 
             case IDLE:
 
