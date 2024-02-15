@@ -111,52 +111,52 @@ public class LaunchMenu {
                 }
                 break;
             case DELAY:
-                prompt("Delay = " + delay, "Y = ↑, A = ↓, right bumper = ok");
-                if (currentGamepad.y && !previousGamepad.y) {
+                prompt("Delay = " + delay, "X = ok, dpad = adjust");
+                if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
                     delay = Math.min(delay + 1, MAXIMUM_DELAY);
                 }
-                else if (currentGamepad.a && !previousGamepad.a) {
+                else if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
                     delay = Math.max(delay - 1, MINIMUM_DELAY);
                 }
-                else if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                else if (currentGamepad.x && !previousGamepad.x) {
                     state = BACKDROP;
                 }
                 break;
             case BACKDROP:
-                String backdropCaption = "Backdrop = " + placeBackdropX + ", " + placeBackdropY + "";
-                prompt(backdropCaption, "X = ↓ x, A = ↓ y, B = ↑ x, Y = ↑ y, right bumper = ok");
-                if (currentGamepad.x && !previousGamepad.x) {
+                String backdropCaption = "Backdrop = (" + placeBackdropX + ", " + placeBackdropY + ")";
+                prompt(backdropCaption, "X = ok, dpad = adjust");
+                if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
                     placeBackdropX -= POSITION_INCREMENT;
                 }
-                else if (currentGamepad.a && !previousGamepad.a) {
+                else if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
                     placeBackdropY -= POSITION_INCREMENT;
                 }
-                else if (currentGamepad.b && !previousGamepad.b) {
+                else if (currentGamepad.dpad_right && !previousGamepad.dpad_right) {
                     placeBackdropX += POSITION_INCREMENT;
                 }
-                else if (currentGamepad.y && !previousGamepad.y) {
+                else if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
                     placeBackdropY += POSITION_INCREMENT;
                 }
-                else if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                else if (currentGamepad.x && !previousGamepad.x) {
                     state = STACK;
                 }
                 break;
             case STACK:
-                String stackCaption = "Stack = " + grabStackX + ", " + grabStackY + "";
-                prompt(stackCaption, "X = ↓ x, A = ↓ y, B = ↑ x, Y = ↑ y, right bumper = ok");
-                if (currentGamepad.x && !previousGamepad.x) {
+                String stackCaption = "Stack = (" + grabStackX + ", " + grabStackY + ")";
+                prompt(stackCaption, "X = ok, dpad = adjust");
+                if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
                     grabStackX -= POSITION_INCREMENT;
                 }
-                else if (currentGamepad.a && !previousGamepad.a) {
+                else if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
                     grabStackY -= POSITION_INCREMENT;
                 }
-                else if (currentGamepad.b && !previousGamepad.b) {
+                else if (currentGamepad.dpad_right && !previousGamepad.dpad_right) {
                     grabStackX += POSITION_INCREMENT;
                 }
-                else if (currentGamepad.y && !previousGamepad.y) {
+                else if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
                     grabStackY += POSITION_INCREMENT;
                 }
-                else if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                else if (currentGamepad.x && !previousGamepad.x) {
                     state = IDLE;
                 }
                 break;
