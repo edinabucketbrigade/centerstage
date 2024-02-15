@@ -25,6 +25,7 @@ public class Arm {
     public static double RAISE_EXPONENT = 2;
     public static double RAISE_GAIN = 0.0000018;
     public static int UP_POSITION = 750;
+    public static int THRESHOLD = 50;
 
     private RobotHardwareC robotHardware;
     private DcMotor armMotor;
@@ -84,6 +85,17 @@ public class Arm {
                 armMotor.setPower(0);
                 armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                // Remember that the arm is down.
+                state = DOWN;
+
+            }
+
+            // Otherwise, if the arm is almost down...
+            else if(currentPosition < THRESHOLD) {
+
+                // Stop the arm motor.
+                armMotor.setPower(0);
 
                 // Remember that the arm is down.
                 state = DOWN;
