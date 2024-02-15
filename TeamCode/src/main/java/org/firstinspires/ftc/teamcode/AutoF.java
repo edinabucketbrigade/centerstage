@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_STACK_GRAB;
 import static org.firstinspires.ftc.teamcode.AutoF.State.GRAB_OFF_STACK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.IDLE;
 import static org.firstinspires.ftc.teamcode.AutoF.State.DRIVE_TO_SPIKE_MARK;
+import static org.firstinspires.ftc.teamcode.AutoF.State.LOWER_WRIST_AND_OPEN_CLAW;
 import static org.firstinspires.ftc.teamcode.AutoF.State.PARK;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RAISE_ARM_AND_LIFT;
 import static org.firstinspires.ftc.teamcode.AutoF.State.RELEASE_PIXEL_ON_BACKDROP;
@@ -81,7 +82,7 @@ public class AutoF extends LinearOpMode {
     private CenterStageCVDetection teamPropDetector;
     private RobotHardwareC robotHardware;
 
-    enum State {IDLE, DRIVE_TO_SPIKE_MARK, DRIVE_TO_BACKDROP_APPROACH, RAISE_ARM_AND_LIFT, DRIVE_TO_BACKDROP_PLACE, RELEASE_PIXEL_ON_BACKDROP, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_STACK_APPROACH, DRIVE_TO_STACK_GRAB, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK}
+    enum State {IDLE, DRIVE_TO_SPIKE_MARK, DRIVE_TO_BACKDROP_APPROACH, RAISE_ARM_AND_LIFT, DRIVE_TO_BACKDROP_PLACE, RELEASE_PIXEL_ON_BACKDROP, WAIT_FOR_RELEASE, RETRACT, DRIVE_TO_STACK_APPROACH, DRIVE_TO_STACK_GRAB, GRAB_OFF_STACK, RETURN_TO_BACKDROP, PARK, LOWER_WRIST_AND_OPEN_CLAW}
 
     private State state = IDLE;
     private ElapsedTime timer = new ElapsedTime();
@@ -331,7 +332,7 @@ public class AutoF extends LinearOpMode {
 
                 }
 
-                // Open the claw to release the yellow or white pixel.
+                // Open the claw partially to release the yellow or white pixel.
                 robotHardware.openClaw(false);
 
                 // Advance to the next step.
@@ -374,7 +375,7 @@ public class AutoF extends LinearOpMode {
                 break;
 
             case DRIVE_TO_STACK_APPROACH:
-
+/*
                 // If we are waiting...
                 if (timer.milliseconds() < 500) {
 
@@ -382,6 +383,20 @@ public class AutoF extends LinearOpMode {
                     return;
 
                 }
+*/
+                // If we are waiting for the arm or lift...
+                if (!robotHardware.isArmDown() || !robotHardware.isLiftInPosition(DOWN_POSITION)) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Lower the wrist.
+                robotHardware.setWristGround();
+
+                // Close the claw so the robot pushes the team prop out of the way while driving.
+                robotHardware.closeClaw();
 
                 // Get a stack approach trajectory sequence.
                 TrajectorySequence stackApproachTrajectorySequence = getStackApproachTrajectorySequence();
@@ -404,6 +419,9 @@ public class AutoF extends LinearOpMode {
                     return;
 
                 }
+
+                // Open the claw fully to prepare to grab white pixels.
+                robotHardware.openClaw(true);
 
                 // Raise the lift.
                 robotHardware.setLiftPosition(STACK_LIFT_POSITION);
@@ -486,6 +504,26 @@ public class AutoF extends LinearOpMode {
                 drive.followTrajectorySequenceAsync(parkTrajectorySequence);
 
                 // Advance to the next step.
+                setState(LOWER_WRIST_AND_OPEN_CLAW);
+
+                break;
+
+            case LOWER_WRIST_AND_OPEN_CLAW:
+
+                // If we are waiting for the arm or lift...
+                if (!robotHardware.isArmDown() || !robotHardware.isLiftInPosition(DOWN_POSITION)) {
+
+                    // Exit the method.
+                    return;
+
+                }
+
+                // Lower the wrist.
+                robotHardware.setWristGround();
+
+                // Open the claw.
+                robotHardware.openClaw(true);
+
                 setState(IDLE);
 
                 break;
@@ -762,7 +800,7 @@ public class AutoF extends LinearOpMode {
 
         // Drive to the stack approach position.
         applyActions(driveToStackApproach(redAlliance, grabStackX, grabStackY), trajectorySequenceBuilder, true);
-
+/*
         // During the sequence...
         trajectorySequenceBuilder.addTemporalMarker(4, () -> {
 
@@ -773,7 +811,7 @@ public class AutoF extends LinearOpMode {
             robotHardware.openClaw(true);
 
         });
-
+*/
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
 
@@ -819,7 +857,7 @@ public class AutoF extends LinearOpMode {
 
         // Park.
         applyActions(park(redAlliance, parkLeft), trajectorySequenceBuilder, true);
-
+/*
         // During the sequence...
         trajectorySequenceBuilder.addTemporalMarker(2, () -> {
 
@@ -830,7 +868,7 @@ public class AutoF extends LinearOpMode {
             robotHardware.openClaw(true);
 
         });
-
+*/
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
 
