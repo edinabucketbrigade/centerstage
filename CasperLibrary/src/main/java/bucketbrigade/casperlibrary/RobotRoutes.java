@@ -182,8 +182,8 @@ public class RobotRoutes {
             actions.add(new SplineToConstantHeadingAction(58, 60, Math.toRadians(0)));
         } else {
             actions.add(new SetTangentAction(Math.toRadians(-90)));
-            actions.add(new SplineToConstantHeadingAction(44, 10, Math.toRadians(0)));
-            actions.add(new SplineToConstantHeadingAction(58, 10, Math.toRadians(0)));
+            actions.add(new SplineToConstantHeadingAction(44, 8, Math.toRadians(0)));
+            actions.add(new SplineToConstantHeadingAction(58, 8, Math.toRadians(0)));
         }
         if(redAlliance) mirrorActions(actions);
         return actions;
