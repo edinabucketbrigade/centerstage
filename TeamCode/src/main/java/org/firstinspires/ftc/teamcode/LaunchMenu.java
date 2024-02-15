@@ -111,7 +111,7 @@ public class LaunchMenu {
                 }
                 break;
             case DELAY:
-                prompt("Delay = " + delay, "Y = increase, A = decrease, right bumper = ok");
+                prompt("Delay = " + delay, "Y = ↑, A = ↓, right bumper = ok");
                 if (currentGamepad.y && !previousGamepad.y) {
                     delay = Math.min(delay + 1, MAXIMUM_DELAY);
                 }
@@ -124,7 +124,7 @@ public class LaunchMenu {
                 break;
             case BACKDROP:
                 String backdropCaption = "Backdrop = " + placeBackdropX + ", " + placeBackdropY + "";
-                prompt(backdropCaption, "X = decrease x, A = decrease y, B = increase x, Y = increase y, right bumper = ok");
+                prompt(backdropCaption, "X = ↓ x, A = ↓ y, B = ↑ x, Y = ↑ y, right bumper = ok");
                 if (currentGamepad.x && !previousGamepad.x) {
                     placeBackdropX -= POSITION_INCREMENT;
                 }
@@ -143,7 +143,7 @@ public class LaunchMenu {
                 break;
             case STACK:
                 String stackCaption = "Stack = " + grabStackX + ", " + grabStackY + "";
-                prompt(stackCaption, "X = decrease x, A = decrease y, B = increase x, Y = increase y, right bumper = ok");
+                prompt(stackCaption, "X = ↓ x, A = ↓ y, B = ↑ x, Y = ↑ y, right bumper = ok");
                 if (currentGamepad.x && !previousGamepad.x) {
                     grabStackX -= POSITION_INCREMENT;
                 }
