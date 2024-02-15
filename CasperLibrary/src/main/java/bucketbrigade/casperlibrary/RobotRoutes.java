@@ -39,7 +39,7 @@ public class RobotRoutes {
     public static final int WHITE_PIXEL_ROW = 3;
     public static final int YELLOW_PIXEL_ROW = 1;
     public static final double DEFAULT_BLUE_GRAB_STACK_X = -60;
-    public static final double DEFAULT_RED_GRAB_STACK_X = -55.5;
+    public static final double DEFAULT_RED_GRAB_STACK_X = DEFAULT_BLUE_GRAB_STACK_X;
     public static final double DEFAULT_BLUE_GRAB_STACK_Y = 7.5;
     public static final double DEFAULT_RED_GRAB_STACK_Y = 9;
 
