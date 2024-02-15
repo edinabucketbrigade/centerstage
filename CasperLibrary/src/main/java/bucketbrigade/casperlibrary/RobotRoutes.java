@@ -15,7 +15,7 @@ public class RobotRoutes {
     public static final double BACKDROP_APPROACH_DISTANCE = 5;
     public static final double STACK_APPROACH_DISTANCE = 8;
     public static final double BACKDROP_SEPARATION = 36;
-    public static final int FIRST_ROW_LIFT_POSITION = 0;
+    public static final int FIRST_ROW_LIFT_POSITION = 200;
     public static final int LIFT_INCREMENT = 200;
     public static final double MAXIMUM_ACCELERATION = 50;
     public static final double MAXIMUM_ANGULAR_ACCELERATION = Math.toRadians(100);
