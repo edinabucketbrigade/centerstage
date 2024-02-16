@@ -30,17 +30,21 @@ public class RobotRoutes {
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
     public static double PIXEL_WIDTH = 3;
-    public static final double DEFAULT_BLUE_PLACE_BACKDROP_X = 44.5;
-    public static final double DEFAULT_RED_PLACE_BACKDROP_X = DEFAULT_BLUE_PLACE_BACKDROP_X;
-    public static final double DEFAULT_BLUE_PLACE_BACKDROP_Y = 41.5;
-    public static final double DEFAULT_RED_PLACE_BACKDROP_Y = 40.5;
     public static final double TRACK_WIDTH = 14;
     public static final int WHITE_PIXEL_LEFT_COLUMN = 3;
     public static final int WHITE_PIXEL_ROW = 3;
     public static final int YELLOW_PIXEL_ROW = 1;
+
+    // Blue defaults
+    public static final double DEFAULT_BLUE_PLACE_BACKDROP_X = 47;
+    public static final double DEFAULT_BLUE_PLACE_BACKDROP_Y = 41.5;
     public static final double DEFAULT_BLUE_GRAB_STACK_X = -60;
-    public static final double DEFAULT_RED_GRAB_STACK_X = DEFAULT_BLUE_GRAB_STACK_X;
     public static final double DEFAULT_BLUE_GRAB_STACK_Y = 7.5;
+
+    // Red defaults
+    public static final double DEFAULT_RED_PLACE_BACKDROP_X = DEFAULT_BLUE_PLACE_BACKDROP_X;
+    public static final double DEFAULT_RED_PLACE_BACKDROP_Y = 40.5;
+    public static final double DEFAULT_RED_GRAB_STACK_X = DEFAULT_BLUE_GRAB_STACK_X;
     public static final double DEFAULT_RED_GRAB_STACK_Y = 9;
 
     // Gets a start pose.

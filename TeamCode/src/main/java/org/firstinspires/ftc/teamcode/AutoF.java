@@ -77,7 +77,7 @@ import bucketbrigade.casperlibrary.TurnAction;
 public class AutoF extends LinearOpMode {
 
     public static final int MILLISECONDS_PER_SECOND = 1000;
-    public static int STACK_LIFT_POSITION = 145;
+    public static int STACK_LIFT_POSITION = 140;
 
     private OpenCvWebcam camera;
     private boolean startedStreaming;
@@ -286,6 +286,10 @@ public class AutoF extends LinearOpMode {
                 break;
 
             case RAISE_ARM_AND_LIFT:
+
+                if (timer.milliseconds() > 500) {
+                    robotHardware.closeClaw();
+                }
 
                 // If the robot is driving...
                 if (drive.isBusy()) {
