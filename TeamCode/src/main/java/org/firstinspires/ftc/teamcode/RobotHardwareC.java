@@ -730,7 +730,7 @@ public class RobotHardwareC {
         return claw.isOpen();
     }
 
-    private static boolean areEqual(double a, double b, double epsilon) {
+    public static boolean areEqual(double a, double b, double epsilon) {
         return Math.abs(a - b) <= epsilon;
     }
 

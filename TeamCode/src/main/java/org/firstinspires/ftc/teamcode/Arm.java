@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.ArmState.DOWN;
 import static org.firstinspires.ftc.teamcode.ArmState.LOWERING;
 import static org.firstinspires.ftc.teamcode.ArmState.RAISING;
 import static org.firstinspires.ftc.teamcode.ArmState.UP;
+import static org.firstinspires.ftc.teamcode.RobotHardwareC.areEqual;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -18,13 +19,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class Arm {
 
-    public static int DOWN_POSITION = 0;
     public static double LOWER_GAIN = 0.0008;
     public static double MAXIMUM_LOWER_POWER = 0.5;
     public static double MAXIMUM_RAISE_POWER = 0.8;
     public static double RAISE_EXPONENT = 2;
     public static double RAISE_GAIN = 0.0000018;
-    public static int UP_POSITION = 750;
+    public static int POSITION_RANGE = 750;
     public static int THRESHOLD = 50;
 
     private RobotHardwareC robotHardware;
@@ -32,6 +32,7 @@ public class Arm {
     private TouchSensor upTouch;
     private TouchSensor downTouch;
     public ArmState state = DOWN;
+    private int targetPosition;
 
     // Initializes this.
     public Arm(RobotHardwareC robotHardware) {
@@ -78,24 +79,20 @@ public class Arm {
             // Determine whether the down touch sensor is pressed.
             boolean isDownPressed = downTouch.isPressed();
 
-            // If the down touch sensor is pressed...
-            if(isDownPressed) {
-
-                // Reset the arm motor.
-                armMotor.setPower(0);
-                armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-                // Remember that the arm is down.
-                state = DOWN;
-
-            }
-
-            // Otherwise, if the arm is almost down...
-            else if(currentPosition < THRESHOLD) {
+            // If the arm is down...
+            if(isDownPressed || areEqual(currentPosition, targetPosition, THRESHOLD)) {
 
                 // Stop the arm motor.
                 armMotor.setPower(0);
+
+                // If the down touch sensor is pressed...
+                if(isDownPressed) {
+
+                    // Reset the arm motor.
+                    armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                }
 
                 // Remember that the arm is down.
                 state = DOWN;
@@ -106,7 +103,7 @@ public class Arm {
             else {
 
                 // Lower the arm.
-                double positionError = Math.abs(DOWN_POSITION - currentPosition);
+                double positionError = Math.abs(targetPosition - currentPosition);
                 double armPower = Math.min(positionError * LOWER_GAIN, MAXIMUM_LOWER_POWER);
                 armMotor.setPower(-armPower);
 
@@ -120,8 +117,8 @@ public class Arm {
             // Determine whether the up touch sensor is pressed.
             boolean isUpPressed = upTouch.isPressed();
 
-            // If the up touch sensor is pressed...
-            if(isUpPressed) {
+            // If the arm is up...
+            if(isUpPressed || areEqual(currentPosition, targetPosition, THRESHOLD)) {
 
                 // Stop the arm motor.
                 armMotor.setPower(0);
@@ -135,7 +132,7 @@ public class Arm {
             else {
 
                 // Raise the arm.
-                double positionError = Math.abs(UP_POSITION - currentPosition);
+                double positionError = Math.abs(targetPosition - currentPosition);
                 double armPower = Math.min(Math.pow(positionError, RAISE_EXPONENT) * RAISE_GAIN, MAXIMUM_RAISE_POWER);
                 armMotor.setPower(armPower);
 
@@ -176,6 +173,12 @@ public class Arm {
     // Raises the arm.
     public void raise() {
 
+        // Get the arm's current position.
+        int currentPosition = armMotor.getCurrentPosition();
+
+        // Compute a target position.
+        targetPosition = currentPosition + POSITION_RANGE;
+
         // Raise the arm.
         state = RAISING;
 
@@ -183,6 +186,12 @@ public class Arm {
 
     // Lowers the arm.
     public void lower() {
+
+        // Get the arm's current position.
+        int currentPosition = armMotor.getCurrentPosition();
+
+        // Compute a target position.
+        targetPosition = currentPosition - POSITION_RANGE;
 
         // Lower the arm.
         state = LOWERING;
