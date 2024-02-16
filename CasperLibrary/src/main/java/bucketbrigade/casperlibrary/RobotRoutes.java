@@ -328,11 +328,11 @@ public class RobotRoutes {
     }
 
     public static double getMaximumVelocityFast(boolean redAlliance, boolean startClose, TeamPropLocation location) {
-        if((redAlliance && !startClose && location == RIGHT) || (!redAlliance && !startClose && location == LEFT)) {
-            return MAXIMUM_VELOCITY_FAST;
+        if(startClose) {
+            return MAXIMUM_VELOCITY_NORMAL;
         }
         else {
-            return MAXIMUM_VELOCITY_NORMAL;
+            return MAXIMUM_VELOCITY_FAST;
         }
     }
 
