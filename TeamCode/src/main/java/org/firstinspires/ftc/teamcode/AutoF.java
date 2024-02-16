@@ -387,15 +387,7 @@ public class AutoF extends LinearOpMode {
                 break;
 
             case DRIVE_TO_STACK_APPROACH:
-/*
-                // If we are waiting...
-                if (timer.milliseconds() < 500) {
 
-                    // Exit the method.
-                    return;
-
-                }
-*/
                 // If we are waiting for the arm or lift...
                 if (!robotHardware.isArmDown() || !robotHardware.isLiftInPosition(DOWN_POSITION)) {
 
