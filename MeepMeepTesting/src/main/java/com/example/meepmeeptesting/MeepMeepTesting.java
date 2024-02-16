@@ -5,7 +5,7 @@ import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_VELOCITY;
-import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_NORMAL;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdropApproach;
@@ -17,6 +17,7 @@ import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultGrabStackX;
 import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultGrabStackY;
 import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultPlaceBackdropX;
 import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultPlaceBackdropY;
+import static bucketbrigade.casperlibrary.RobotRoutes.getMaximumVelocityFast;
 import static bucketbrigade.casperlibrary.RobotRoutes.getStartPose;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
 import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
@@ -86,7 +87,7 @@ public class MeepMeepTesting {
         Pose2d outputStartPose = new Pose2d(inputStartPose.x, inputStartPose.y, inputStartPose.heading);
 
         // Construct a velocity constraint.
-        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_FAST, TRACK_WIDTH);
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_NORMAL, TRACK_WIDTH);
 
         // Construct an acceleration constraint.
         TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);
@@ -94,8 +95,11 @@ public class MeepMeepTesting {
         // Construct a trajectory sequence builder.
         TrajectorySequenceBuilder trajectorySequenceBuilder = new TrajectorySequenceBuilder(outputStartPose, null, velocityConstraint, accelerationConstraint, MAXIMUM_ANGULAR_VELOCITY, MAXIMUM_ANGULAR_ACCELERATION);
 
+        // Get a fast maximum velocity.
+        double maximumVelocityFast = getMaximumVelocityFast(RED_ALLIANCE, START_CLOSE, LOCATION);
+
         // Drive to the spike mark.
-        applyActions(driveToSpikeMark(RED_ALLIANCE, START_CLOSE, LOCATION), trajectorySequenceBuilder, true);
+        applyActions(driveToSpikeMark(RED_ALLIANCE, START_CLOSE, LOCATION), trajectorySequenceBuilder, maximumVelocityFast);
 
         // Wait for a bit.
         trajectorySequenceBuilder.waitSeconds(1);
@@ -109,13 +113,13 @@ public class MeepMeepTesting {
             double placeBackdropY = getDefaultPlaceBackdropY(RED_ALLIANCE);
 
             // Drive to the backdrop approach position.
-            applyActions(driveToBackdropApproach(RED_ALLIANCE, START_CLOSE, LOCATION, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, true);
+            applyActions(driveToBackdropApproach(RED_ALLIANCE, START_CLOSE, LOCATION, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, maximumVelocityFast);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);
 
             // Drive to the backdrop place position.
-            applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, true, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, false);
+            applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, true, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, MAXIMUM_VELOCITY_SLOW);
 
             // Wait for a bit.
             trajectorySequenceBuilder.waitSeconds(1);
@@ -124,25 +128,25 @@ public class MeepMeepTesting {
             if(objectives == PURPLE_YELLOW_WHITE) {
 
                 // Drive to the stack approach position.
-                applyActions(driveToStackApproach(RED_ALLIANCE, grabStackX, grabStackY), trajectorySequenceBuilder, true);
+                applyActions(driveToStackApproach(RED_ALLIANCE, grabStackX, grabStackY), trajectorySequenceBuilder, maximumVelocityFast);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Drive to the stack grab position.
-                applyActions(driveToStackGrab(RED_ALLIANCE, grabStackX, grabStackY), trajectorySequenceBuilder, false);
+                applyActions(driveToStackGrab(RED_ALLIANCE, grabStackX, grabStackY), trajectorySequenceBuilder, MAXIMUM_VELOCITY_SLOW);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(2);
 
                 // Return to the backdrop.
-                applyActions(returnToBackdrop(RED_ALLIANCE, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, true);
+                applyActions(returnToBackdrop(RED_ALLIANCE, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, maximumVelocityFast);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
 
                 // Drive to the backdrop place position.
-                applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, false, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, false);
+                applyActions(driveToBackdropPlace(RED_ALLIANCE, LOCATION, false, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, MAXIMUM_VELOCITY_SLOW);
 
                 // Wait for a bit.
                 trajectorySequenceBuilder.waitSeconds(1);
@@ -155,7 +159,7 @@ public class MeepMeepTesting {
         if(START_CLOSE || objectives == PURPLE_YELLOW || objectives == PURPLE_YELLOW_WHITE) {
 
             // Park.
-            applyActions(park(RED_ALLIANCE, PARK_LEFT), trajectorySequenceBuilder, true);
+            applyActions(park(RED_ALLIANCE, PARK_LEFT), trajectorySequenceBuilder, maximumVelocityFast);
 
         }
 
@@ -170,10 +174,7 @@ public class MeepMeepTesting {
 
     }
 
-    public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder, boolean fast) throws Exception {
-
-        // Get a maximum velocity.
-        double maximumVelocity = fast ? MAXIMUM_VELOCITY_FAST : MAXIMUM_VELOCITY_SLOW;
+    public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder, double maximumVelocity) throws Exception {
 
         // Construct a velocity constraint.
         TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(maximumVelocity, TRACK_WIDTH);

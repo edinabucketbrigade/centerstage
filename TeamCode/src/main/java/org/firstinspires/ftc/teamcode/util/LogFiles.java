@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.util;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_VELOCITY;
-import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_NORMAL;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 
 import android.annotation.SuppressLint;
@@ -67,7 +67,7 @@ public final class LogFiles {
         public double kV = DriveConstants.kV;
         public double kA = DriveConstants.kA;
         public double kStatic = DriveConstants.kStatic;
-        public double maxVel = MAXIMUM_VELOCITY_FAST;
+        public double maxVel = MAXIMUM_VELOCITY_NORMAL;
         public double maxAccel = MAXIMUM_ACCELERATION;
         public double maxAngVel = MAXIMUM_ANGULAR_VELOCITY;
         public double maxAngAccel = MAXIMUM_ANGULAR_ACCELERATION;

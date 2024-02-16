@@ -46,7 +46,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_VELOCITY;
-import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_NORMAL;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 
 /*
@@ -63,7 +63,7 @@ public class SampleTankDrive extends TankDrive {
 
     private TrajectorySequenceRunner trajectorySequenceRunner;
 
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAXIMUM_VELOCITY_FAST, MAXIMUM_ANGULAR_VELOCITY, TRACK_WIDTH);
+    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAXIMUM_VELOCITY_NORMAL, MAXIMUM_ANGULAR_VELOCITY, TRACK_WIDTH);
     private static final TrajectoryAccelerationConstraint accelConstraint = getAccelerationConstraint(MAXIMUM_ACCELERATION);
 
     private TrajectoryFollower follower;

@@ -25,7 +25,8 @@ public class RobotRoutes {
     public static final int MAXIMUM_COLUMN_ODD_ROW = 6;
     public static final int MAXIMUM_POSITION = 1700;
     public static final int MAXIMUM_ROW = 8;
-    public static final double MAXIMUM_VELOCITY_FAST = 55;
+    public static final double MAXIMUM_VELOCITY_FAST = 65;
+    public static final double MAXIMUM_VELOCITY_NORMAL = 55;
     public static final double MAXIMUM_VELOCITY_SLOW = 25;
     public static final int MINIMUM_COLUMN = 1;
     public static final int MINIMUM_ROW = 1;
@@ -324,6 +325,15 @@ public class RobotRoutes {
 
     public static double getDefaultGrabStackY(boolean redAlliance) {
         return redAlliance ? DEFAULT_RED_GRAB_STACK_Y : DEFAULT_BLUE_GRAB_STACK_Y;
+    }
+
+    public static double getMaximumVelocityFast(boolean redAlliance, boolean startClose, TeamPropLocation location) {
+        if((redAlliance && !startClose && location == RIGHT) || (!redAlliance && !startClose && location == LEFT)) {
+            return MAXIMUM_VELOCITY_FAST;
+        }
+        else {
+            return MAXIMUM_VELOCITY_NORMAL;
+        }
     }
 
 }

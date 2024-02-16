@@ -12,7 +12,7 @@ import static bucketbrigade.casperlibrary.RobotRoutes.LIFT_INCREMENT;
 import static bucketbrigade.casperlibrary.RobotRoutes.LOW_FIRST_ROW_LIFT_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_POSITION;
-import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_NORMAL;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 import static bucketbrigade.casperlibrary.RobotRoutes.getDefaultPlaceBackdropX;
@@ -28,7 +28,6 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -130,7 +129,7 @@ public class HeatSeekC {
                 double approachTargetX = getDefaultPlaceBackdropX(redAlliance) - 10;
 
                 // Drive to the approach position.
-                startDrivingToBackdrop(MAXIMUM_VELOCITY_FAST, approachTargetX);
+                startDrivingToBackdrop(MAXIMUM_VELOCITY_NORMAL, approachTargetX);
 
                 // Advance to the next step.
                 setState(DRIVE_TO_PLACE_POSITION);

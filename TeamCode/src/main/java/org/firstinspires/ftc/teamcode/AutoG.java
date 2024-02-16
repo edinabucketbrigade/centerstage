@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
-import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_NORMAL;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 
 import android.util.Size;
@@ -20,7 +20,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
-import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagMetadata;
@@ -116,7 +115,7 @@ public class AutoG extends LinearOpMode {
         //Pose2d targetPose = new Pose2d(50, -35, Math.toRadians(180)); // red backdrop middle
 
         // Construct a velocity constraint.
-        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_FAST, TRACK_WIDTH);
+        TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_NORMAL, TRACK_WIDTH);
 
         // Construct an acceleration constraint.
         TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);

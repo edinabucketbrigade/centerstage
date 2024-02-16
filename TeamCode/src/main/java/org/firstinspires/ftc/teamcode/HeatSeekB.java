@@ -22,7 +22,7 @@ import static org.firstinspires.ftc.teamcode.RobotHardwareB.getMaximumColumn;
 import static org.firstinspires.ftc.teamcode.RobotHardwareB.isEven;
 
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
-import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_NORMAL;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -34,7 +34,6 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -114,7 +113,7 @@ public class HeatSeekB {
                 Pose2d targetPose = new Pose2d(targetPosition, Math.toRadians(180));
 
                 // Construct a velocity constraint.
-                TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_FAST, TRACK_WIDTH);
+                TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(MAXIMUM_VELOCITY_NORMAL, TRACK_WIDTH);
 
                 // Construct an acceleration constraint.
                 TrajectoryAccelerationConstraint accelerationConstraint = new ProfileAccelerationConstraint(MAXIMUM_ACCELERATION);

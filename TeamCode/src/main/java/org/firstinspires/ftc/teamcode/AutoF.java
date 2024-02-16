@@ -21,7 +21,6 @@ import static bucketbrigade.casperlibrary.Objectives.PURPLE_YELLOW_WHITE;
 import static bucketbrigade.casperlibrary.RobotRoutes.HIGH_FIRST_ROW_LIFT_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.LOW_FIRST_ROW_LIFT_POSITION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
-import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_SLOW;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 import static bucketbrigade.casperlibrary.RobotRoutes.WHITE_PIXEL_ROW;
@@ -31,6 +30,7 @@ import static bucketbrigade.casperlibrary.RobotRoutes.driveToBackdropPlace;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToSpikeMark;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToStackApproach;
 import static bucketbrigade.casperlibrary.RobotRoutes.driveToStackGrab;
+import static bucketbrigade.casperlibrary.RobotRoutes.getMaximumVelocityFast;
 import static bucketbrigade.casperlibrary.RobotRoutes.park;
 import static bucketbrigade.casperlibrary.RobotRoutes.returnToBackdrop;
 
@@ -43,7 +43,6 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -737,9 +736,10 @@ public class AutoF extends LinearOpMode {
 
         boolean redAlliance = launchMenu.redAlliance;
         boolean startClose = launchMenu.startClose;
+        double maximumVelocityFast = getMaximumVelocityFastHelper();
 
         // Drive to the spike mark.
-        applyActions(driveToSpikeMark(redAlliance, startClose, location), trajectorySequenceBuilder, true);
+        applyActions(driveToSpikeMark(redAlliance, startClose, location), trajectorySequenceBuilder, maximumVelocityFast);
 
         // Build the trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -763,7 +763,7 @@ public class AutoF extends LinearOpMode {
         double placeBackdropY = launchMenu.placeBackdropY;
 
         // Drive to the place.
-        applyActions(driveToBackdropPlace(redAlliance, location, placingYellowPixel, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, false);
+        applyActions(driveToBackdropPlace(redAlliance, location, placingYellowPixel, placeBackdropX, placeBackdropY), trajectorySequenceBuilder, MAXIMUM_VELOCITY_SLOW);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -787,9 +787,10 @@ public class AutoF extends LinearOpMode {
         double placeBackdropY = launchMenu.placeBackdropY;
         boolean redAlliance = launchMenu.redAlliance;
         boolean startClose = launchMenu.startClose;
+        double maximumVelocityFast = getMaximumVelocityFastHelper();
 
         // Drive to the backdrop.
-        applyActions(driveToBackdropApproach(redAlliance, startClose, location, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, true);
+        applyActions(driveToBackdropApproach(redAlliance, startClose, location, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, maximumVelocityFast);
 
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -811,21 +812,11 @@ public class AutoF extends LinearOpMode {
         double grabStackX = launchMenu.grabStackX;
         double grabStackY = launchMenu.grabStackY;
         boolean redAlliance = launchMenu.redAlliance;
+        double maximumVelocityFast = getMaximumVelocityFastHelper();
 
         // Drive to the stack approach position.
-        applyActions(driveToStackApproach(redAlliance, grabStackX, grabStackY), trajectorySequenceBuilder, true);
-/*
-        // During the sequence...
-        trajectorySequenceBuilder.addTemporalMarker(4, () -> {
+        applyActions(driveToStackApproach(redAlliance, grabStackX, grabStackY), trajectorySequenceBuilder, maximumVelocityFast);
 
-            // Lower the wrist.
-            robotHardware.setWristGround();
-
-            // Open the claw.
-            robotHardware.openClaw(true);
-
-        });
-*/
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
 
@@ -848,7 +839,7 @@ public class AutoF extends LinearOpMode {
         boolean redAlliance = launchMenu.redAlliance;
 
         // Drive to the stack grab position.
-        applyActions(driveToStackGrab(redAlliance, grabStackX, grabStackY), trajectorySequenceBuilder, false);
+        applyActions(driveToStackGrab(redAlliance, grabStackX, grabStackY), trajectorySequenceBuilder, MAXIMUM_VELOCITY_SLOW);
 
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -868,21 +859,11 @@ public class AutoF extends LinearOpMode {
 
         boolean redAlliance = launchMenu.redAlliance;
         boolean parkLeft = launchMenu.parkLeft;
+        double maximumVelocityFast = getMaximumVelocityFastHelper();
 
         // Park.
-        applyActions(park(redAlliance, parkLeft), trajectorySequenceBuilder, true);
-/*
-        // During the sequence...
-        trajectorySequenceBuilder.addTemporalMarker(2, () -> {
+        applyActions(park(redAlliance, parkLeft), trajectorySequenceBuilder, maximumVelocityFast);
 
-            // Lower the wrist.
-            robotHardware.setWristGround();
-
-            // Open the claw.
-            robotHardware.openClaw(true);
-
-        });
-*/
         // Get a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
 
@@ -903,9 +884,10 @@ public class AutoF extends LinearOpMode {
         double placeBackdropX = launchMenu.placeBackdropX;
         double placeBackdropY = launchMenu.placeBackdropY;
         boolean redAlliance = launchMenu.redAlliance;
+        double maximumVelocityFast = getMaximumVelocityFastHelper();
 
         // Return to backdrop.
-        applyActions(returnToBackdrop(redAlliance, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, true);
+        applyActions(returnToBackdrop(redAlliance, placeBackdropX, placeBackdropY, grabStackY), trajectorySequenceBuilder, maximumVelocityFast);
 
         // Construct a trajectory sequence.
         TrajectorySequence trajectorySequence = trajectorySequenceBuilder.build();
@@ -915,10 +897,7 @@ public class AutoF extends LinearOpMode {
 
     }
 
-    public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder, boolean fast) throws InterruptedException {
-
-        // Get a maximum velocity.
-        double maximumVelocity = fast ? MAXIMUM_VELOCITY_FAST : MAXIMUM_VELOCITY_SLOW;
+    public static void applyActions(List<Action> actions, TrajectorySequenceBuilder trajectorySequenceBuilder, double maximumVelocity) throws InterruptedException {
 
         // Construct a velocity constraint.
         TrajectoryVelocityConstraint velocityConstraint = new MecanumVelocityConstraint(maximumVelocity, TRACK_WIDTH);
@@ -973,5 +952,13 @@ public class AutoF extends LinearOpMode {
         }
 
     }
+
+    private double getMaximumVelocityFastHelper() {
+        boolean redAlliance = launchMenu.redAlliance;
+        boolean startClose = launchMenu.startClose;
+        double maximumVelocityFast = getMaximumVelocityFast(redAlliance, startClose, location);
+        return maximumVelocityFast;
+    }
+
 
 }

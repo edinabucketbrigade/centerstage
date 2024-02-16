@@ -18,17 +18,13 @@ import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationCon
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
@@ -47,7 +43,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_ACCELERATION;
 import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_ANGULAR_VELOCITY;
-import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_FAST;
+import static bucketbrigade.casperlibrary.RobotRoutes.MAXIMUM_VELOCITY_NORMAL;
 import static bucketbrigade.casperlibrary.RobotRoutes.TRACK_WIDTH;
 
 /*
@@ -66,7 +62,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private TrajectorySequenceRunner trajectorySequenceRunner;
 
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAXIMUM_VELOCITY_FAST, MAXIMUM_ANGULAR_VELOCITY, TRACK_WIDTH);
+    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAXIMUM_VELOCITY_NORMAL, MAXIMUM_ANGULAR_VELOCITY, TRACK_WIDTH);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAXIMUM_ACCELERATION);
 
     private static final Pose2d ADMISSIBLE_ERROR_POSE = new Pose2d(0.5, 0.5, Math.toRadians(2));
