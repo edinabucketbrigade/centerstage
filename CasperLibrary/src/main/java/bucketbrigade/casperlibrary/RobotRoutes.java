@@ -44,7 +44,7 @@ public class RobotRoutes {
 
     // Red defaults
     public static final double DEFAULT_RED_PLACE_BACKDROP_X = DEFAULT_BLUE_PLACE_BACKDROP_X;
-    public static final double DEFAULT_RED_PLACE_BACKDROP_Y = 40.5;
+    public static final double DEFAULT_RED_PLACE_BACKDROP_Y = DEFAULT_BLUE_PLACE_BACKDROP_Y;
     public static final double DEFAULT_RED_GRAB_STACK_X = DEFAULT_BLUE_GRAB_STACK_X;
     public static final double DEFAULT_RED_GRAB_STACK_Y = 9;
 
